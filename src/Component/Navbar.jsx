@@ -50,8 +50,9 @@ const Navbar = () => {
           className="flex items-center space-x-2 font-bold text-xl"
           onClick={handleNavLinkClick}
         >
+          {/* Replace '/logo.png' with your actual logo path or remove this img if no logo */}
           <img
-            src="" // Replace with your actual logo path
+            src="/logo.png"
             alt="Logo"
             className="h-8 w-8"
           />
@@ -60,8 +61,14 @@ const Navbar = () => {
 
         {/* Middle: Navigation Links for md+ */}
         <div className="hidden md:flex space-x-6">
-          {["/", "/meals", "/upcoming-meals"].map((path, idx) => {
-            const text = path === "/" ? "Home" : path.slice(1).replace("-", " ").replace(/\b\w/g, (c) => c.toUpperCase());
+          {["/", "/meals", "/upcoming-meals"].map((path) => {
+            const text =
+              path === "/"
+                ? "Home"
+                : path
+                    .slice(1)
+                    .replace("-", " ")
+                    .replace(/\b\w/g, (c) => c.toUpperCase());
             return (
               <NavLink
                 key={path}
