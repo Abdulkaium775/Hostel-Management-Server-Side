@@ -1,47 +1,108 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter } from "react-router";
 import Root from "../Root/Root";
 import Home from "../Component/Home";
 import Login from "../Component/Login";
 import Register from "../Component/Register";
-import Meals from "../Component/Meals";
 import UpcomingMeals from "../Component/UpcomingMeals";
 import JoinUs from "../Component/JoinUs";
 import Dashboard from "../Component/Dashboard";
-
-
+import { MyProfile } from "../Component/MyProfile";
+import RequestedMeals from "../Component/RequestedMeals";
+import MyReviews from "../Component/MyReviews";
+import PaymentHistory from "../Component/PaymentHistory";
+import { AdminProfile } from "../Component/AdminProfile";
+import ManageUsers from "../Component/ManageUsers";
+import AddMeal from "../Component/AddMeal";
+import AllMeals from "../Component/AllMeals";
+import AllReviews from "../Component/AllReviews";
+import ServeMeals from "../Component/ServeMeals";
+import Meals from "../Component/Meals";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
     children: [
-      {
-        index: true,
-        element: <Home />,
-      },
-      {
-        path: "login",
-        element: <Login />,
-      },
-      {
-        path: "register",
-        element: <Register />,
-      },
-      {
-        path: "meals",
-        element: <Meals />,
-      },
-      {
-        path: "upcoming-meals",
-        element: <UpcomingMeals />,
-      },
-      {
-        path: "join-us",
-        element: <JoinUs />,
-      },
+      { index: true, element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "register", element: <Register /> },
+      { path: "meals", element: <Meals /> },
+      { path: "upcoming-meals", element: <UpcomingMeals/> },
+      { path: "join-us", element: <JoinUs /> },
+
+      // ✅ Dashboard Routes (Nested inside Layout)
       {
         path: "dashboard",
-        element: <Dashboard />,
+        element: (
+         
+            <Dashboard />
+      
+        ),
+        children: [
+          //  User Dashboard Routes
+          { path: "my-profile", element: <MyProfile /> },
+          { path: "requested-meals", element: <RequestedMeals/> },
+          { path: "my-reviews", element: <MyReviews /> },
+          { path: "payment-history", element: <PaymentHistory /> },
+
+          // 🛡️ Admin Dashboard Routes
+          {
+            path: "admin-profile",
+            element: (
+       
+                <AdminProfile />
+          
+            ),
+          },
+          {
+            path: "manage-users",
+            element: (
+             
+                <ManageUsers />
+            
+            ),
+          },
+          {
+            path: "add-meal",
+            element: (
+          
+                <AddMeal />
+  
+            ),
+          },
+          {
+            path: "all-meals",
+            element: (
+      
+                <AllMeals />
+        
+            ),
+          },
+          {
+            path: "all-reviews",
+            element: (
+           
+                <AllReviews />
+          
+            ),
+          },
+          {
+            path: "serve-meals",
+            element: (
+             
+                <ServeMeals />
+       
+            ),
+          },
+          {
+            path: "upcoming-meals",
+            element: (
+              
+                <UpcomingMeals />
+            
+            ),
+          },
+        ],
       },
     ],
   },
