@@ -1,22 +1,22 @@
-import React, { useState, useRef, useContext } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FiEye, FiEyeOff } from 'react-icons/fi';
-import { FcGoogle } from 'react-icons/fc';
-import { toast } from 'react-toastify';
-import { AuthContext } from '../Auth/AuthContext';
-import { motion, useAnimation } from 'framer-motion';
+import React, { useState, useContext, useRef } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FiEye, FiEyeOff } from "react-icons/fi";
+import { FcGoogle } from "react-icons/fc";
+import { toast } from "react-toastify";
+import { AuthContext } from "../Auth/AuthContext";
+import { motion, useAnimation } from "framer-motion";
+import { useForm } from "react-hook-form";
 
 const CartoonCharacter = () => {
-  // Controls for blinking eyes
   const controls = useAnimation();
 
   React.useEffect(() => {
     const sequence = async () => {
       while (true) {
-        await controls.start({ scaleY: 1, transition: { duration: 0.1 } }); // eyes open
-        await new Promise(r => setTimeout(r, 2000));
-        await controls.start({ scaleY: 0.1, transition: { duration: 0.1 } }); // eyes closed
-        await new Promise(r => setTimeout(r, 200));
+        await controls.start({ scaleY: 1, transition: { duration: 0.1 } });
+        await new Promise((r) => setTimeout(r, 2000));
+        await controls.start({ scaleY: 0.1, transition: { duration: 0.1 } });
+        await new Promise((r) => setTimeout(r, 200));
       }
     };
     sequence();
@@ -29,7 +29,6 @@ const CartoonCharacter = () => {
       className="fixed top-8 left-8 w-24 h-24 bg-yellow-400 rounded-full flex flex-col items-center justify-center shadow-lg cursor-default select-none"
       title="Hey! Welcome to the login page"
     >
-      {/* Eyes */}
       <div className="flex justify-between w-12">
         <motion.div
           animate={controls}
@@ -44,7 +43,6 @@ const CartoonCharacter = () => {
           className="w-4 h-4 bg-black rounded-full"
         />
       </div>
-      {/* Mouth */}
       <div className="w-8 h-2 bg-black rounded-b-full mt-1" />
     </motion.div>
   );
@@ -54,24 +52,26 @@ const Login = () => {
   const { createUserWithGoogle, setUser, loginUser } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
-  const emailRef = useRef();
   const [showPassword, setShowPassword] = useState(false);
 
-  const togglePassword = () => setShowPassword(prev => !prev);
+  const togglePassword = () => setShowPassword((prev) => !prev);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
-    loginUser(email, password)
-      .then((userCredential) => {
-        const currentUser = userCredential.user;
-        toast.success(`Welcome back ${currentUser.displayName}`);
-        navigate(location?.state || '/');
-      })
-      .catch((error) => {
-        toast.warning(error.code);
-      });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const onSubmit = async (data) => {
+    const { email, password } = data;
+    try {
+      const userCredential = await loginUser(email, password);
+      const currentUser = userCredential.user;
+      toast.success(`Welcome back ${currentUser.displayName}`);
+      navigate(location?.state || "/");
+    } catch (error) {
+      toast.warning(error.code || "Login failed");
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -80,7 +80,7 @@ const Login = () => {
         const currentUser = result.user;
         setUser(currentUser);
         toast.success(`Welcome back ${currentUser.displayName}`);
-        navigate(location?.state || '/');
+        navigate(location?.state || "/");
       })
       .catch(() => {
         toast.error("Google login failed.");
@@ -99,29 +99,33 @@ const Login = () => {
       >
         <div className="bg-white w-full max-w-md p-8 rounded-xl shadow-xl">
           <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Login</h2>
-          
-          <form onSubmit={handleLogin} className="space-y-4">
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
               <label className="block mb-1 text-sm text-gray-600">Email</label>
               <input
                 type="email"
-                name="email"
-                required
-                className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none"
                 placeholder="Type your email"
-                ref={emailRef}
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^\S+@\S+$/i,
+                    message: "Invalid email address",
+                  },
+                })}
+                className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none"
               />
+              {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
             </div>
 
             <div>
               <label className="block mb-1 text-sm text-gray-600">Password</label>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  required
-                  className="w-full px-4 py-2 border rounded-md pr-10 focus:ring-2 focus:ring-indigo-400 outline-none"
+                  type={showPassword ? "text" : "password"}
                   placeholder="Type your password"
+                  {...register("password", { required: "Password is required" })}
+                  className="w-full px-4 py-2 border rounded-md pr-10 focus:ring-2 focus:ring-indigo-400 outline-none"
                 />
                 <span
                   onClick={togglePassword}
@@ -132,6 +136,7 @@ const Login = () => {
                   {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
                 </span>
               </div>
+              {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
             </div>
 
             <div className="text-right">
