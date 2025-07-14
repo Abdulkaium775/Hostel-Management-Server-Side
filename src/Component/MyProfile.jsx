@@ -1,46 +1,23 @@
 import React, { useContext } from "react";
 import { AuthContext } from "../Auth/AuthContext";
 
-export const MyProfile = () => {
+const MyProfile = () => {
   const { user } = useContext(AuthContext);
 
-  if (!user) {
-    return <p>Loading user info...</p>;
-  }
+  if (!user) return <p>Loading user info...</p>;
 
   return (
-    <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md mt-6">
-      <h2 className="text-3xl font-bold mb-4 text-center">My Profile</h2>
-      
-      <div className="flex flex-col items-center gap-4">
-        {user.photoURL ? (
-          <img
-            src={user.photoURL}
-            alt={`${user.displayName}'s profile`}
-            className="w-24 h-24 rounded-full object-cover border-2 border-indigo-500"
-          />
-        ) : (
-          <div className="w-24 h-24 rounded-full bg-gray-300 flex items-center justify-center text-3xl text-gray-600">
-            {user.displayName?.charAt(0).toUpperCase() || "U"}
-          </div>
-        )}
-
+    <div className="p-5 space-y-4">
+      <h2 className="text-2xl font-bold">My Profile</h2>
+      <div className="bg-white p-4 rounded shadow-md w-full max-w-md mx-auto space-y-3">
+        <img src={user.photoURL} alt="Profile" className="w-24 h-24 rounded-full mx-auto" />
+        <h3 className="text-xl font-semibold text-center">{user.displayName}</h3>
+        <p className="text-center">{user.email}</p>
         <div className="text-center">
-          <p className="text-xl font-semibold">{user.displayName || "No Name"}</p>
-          <p className="text-gray-600">{user.email}</p>
-        </div>
-
-        <div>
-          <span
-            className={`inline-block px-4 py-1 rounded-full text-white font-semibold
-              ${
-                user.badge === "Gold"
-                  ? "bg-yellow-500"
-                  : user.badge === "Silver"
-                  ? "bg-gray-400"
-                  : "bg-yellow-800" /* Bronze as default */
-              }`}
-          >
+          <span className={`inline-block px-3 py-1 rounded-full text-white ${
+            user.badge === "Gold" ? "bg-yellow-500" :
+            user.badge === "Silver" ? "bg-gray-400" : "bg-orange-500"
+          }`}>
             {user.badge || "Bronze"}
           </span>
         </div>
@@ -48,3 +25,5 @@ export const MyProfile = () => {
     </div>
   );
 };
+
+export default MyProfile;

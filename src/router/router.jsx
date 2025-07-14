@@ -6,8 +6,8 @@ import Register from "../Component/Register";
 import UpcomingMeals from "../Component/UpcomingMeals";
 import JoinUs from "../Component/JoinUs";
 import Dashboard from "../Component/Dashboard";
-import { MyProfile } from "../Component/MyProfile";
-import RequestedMeals from "../Component/RequestedMeals";
+
+
 import MyReviews from "../Component/MyReviews";
 import PaymentHistory from "../Component/PaymentHistory";
 import { AdminProfile } from "../Component/AdminProfile";
@@ -17,6 +17,9 @@ import AllMeals from "../Component/AllMeals";
 import AllReviews from "../Component/AllReviews";
 import ServeMeals from "../Component/ServeMeals";
 import Meals from "../Component/Meals";
+import RequestedMeals from "../Component/RequestedMeals";
+import MyProfile from "../Component/MyProfile";
+
 
 export const router = createBrowserRouter([
   {
