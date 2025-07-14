@@ -19,6 +19,7 @@ import ServeMeals from "../Component/ServeMeals";
 import Meals from "../Component/Meals";
 import RequestedMeals from "../Component/RequestedMeals";
 import MyProfile from "../Component/MyProfile";
+import MealDetails from "../Component/MealDetails";
 
 
 export const router = createBrowserRouter([
@@ -30,6 +31,7 @@ export const router = createBrowserRouter([
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
       { path: "meals", element: <Meals /> },
+      { path: "meal/:id", element: <MealDetails /> },
       { path: "upcoming-meals", element: <UpcomingMeals/> },
       { path: "join-us", element: <JoinUs /> },
 
