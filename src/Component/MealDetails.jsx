@@ -19,13 +19,24 @@ const MealDetails = () => {
       try {
         const { data } = await axiosInstance.get(`/meals/${id}`);
         setMeal(data);
-        setReviews(data.reviews || []);
+        fetchReviews();
       } catch (err) {
         console.error('Failed to load meal:', err);
+        setMeal(null);
       } finally {
         setLoading(false);
       }
     };
+
+    const fetchReviews = async () => {
+      try {
+        const { data } = await axiosInstance.get(`/reviews/${id}`);
+        setReviews(data);
+      } catch (error) {
+        console.error('Failed to fetch reviews:', error);
+      }
+    };
+
     fetchMeal();
   }, [id]);
 
@@ -33,8 +44,8 @@ const MealDetails = () => {
     if (!user) return toast.error('Please log in to like');
 
     try {
-      const { data } = await axiosInstance.patch(`/meals/like/${id}`);
-      setMeal((prev) => ({ ...prev, likes: data.likes }));
+      await axiosInstance.patch(`/meals/${id}/like`);
+      setMeal((prev) => ({ ...prev, likes: (prev.likes || 0) + 1 }));
     } catch (err) {
       console.error(err);
       toast.error('Failed to like');
@@ -50,10 +61,8 @@ const MealDetails = () => {
     try {
       const payload = {
         mealId: id,
-        title: meal.title,
         userEmail: user.email,
         userName: user.displayName,
-        status: 'pending',
       };
       await axiosInstance.post('/meal-requests', payload);
       toast.success('Meal request submitted!');
@@ -71,13 +80,9 @@ const MealDetails = () => {
     try {
       const payload = {
         mealId: id,
-        mealTitle: meal.title,
-        reviewer: {
-          email: user.email,
-          name: user.displayName,
-        },
-        review: reviewText,
-        time: new Date(),
+        userEmail: user.email,
+        userName: user.displayName,
+        comment: reviewText,
       };
       const { data } = await axiosInstance.post('/reviews', payload);
       setReviews((prev) => [data, ...prev]);
@@ -105,6 +110,9 @@ const MealDetails = () => {
           className="w-full h-64 object-cover rounded"
         />
         <h1 className="text-3xl font-bold mt-4">{meal.title}</h1>
+        {meal.distributor && (
+          <p className="text-sm text-gray-500 mt-1">Distributed by: {meal.distributor}</p>
+        )}
         <p className="text-indigo-600 mt-2 font-medium">{meal.category}</p>
         <p className="text-gray-700 mt-2">{meal.description}</p>
         <p className="mt-2 text-sm text-gray-500">
@@ -159,11 +167,11 @@ const MealDetails = () => {
           <ul className="space-y-4">
             {reviews.map((rev, idx) => (
               <li key={idx} className="bg-white p-4 rounded shadow">
-                <p className="font-semibold">{rev.reviewer?.name || 'Anonymous'}</p>
+                <p className="font-semibold">{rev.userName || 'Anonymous'}</p>
                 <p className="text-sm text-gray-600">
-                  {new Date(rev.time).toLocaleString()}
+                  {new Date(rev.createdAt || rev.time).toLocaleString()}
                 </p>
-                <p className="mt-2">{rev.review}</p>
+                <p className="mt-2">{rev.comment || rev.review}</p>
               </li>
             ))}
           </ul>
