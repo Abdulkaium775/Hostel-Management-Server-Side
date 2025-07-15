@@ -14,11 +14,7 @@ const MembershipSection = () => {
     {
       name: "Gold",
       price: "$29.99",
-      benefits: [
-        "All Silver Benefits",
-        "Faster Meal Approval",
-        "Bonus Points",
-      ],
+      benefits: ["All Silver Benefits", "Faster Meal Approval", "Bonus Points"],
       icon: <FaStar className="text-3xl text-yellow-500" />,
       bg: "bg-white",
       ring: "ring-yellow-300",
@@ -49,7 +45,7 @@ const MembershipSection = () => {
           <Link
             to={`/checkout/${pkg.name.toLowerCase()}`}
             key={pkg.name}
-            className={`relative rounded-3xl p-6 shadow-xl border-t-4 border-indigo-100 hover:shadow-2xl transform hover:scale-105 transition-all duration-300 ${pkg.bg} ring-2 ${pkg.ring}`}
+            className={`relative rounded-3xl p-6 shadow-xl border-t-4 border-indigo-100 hover:shadow-2xl transform hover:scale-105 transition-all duration-300 ${pkg.bg} ring-2 ${pkg.ring} flex flex-col`}
           >
             {/* Ribbon for Gold plan */}
             {pkg.name === "Gold" && (
@@ -58,7 +54,7 @@ const MembershipSection = () => {
               </div>
             )}
 
-            <div className="flex flex-col items-center text-center">
+            <div className="flex flex-col items-center text-center flex-grow">
               <div className="mb-4">{pkg.icon}</div>
               <h3 className="text-2xl font-bold text-indigo-700 mb-2">
                 {pkg.name} Package
@@ -76,10 +72,14 @@ const MembershipSection = () => {
                   </li>
                 ))}
               </ul>
-              <button className="mt-auto px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-medium shadow">
-                Choose {pkg.name}
-              </button>
             </div>
+
+            <button
+              type="button"
+              className="mt-auto px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-medium shadow"
+            >
+              Choose {pkg.name}
+            </button>
           </Link>
         ))}
       </div>

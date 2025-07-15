@@ -7,7 +7,6 @@ import UpcomingMeals from "../Component/UpcomingMeals";
 import JoinUs from "../Component/JoinUs";
 import Dashboard from "../Component/Dashboard";
 
-
 import MyReviews from "../Component/MyReviews";
 import PaymentHistory from "../Component/PaymentHistory";
 import { AdminProfile } from "../Component/AdminProfile";
@@ -21,6 +20,7 @@ import RequestedMeals from "../Component/RequestedMeals";
 import MyProfile from "../Component/MyProfile";
 import MealDetails from "../Component/MealDetails";
 
+import CheckoutPage from "../Component/CheckoutPage";  // <-- import CheckoutPage
 
 export const router = createBrowserRouter([
   {
@@ -32,81 +32,30 @@ export const router = createBrowserRouter([
       { path: "register", element: <Register /> },
       { path: "meals", element: <Meals /> },
       { path: "meal/:id", element: <MealDetails /> },
-      { path: "upcoming-meals", element: <UpcomingMeals/> },
+      { path: "upcoming-meals", element: <UpcomingMeals /> },
       { path: "join-us", element: <JoinUs /> },
+
+      // Add checkout route here
+      { path: "checkout/:packageName", element: <CheckoutPage /> },
 
       // ✅ Dashboard Routes (Nested inside Layout)
       {
         path: "dashboard",
-        element: (
-         
-            <Dashboard />
-      
-        ),
+        element: <Dashboard />,
         children: [
-          //  User Dashboard Routes
           { path: "my-profile", element: <MyProfile /> },
-          { path: "requested-meals", element: <RequestedMeals/> },
+          { path: "requested-meals", element: <RequestedMeals /> },
           { path: "my-reviews", element: <MyReviews /> },
           { path: "payment-history", element: <PaymentHistory /> },
 
-          // 🛡️ Admin Dashboard Routes
-          {
-            path: "admin-profile",
-            element: (
-       
-                <AdminProfile />
-          
-            ),
-          },
-          {
-            path: "manage-users",
-            element: (
-             
-                <ManageUsers />
-            
-            ),
-          },
-          {
-            path: "add-meal",
-            element: (
-          
-                <AddMeal />
-  
-            ),
-          },
-          {
-            path: "all-meals",
-            element: (
-      
-                <AllMeals />
-        
-            ),
-          },
-          {
-            path: "all-reviews",
-            element: (
-           
-                <AllReviews />
-          
-            ),
-          },
-          {
-            path: "serve-meals",
-            element: (
-             
-                <ServeMeals />
-       
-            ),
-          },
-          {
-            path: "upcoming-meals",
-            element: (
-              
-                <UpcomingMeals />
-            
-            ),
-          },
+          // Admin routes
+          { path: "admin-profile", element: <AdminProfile /> },
+          { path: "manage-users", element: <ManageUsers /> },
+          { path: "add-meal", element: <AddMeal /> },
+          { path: "all-meals", element: <AllMeals /> },
+          { path: "all-reviews", element: <AllReviews /> },
+          { path: "serve-meals", element: <ServeMeals /> },
+          { path: "upcoming-meals", element: <UpcomingMeals /> },
         ],
       },
     ],

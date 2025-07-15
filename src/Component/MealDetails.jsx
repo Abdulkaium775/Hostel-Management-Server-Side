@@ -19,7 +19,7 @@ const MealDetails = () => {
       try {
         const { data } = await axiosInstance.get(`/meals/${id}`);
         setMeal(data);
-        fetchReviews();
+        await fetchReviews();
       } catch (err) {
         console.error('Failed to load meal:', err);
         setMeal(null);
@@ -41,11 +41,15 @@ const MealDetails = () => {
   }, [id]);
 
   const handleLike = async () => {
-    if (!user) return toast.error('Please log in to like');
+    if (!user) {
+      toast.error('Please log in to like');
+      return;
+    }
 
     try {
       await axiosInstance.patch(`/meals/${id}/like`);
       setMeal((prev) => ({ ...prev, likes: (prev.likes || 0) + 1 }));
+      toast.success('Liked!');
     } catch (err) {
       console.error(err);
       toast.error('Failed to like');
@@ -53,9 +57,13 @@ const MealDetails = () => {
   };
 
   const handleRequest = async () => {
-    if (!user) return toast.error('Please log in to request');
+    if (!user) {
+      toast.error('Please log in to request');
+      return;
+    }
     if (!user.badge || user.badge === 'Bronze') {
-      return toast.error('Upgrade your package to request meals');
+      toast.error('Upgrade your package to request meals');
+      return;
     }
 
     try {
@@ -74,8 +82,14 @@ const MealDetails = () => {
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
-    if (!user) return toast.error('Please log in to post review');
-    if (!reviewText.trim()) return;
+    if (!user) {
+      toast.error('Please log in to post review');
+      return;
+    }
+    if (!reviewText.trim()) {
+      toast.error('Review cannot be empty');
+      return;
+    }
 
     try {
       const payload = {
@@ -94,12 +108,19 @@ const MealDetails = () => {
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
-  if (!meal) return <p className="text-center mt-10 text-red-600">Meal not found.</p>;
+  if (loading)
+    return <p className="text-center mt-10 text-lg font-medium">Loading...</p>;
+  if (!meal)
+    return (
+      <p className="text-center mt-10 text-red-600 font-semibold">Meal not found.</p>
+    );
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <button onClick={() => navigate(-1)} className="text-indigo-600 mb-4 hover:underline">
+      <button
+        onClick={() => navigate(-1)}
+        className="text-indigo-600 mb-4 hover:underline"
+      >
         ← Back
       </button>
 
