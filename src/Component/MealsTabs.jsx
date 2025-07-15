@@ -18,7 +18,7 @@ const MealsTabs = () => {
         const { data } = await axiosInstance.get('/meals', {
           params: { category: activeTab, limit: 3 },
         });
-        setMeals(data.meals);
+        setMeals(data.meals || []);
       } catch (error) {
         console.error('Error fetching meals:', error);
       } finally {
@@ -30,14 +30,14 @@ const MealsTabs = () => {
   }, [activeTab]);
 
   return (
-    <div className="max-w-6xl mx-auto p-6 min-h-screen bg-gray-50">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 min-h-screen bg-gray-50">
       {/* Tabs */}
-      <div className="flex justify-center space-x-6 mb-8">
+      <div className="flex flex-wrap justify-center gap-3 mb-8">
         {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => setActiveTab(cat)}
-            className={`px-6 py-2 rounded-full font-semibold transition ${
+            className={`px-5 py-2 rounded-full text-sm sm:text-base font-semibold transition duration-300 ${
               activeTab === cat
                 ? 'bg-indigo-600 text-white shadow-md'
                 : 'bg-white text-indigo-600 border border-indigo-600 hover:bg-indigo-100'
@@ -52,7 +52,7 @@ const MealsTabs = () => {
       {loading ? (
         <p className="text-center text-gray-500 text-lg">Loading meals...</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {meals.length === 0 && (
             <p className="text-center col-span-full text-gray-500">
               No meals available in this category.
@@ -62,23 +62,27 @@ const MealsTabs = () => {
           {meals.map((meal) => (
             <div
               key={meal._id}
-              className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300"
+              className="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden"
             >
               <img
                 src={meal.image || 'https://via.placeholder.com/400x240?text=No+Image'}
                 alt={meal.title}
                 className="w-full h-48 object-cover"
               />
-              <div className="p-5">
-                <h2 className="text-2xl font-semibold text-gray-900 truncate">{meal.title}</h2>
-                <p className="mt-2 text-yellow-500 font-semibold">
+              <div className="p-4 sm:p-5">
+                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 truncate">
+                  {meal.title}
+                </h2>
+                <p className="mt-2 text-yellow-500 text-sm sm:text-base font-semibold">
                   {Array(Math.round(meal.rating || 0)).fill('★').join('')}
                   {Array(5 - Math.round(meal.rating || 0)).fill('☆').join('')}
                 </p>
-                <p className="text-xl font-bold mt-4">${meal.price != null ? meal.price.toFixed(2) : '0.00'}</p>
+                <p className="text-lg sm:text-xl font-bold mt-3">
+                  ${meal.price != null ? meal.price.toFixed(2) : '0.00'}
+                </p>
                 <button
                   onClick={() => navigate(`/meal/${meal._id}`)}
-                  className="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg font-semibold transition-colors duration-300 shadow-md"
+                  className="mt-5 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 sm:py-3 rounded-md font-semibold transition"
                 >
                   Details
                 </button>
