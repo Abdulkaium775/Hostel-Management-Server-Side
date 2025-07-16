@@ -31,9 +31,15 @@ const UpcomingMeals = () => {
       return navigate('/join-us');
     }
 
-    const isPremium = ['Silver', 'Gold', 'Platinum'].includes(user?.badge);
+    const isPremium = ['Silver', 'Gold', 'Platinum'].includes(user.badge);
     if (!isPremium) {
       toast.error('Only premium users can like meals.');
+      return;
+    }
+
+    const meal = meals.find((m) => m._id === mealId);
+    if (meal?.likedBy?.includes(user.email)) {
+      toast.error('You have already liked this meal.');
       return;
     }
 
@@ -43,20 +49,20 @@ const UpcomingMeals = () => {
       });
 
       if (res.data.success) {
-        setMeals((prev) =>
-          prev.map((meal) =>
-            meal._id === mealId
+        setMeals((prevMeals) =>
+          prevMeals.map((m) =>
+            m._id === mealId
               ? {
-                  ...meal,
-                  likes: (meal.likes || 0) + 1,
-                  likedBy: [...(meal.likedBy || []), user.email],
+                  ...m,
+                  likes: (m.likes || 0) + 1,
+                  likedBy: [...(m.likedBy || []), user.email],
                 }
-              : meal
+              : m
           )
         );
         toast.success('Meal liked!');
       } else {
-        toast.error(res.data.message || 'You have already liked this meal.');
+        toast.error(res.data.message || 'Failed to like meal.');
       }
     } catch (err) {
       console.error('Like error:', err);
@@ -65,7 +71,9 @@ const UpcomingMeals = () => {
   };
 
   if (loading)
-    return <p className="text-center mt-10 text-lg font-medium">Loading upcoming meals...</p>;
+    return (
+      <p className="text-center mt-10 text-lg font-medium">Loading upcoming meals...</p>
+    );
 
   return (
     <div className="max-w-6xl mx-auto p-6 min-h-screen">

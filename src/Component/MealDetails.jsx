@@ -1,205 +1,225 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axiosInstance from '../Api/axios';
-import { AuthContext } from '../Auth/AuthContext';
+import React, { useState, useEffect, useContext } from 'react';
+import { useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { AuthContext } from '../Auth/AuthContext';
+import axiosInstance from '../Api/axios';
 
 const MealDetails = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-
   const [meal, setMeal] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [reviewText, setReviewText] = useState('');
+  const [likes, setLikes] = useState(0);
   const [reviews, setReviews] = useState([]);
+  const [reviewComment, setReviewComment] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [requesting, setRequesting] = useState(false);
+  const [liking, setLiking] = useState(false);
+
+  // User must have subscription Silver, Gold, or Platinum to request meal
+  const canRequestMeal = user && ['Silver', 'Gold', 'Platinum'].includes(user.subscriptionLevel);
 
   useEffect(() => {
-    const fetchMeal = async () => {
+    async function fetchData() {
       try {
-        const { data } = await axiosInstance.get(`/meals/${id}`);
-        setMeal(data);
-        await fetchReviews();
-      } catch (err) {
-        console.error('Failed to load meal:', err);
-        setMeal(null);
+        setLoading(true);
+        const mealRes = await axiosInstance.get(`/meals/${id}`);
+        setMeal(mealRes.data);
+        setLikes(mealRes.data.likes || 0);
+
+        const reviewsRes = await axiosInstance.get(`/reviews/${id}`);
+        setReviews(reviewsRes.data);
+      } catch {
+        toast.error('Failed to load meal details.');
       } finally {
         setLoading(false);
       }
-    };
-
-    const fetchReviews = async () => {
-      try {
-        const { data } = await axiosInstance.get(`/reviews/${id}`);
-        setReviews(data);
-      } catch (error) {
-        console.error('Failed to fetch reviews:', error);
-      }
-    };
-
-    fetchMeal();
+    }
+    fetchData();
   }, [id]);
 
-  const handleLike = async () => {
+  async function handleLike() {
     if (!user) {
-      toast.error('Please log in to like');
+      toast.error('Please login to like meals.');
       return;
     }
-
+    if (liking) return;
+    setLiking(true);
     try {
       await axiosInstance.patch(`/meals/${id}/like`);
-      setMeal((prev) => ({ ...prev, likes: (prev.likes || 0) + 1 }));
-      toast.success('Liked!');
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to like');
+      setLikes((prev) => prev + 1);
+      toast.success('Thanks for liking!');
+    } catch {
+      toast.error('Failed to like meal.');
+    } finally {
+      setLiking(false);
     }
-  };
+  }
 
-  const handleRequest = async () => {
+  async function handleRequestMeal() {
     if (!user) {
-      toast.error('Please log in to request');
+      toast.error('Please login to request meals.');
       return;
     }
-    if (!user.badge || user.badge === 'Bronze') {
-      toast.error('Upgrade your package to request meals');
+    if (!canRequestMeal) {
+      toast.error('Upgrade your subscription to request meals.');
       return;
     }
-
+    if (requesting) return;
+    setRequesting(true);
     try {
-      const payload = {
+      await axiosInstance.post('/meal-requests', {
         mealId: id,
         userEmail: user.email,
-        userName: user.displayName,
-      };
-      await axiosInstance.post('/meal-requests', payload);
-      toast.success('Meal request submitted!');
-    } catch (err) {
-      console.error(err);
-      toast.error('Request failed');
+        userName: user.name,
+      });
+      toast.success('Meal requested successfully!');
+    } catch {
+      toast.error('Failed to request meal.');
+    } finally {
+      setRequesting(false);
     }
-  };
+  }
 
-  const handleReviewSubmit = async (e) => {
-    e.preventDefault();
+  async function handlePostReview() {
     if (!user) {
-      toast.error('Please log in to post review');
+      toast.error('Please login to post reviews.');
       return;
     }
-    if (!reviewText.trim()) {
-      toast.error('Review cannot be empty');
+    if (!reviewComment.trim()) {
+      toast.error('Review cannot be empty.');
       return;
     }
-
     try {
-      const payload = {
+      await axiosInstance.post('/reviews', {
         mealId: id,
         userEmail: user.email,
-        userName: user.displayName,
-        comment: reviewText,
-      };
-      const { data } = await axiosInstance.post('/reviews', payload);
-      setReviews((prev) => [data, ...prev]);
-      setReviewText('');
+        userName: user.name,
+        comment: reviewComment.trim(),
+      });
+      setReviews((prev) => [
+        {
+          mealId: id,
+          userEmail: user.email,
+          userName: user.name,
+          comment: reviewComment.trim(),
+          createdAt: new Date().toISOString(),
+        },
+        ...prev,
+      ]);
+      setReviewComment('');
       toast.success('Review posted!');
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to post review');
+    } catch {
+      toast.error('Failed to post review.');
     }
-  };
+  }
 
-  if (loading)
-    return <p className="text-center mt-10 text-lg font-medium">Loading...</p>;
-  if (!meal)
-    return (
-      <p className="text-center mt-10 text-red-600 font-semibold">Meal not found.</p>
-    );
+  if (loading) return <p className="text-center mt-24 text-lg text-gray-600">Loading meal details...</p>;
+  if (!meal) return <p className="text-center mt-24 text-lg text-gray-600">Meal not found.</p>;
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <button
-        onClick={() => navigate(-1)}
-        className="text-indigo-600 mb-4 hover:underline"
-      >
-        ← Back
-      </button>
+    <div className="max-w-5xl mx-auto px-4 py-10 font-sans text-gray-900">
+      <h1 className="text-4xl font-extrabold mb-10 text-center text-gray-800">{meal.title}</h1>
 
-      <div className="bg-white p-6 rounded-lg shadow-md">
+      <div className="flex flex-col md:flex-row gap-10">
         <img
-          src={meal.image || 'https://via.placeholder.com/600x360?text=No+Image'}
+          src={meal.image}
           alt={meal.title}
-          className="w-full h-64 object-cover rounded"
+          loading="lazy"
+          className="md:flex-1 rounded-xl max-h-[400px] w-full object-cover shadow-lg"
         />
-        <h1 className="text-3xl font-bold mt-4">{meal.title}</h1>
-        {meal.distributor && (
-          <p className="text-sm text-gray-500 mt-1">Distributed by: {meal.distributor}</p>
-        )}
-        <p className="text-indigo-600 mt-2 font-medium">{meal.category}</p>
-        <p className="text-gray-700 mt-2">{meal.description}</p>
-        <p className="mt-2 text-sm text-gray-500">
-          Ingredients: {meal.ingredients?.join(', ') || 'Not available'}
-        </p>
-        <p className="mt-2 text-sm text-gray-500">
-          Posted on: {new Date(meal.createdAt || Date.now()).toLocaleString()}
-        </p>
-        <p className="text-xl font-bold mt-4">${meal.price?.toFixed(2)}</p>
-        <p className="mt-3 text-yellow-500 text-lg">
-          {Array(Math.round(meal.rating || 0)).fill('★').join('')}
-          {Array(5 - Math.round(meal.rating || 0)).fill('☆').join('')}
-        </p>
 
-        <div className="flex gap-4 mt-6">
-          <button
-            onClick={handleLike}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
-            👍 Like ({meal.likes || 0})
-          </button>
-          <button
-            onClick={handleRequest}
-            className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
-          >
-            Request Meal
-          </button>
+        <div className="md:flex-1 space-y-5 text-lg leading-relaxed">
+          <p><span className="font-semibold">Distributor:</span> {meal.distributorName || 'N/A'}</p>
+          <p><span className="font-semibold">Description:</span><br />{meal.description}</p>
+          <p><span className="font-semibold">Ingredients:</span><br />{meal.ingredients}</p>
+          <p><span className="font-semibold">Posted:</span> {new Date(meal.postTime || meal.createdAt).toLocaleString()}</p>
+          <p><span className="font-semibold">Rating:</span> {meal.rating ?? 'No ratings yet'}</p>
+
+          <div className="mt-8 flex gap-6">
+            <button
+              onClick={handleLike}
+              disabled={liking}
+              aria-label="Like meal"
+              className={`px-6 py-3 rounded-lg font-semibold transition-colors duration-300
+                ${liking ? 'bg-red-300 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700 text-white'}`}
+            >
+              👍 Like ({likes})
+            </button>
+
+            <button
+              onClick={handleRequestMeal}
+              disabled={requesting || !canRequestMeal}
+              aria-label="Request meal"
+              title={
+                !user
+                  ? 'Login required'
+                  : !canRequestMeal
+                  ? 'Upgrade your subscription'
+                  : undefined
+              }
+              className={`px-6 py-3 rounded-lg font-semibold transition-colors duration-300
+                ${
+                  requesting || !canRequestMeal
+                    ? 'bg-blue-300 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                }`}
+            >
+              Request Meal
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Review Section */}
-      <div className="mt-10">
-        <h2 className="text-2xl font-semibold mb-4">Reviews ({reviews.length})</h2>
+      <hr className="my-14 border-gray-300" />
 
-        <form onSubmit={handleReviewSubmit} className="mb-6">
-          <textarea
-            rows={3}
-            value={reviewText}
-            onChange={(e) => setReviewText(e.target.value)}
-            placeholder="Write your review..."
-            className="w-full border rounded p-3 focus:outline-none"
-          />
-          <button
-            type="submit"
-            className="mt-2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
-          >
-            Submit Review
-          </button>
-        </form>
+      <section>
+        <h2 className="text-2xl font-bold mb-6">Reviews ({reviews.length})</h2>
 
-        {reviews.length > 0 ? (
-          <ul className="space-y-4">
-            {reviews.map((rev, idx) => (
-              <li key={idx} className="bg-white p-4 rounded shadow">
-                <p className="font-semibold">{rev.userName || 'Anonymous'}</p>
-                <p className="text-sm text-gray-600">
-                  {new Date(rev.createdAt || rev.time).toLocaleString()}
-                </p>
-                <p className="mt-2">{rev.comment || rev.review}</p>
-              </li>
-            ))}
-          </ul>
+        {user ? (
+          <div className="mb-10 flex flex-col gap-3">
+            <textarea
+              rows={4}
+              maxLength={500}
+              value={reviewComment}
+              onChange={(e) => setReviewComment(e.target.value)}
+              placeholder="Write your review here..."
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-y focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+              onClick={handlePostReview}
+              disabled={reviewComment.trim() === ''}
+              className={`self-start px-5 py-2 rounded-lg font-semibold transition-colors duration-300
+                ${
+                  reviewComment.trim() === ''
+                    ? 'bg-green-300 cursor-not-allowed'
+                    : 'bg-green-600 hover:bg-green-700 text-white'
+                }`}
+            >
+              Submit Review
+            </button>
+          </div>
         ) : (
-          <p className="text-gray-500">No reviews yet.</p>
+          <p className="italic text-gray-600 mb-8">Please login to post a review.</p>
         )}
-      </div>
+
+        <div className="flex flex-col gap-6">
+          {reviews.length === 0 && <p className="text-gray-600">No reviews yet. Be the first!</p>}
+          {reviews.map((r, i) => (
+            <div
+              key={i}
+              className="p-5 bg-gray-50 rounded-lg shadow-sm border border-gray-200"
+            >
+              <p className="text-gray-800 font-semibold mb-1">
+                {r.userName}{' '}
+                <span className="text-gray-500 text-sm font-normal">
+                  ({new Date(r.createdAt).toLocaleString()})
+                </span>
+              </p>
+              <p className="text-gray-700 whitespace-pre-wrap">{r.comment}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 };

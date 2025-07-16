@@ -3,6 +3,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import axiosInstance from '../Api/axios';
 
 
+
 const categories = ['All', 'Breakfast', 'Lunch', 'Dinner'];
 
 const Meals = () => {
