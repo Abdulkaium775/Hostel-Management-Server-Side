@@ -1,12 +1,18 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { loadStripe } from "@stripe/stripe-js";
-import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import axiosInstance from "../Api/axios";
+import {
+  Elements,
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
 import { AuthContext } from "../Auth/AuthContext";
+import axiosInstance from "../Api/axios";
 import toast from "react-hot-toast";
 
-// Stripe key from env
 const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = stripeKey ? loadStripe(stripeKey) : null;
 
@@ -16,12 +22,13 @@ const PACKAGE_DETAILS = {
   platinum: { name: "Platinum", price: 49.99 },
 };
 
-const CheckoutForm = ({ packageName, packagePrice }) => {
+const CheckoutForm = ({ packageKey, packageName, packagePrice }) => {
   const stripe = useStripe();
   const elements = useElements();
   const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
   const [processing, setProcessing] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,52 +36,55 @@ const CheckoutForm = ({ packageName, packagePrice }) => {
     setProcessing(true);
 
     try {
-      // Create payment intent on backend
       const { data } = await axiosInstance.post("/create-payment-intent", {
-        amount: Math.round(packagePrice * 100), // cents
-        packageName,
-        userEmail: user.email,
+        amount: Math.round(packagePrice * 100),
+        packageName: packageKey,
+        userEmail: user?.email,
       });
 
       const clientSecret = data.clientSecret;
-      const cardElement = elements.getElement(CardElement);
+      const cardNumberElement = elements.getElement(CardNumberElement);
 
-      // Confirm card payment with Stripe.js
+      if (!cardNumberElement) {
+        toast.error("Card number is incomplete.");
+        setProcessing(false);
+        return;
+      }
+
       const paymentResult = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
-          card: cardElement,
+          card: cardNumberElement,
           billing_details: {
-            email: user.email,
-            name: user.displayName || "User",
+            email: user?.email,
+            name: user?.displayName || "User",
           },
         },
       });
 
       if (paymentResult.error) {
-        toast.error(paymentResult.error.message || "Payment failed");
+        toast.error(paymentResult.error.message || "Payment failed.");
         setProcessing(false);
         return;
       }
 
       if (paymentResult.paymentIntent.status === "succeeded") {
-        // Save payment info to backend and update user badge
         await axiosInstance.post("/payments/save", {
-          userEmail: user.email,
-          packageName,
+          userEmail: user?.email,
+          packageName: packageKey,
           paymentIntentId: paymentResult.paymentIntent.id,
           amount: packagePrice,
           status: "succeeded",
-          purchasedAt: new Date(),
+          purchasedAt: new Date().toISOString(),
         });
 
-        // Update user badge in frontend context
-        setUser((prev) => ({
-          ...prev,
-          badge: packageName.charAt(0).toUpperCase() + packageName.slice(1),
-        }));
+        if (typeof setUser === "function") {
+          setUser((prev) => ({
+            ...prev,
+            badge: packageName,
+          }));
+        }
 
-        toast.success("Payment successful! Your package has been upgraded.");
-        navigate("/dashboard");
+        setShowModal(true);
       }
     } catch (error) {
       console.error("Payment error:", error);
@@ -84,49 +94,107 @@ const CheckoutForm = ({ packageName, packagePrice }) => {
     }
   };
 
+  const inputStyle = {
+    base: {
+      fontSize: "16px",
+      color: "#1f2937", // Tailwind gray-800
+      letterSpacing: "0.025em",
+      fontFamily: "'Inter', sans-serif",
+      "::placeholder": {
+        color: "#9ca3af", // Tailwind gray-400
+      },
+    },
+    invalid: {
+      color: "#dc2626", // Tailwind red-600
+    },
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto p-6 bg-white rounded shadow">
-      <h3 className="text-xl font-bold mb-4">
-        {packageName.charAt(0).toUpperCase() + packageName.slice(1)} Package - ${packagePrice.toFixed(2)}
-      </h3>
-
-      <CardElement
-        options={{
-          style: {
-            base: {
-              fontSize: "16px",
-              color: "#424770",
-              "::placeholder": { color: "#aab7c4" },
-            },
-            invalid: { color: "#9e2146" },
-          },
-        }}
-        className="mb-6 p-3 border rounded"
-      />
-
-      <button
-        type="submit"
-        disabled={!stripe || processing}
-        className={`w-full py-2 rounded text-white font-semibold ${
-          processing ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
-        }`}
+    <>
+      <form
+        onSubmit={handleSubmit}
+        className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 mx-auto"
       >
-        {processing ? "Processing..." : `Pay $${packagePrice.toFixed(2)}`}
-      </button>
-    </form>
+        <h3 className="text-2xl font-extrabold mb-8 text-indigo-700 text-center">
+          {packageName} Package - ${packagePrice.toFixed(2)}
+        </h3>
+
+        <div className="mb-6">
+          <label className="block mb-2 text-gray-700 font-semibold text-sm">
+            Card Number
+          </label>
+          <div className="p-3 border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-indigo-500">
+            <CardNumberElement options={{ style: inputStyle }} />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-6 mb-8">
+          <div>
+            <label className="block mb-2 text-gray-700 font-semibold text-sm">
+              Expiry Date
+            </label>
+            <div className="p-3 border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-indigo-500">
+              <CardExpiryElement options={{ style: inputStyle }} />
+            </div>
+          </div>
+
+          <div>
+            <label className="block mb-2 text-gray-700 font-semibold text-sm">
+              CVC
+            </label>
+            <div className="p-3 border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-indigo-500">
+              <CardCvcElement options={{ style: inputStyle }} />
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={!stripe || processing}
+          className={`w-full py-3 rounded-md text-white font-bold transition-colors duration-200 ${
+            processing
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-indigo-600 hover:bg-indigo-700"
+          }`}
+        >
+          {processing ? "Processing..." : `Pay $${packagePrice.toFixed(2)}`}
+        </button>
+      </form>
+
+      {/* Confirmation Modal */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+            <h2 className="text-2xl font-extrabold mb-4 text-green-600">
+              Payment Successful!
+            </h2>
+            <p className="mb-8 text-gray-700">
+              Your package has been upgraded to <strong>{packageName}</strong>.
+            </p>
+            <button
+              onClick={() => navigate("/dashboard")}
+              className="px-6 py-3 bg-indigo-600 text-white rounded-md font-semibold hover:bg-indigo-700 transition"
+            >
+              Continue
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
 const CheckoutPage = () => {
   const { packageName } = useParams();
   const navigate = useNavigate();
-
-  const packageInfo = PACKAGE_DETAILS[packageName?.toLowerCase()];
+  const packageKey = packageName?.toLowerCase();
+  const packageInfo = PACKAGE_DETAILS[packageKey];
 
   useEffect(() => {
     if (!stripeKey) {
       toast.error("Stripe is not configured.");
       console.error("❌ VITE_STRIPE_PUBLISHABLE_KEY is missing.");
+      return;
     }
     if (!packageInfo) {
       toast.error("Invalid package selected.");
@@ -137,7 +205,7 @@ const CheckoutPage = () => {
   if (!packageInfo || !stripePromise) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
-        <p className="text-red-600 text-lg font-semibold">
+        <p className="text-red-600 text-lg font-semibold text-center">
           Cannot proceed to checkout. Stripe is not configured or package is invalid.
         </p>
       </div>
@@ -145,10 +213,16 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-      <h1 className="text-4xl font-extrabold mb-6 text-indigo-700">Checkout</h1>
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
+      <h1 className="text-5xl font-extrabold mb-10 text-indigo-700 text-center">
+        Checkout
+      </h1>
       <Elements stripe={stripePromise}>
-        <CheckoutForm packageName={packageInfo.name.toLowerCase()} packagePrice={packageInfo.price} />
+        <CheckoutForm
+          packageKey={packageKey}
+          packageName={packageInfo.name}
+          packagePrice={packageInfo.price}
+        />
       </Elements>
     </div>
   );

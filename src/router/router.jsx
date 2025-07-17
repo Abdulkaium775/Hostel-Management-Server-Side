@@ -37,6 +37,7 @@ export const router = createBrowserRouter([
 
       // Add checkout route here
       { path: "checkout/:packageName", element: <CheckoutPage /> },
+   
 
       // ✅ Dashboard Routes (Nested inside Layout)
       {
