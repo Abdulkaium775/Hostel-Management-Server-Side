@@ -1,133 +1,132 @@
 import React, { useEffect, useState, useContext } from 'react';
-import axiosInstance from '../Api/axios';
 import { AuthContext } from '../Auth/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import axiosInstance from '../Api/axios';
 import toast from 'react-hot-toast';
 
 const UpcomingMeals = () => {
-  const [meals, setMeals] = useState([]);
-  const [loading, setLoading] = useState(true);
   const { user } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const [meals, setMeals] = useState([]);
+  const [userBadge, setUserBadge] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchMeals = async () => {
-      try {
-        const { data } = await axiosInstance.get('/upcoming-meals');
-        setMeals(data);
-      } catch (err) {
-        console.error('Error fetching upcoming meals:', err);
-        toast.error('Failed to load upcoming meals');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchMeals();
-  }, []);
-
-  const handleLike = async (mealId) => {
-    if (!user) {
-      toast.error('Please log in to like meals');
-      return navigate('/join-us');
+  // Fetch upcoming meals
+  const fetchUpcomingMeals = async () => {
+    try {
+      const res = await axiosInstance.get('/upcoming-meals');
+      setMeals(res.data);
+    } catch {
+      toast.error('❌ Failed to fetch upcoming meals');
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const isPremium = ['Silver', 'Gold', 'Platinum'].includes(user.badge);
-    if (!isPremium) {
-      toast.error('Only premium users can like meals.');
+  // Fetch user badge
+  const fetchUserBadge = async () => {
+    if (!user?.email) return;
+    try {
+      const res = await axiosInstance.get(`/users/${user.email}`);
+      if (!res.data) {
+        toast.error('⚠️ User not found');
+        return;
+      }
+      setUserBadge(res.data.badge || null);
+    } catch {
+      toast.error('⚠️ Error fetching user badge');
+    }
+  };
+
+  // Like a meal
+  const handleLike = async (mealId) => {
+    if (!user?.email) {
+      toast.error('🔐 Please login to like meals');
       return;
     }
 
-    const meal = meals.find((m) => m._id === mealId);
-    if (meal?.likedBy?.includes(user.email)) {
-      toast.error('You have already liked this meal.');
+    if (!['Silver', 'Gold', 'Platinum'].includes(userBadge)) {
+      toast.error('🚫 Only premium users can like meals');
       return;
     }
 
     try {
-      const res = await axiosInstance.patch(`/upcoming-meals/like/${mealId}`, {
-        email: user.email,
+      const res = await axiosInstance.patch(`/upcoming-meals/${mealId}/like`, {
+        userEmail: user.email,
       });
 
       if (res.data.success) {
-        setMeals((prevMeals) =>
-          prevMeals.map((m) =>
-            m._id === mealId
-              ? {
-                  ...m,
-                  likes: (m.likes || 0) + 1,
-                  likedBy: [...(m.likedBy || []), user.email],
-                }
-              : m
-          )
-        );
-        toast.success('Meal liked!');
-      } else {
-        toast.error(res.data.message || 'Failed to like meal.');
+        toast.success('👍 Meal liked!');
+        fetchUpcomingMeals(); // Refresh likes
       }
     } catch (err) {
-      console.error('Like error:', err);
-      toast.error('Failed to like the meal');
+      const msg = err.response?.data?.message || '❌ Failed to like meal';
+      toast.error(msg);
     }
   };
 
-  if (loading)
-    return (
-      <p className="text-center mt-10 text-lg font-medium">Loading upcoming meals...</p>
-    );
+  useEffect(() => {
+    fetchUpcomingMeals();
+    fetchUserBadge();
+  }, [user]);
+
+  if (loading) {
+    return <div className="text-center py-12 text-lg font-medium text-gray-700">Loading upcoming meals...</div>;
+  }
+
+  if (!meals.length) {
+    return <div className="text-center py-12 text-lg font-medium text-gray-500">No upcoming meals found.</div>;
+  }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 min-h-screen">
-      <h2 className="text-3xl font-bold mb-8 text-center">Upcoming Meals</h2>
+    <div className="max-w-7xl mx-auto p-6">
+      <h2 className="text-3xl font-extrabold text-center mb-10 text-pink-600 drop-shadow-sm">🌟 Upcoming Meals</h2>
+      <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {meals.map((meal) => {
+          const alreadyLiked = meal.likedBy?.includes(user?.email);
 
-      {meals.length === 0 ? (
-        <p className="text-center text-gray-500 text-lg">No upcoming meals available.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {meals.map((meal) => (
-            <div key={meal._id} className="bg-white shadow-lg rounded-xl overflow-hidden">
+          return (
+            <div
+              key={meal._id}
+              className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col"
+            >
               <img
-                src={meal.image || 'https://via.placeholder.com/400x240?text=No+Image'}
+                src={meal.image}
                 alt={meal.title}
-                className="w-full h-48 object-cover"
+                className="h-48 w-full object-cover rounded-t-2xl"
               />
-              <div className="p-5">
-                <h3 className="text-xl font-bold text-gray-800">{meal.title}</h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  {meal.description?.length > 80
-                    ? `${meal.description.slice(0, 80)}...`
-                    : meal.description || 'No description'}
+              <div className="p-6 flex flex-col flex-grow">
+                <h3 className="text-xl font-semibold mb-2 text-gray-900">{meal.title}</h3>
+                <p className="text-gray-600 text-sm mb-3 flex-grow line-clamp-3">{meal.description}</p>
+
+                <p className="text-sm text-gray-500 mb-1">
+                  📅 <span className="font-medium text-gray-700">Publish Date:</span>{' '}
+                  {new Date(meal.publishDate).toLocaleDateString()}
                 </p>
-                <p className="mt-3 font-semibold text-blue-500">
-                  Planned Date:{' '}
-                  {meal.date ? new Date(meal.date).toLocaleDateString() : 'Date not available'}
+                <p className="text-sm text-gray-500 mb-5">
+                  ❤️ <span className="font-medium text-gray-700">Likes:</span> {meal.likes || 0}
                 </p>
 
-                <div className="mt-4 flex justify-between items-center">
+                {user && userBadge && ['Silver', 'Gold', 'Platinum'].includes(userBadge) ? (
                   <button
                     onClick={() => handleLike(meal._id)}
-                    disabled={meal.likedBy?.includes(user?.email)}
-                    className={`px-4 py-2 rounded-md ${
-                      meal.likedBy?.includes(user?.email)
-                        ? 'bg-gray-300 cursor-not-allowed'
-                        : 'bg-blue-600 text-white hover:bg-blue-700'
+                    disabled={alreadyLiked}
+                    className={`w-full py-2 rounded-xl text-white font-semibold text-center transition ${
+                      alreadyLiked
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-pink-600 hover:bg-pink-700 focus:ring-4 focus:ring-pink-300'
                     }`}
-                    aria-label={`Like ${meal.title}`}
                   >
-                    ❤️ Like {meal.likes || 0}
+                    {alreadyLiked ? 'Liked ❤️' : 'Like ❤️'}
                   </button>
-                  <button
-                    onClick={() => navigate(`/meal/${meal._id}`)}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-                    aria-label={`View details of ${meal.title}`}
-                  >
-                    View Details
-                  </button>
-                </div>
+                ) : (
+                  <p className="text-xs text-red-500 font-semibold mt-auto text-center">
+                    Only premium users can like
+                  </p>
+                )}
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          );
+        })}
+      </div>
     </div>
   );
 };

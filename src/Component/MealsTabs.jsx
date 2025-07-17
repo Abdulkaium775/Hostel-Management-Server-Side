@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../Api/axios';
 
-
 const categories = ['All', 'Breakfast', 'Lunch', 'Dinner'];
 
 const MealsTabs = () => {
@@ -16,9 +15,11 @@ const MealsTabs = () => {
     const fetchMeals = async () => {
       setLoading(true);
       try {
-        const { data } = await axiosInstance.get('/meals', {
-          params: { category: activeTab, limit: 3 },
-        });
+        // Don't send category param when activeTab is 'All'
+        const params = { limit: 3 };
+        if (activeTab !== 'All') params.category = activeTab;
+
+        const { data } = await axiosInstance.get('/meals', { params });
         setMeals(data.meals || []);
       } catch (error) {
         console.error('Error fetching meals:', error);

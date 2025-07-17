@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../Api/axios';
-
-
 
 const categories = ['All', 'Breakfast', 'Lunch', 'Dinner'];
 
@@ -10,21 +9,24 @@ const Meals = () => {
   const [meals, setMeals] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [totalMeals, setTotalMeals] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
 
+  const navigate = useNavigate();
+
   const fetchMeals = async (pageNum = 1, replace = false) => {
     try {
+      setLoading(true);
       const { data } = await axiosInstance.get('/meals', {
         params: {
-          search: search || undefined,
+          search: search.trim() || undefined,
           category: category !== 'All' ? category : undefined,
-          minPrice: minPrice || undefined,
-          maxPrice: maxPrice || undefined,
+          minPrice: minPrice !== '' ? minPrice : undefined,
+          maxPrice: maxPrice !== '' ? maxPrice : undefined,
           page: pageNum,
           limit: 6,
         },
@@ -36,24 +38,25 @@ const Meals = () => {
         setMeals((prev) => [...prev, ...data.meals]);
       }
 
-      setTotalMeals(data.total);
-
-      const newLength = replace ? data.meals.length : meals.length + data.meals.length;
-      setHasMore(newLength < data.total);
-
+      setHasMore(data.meals.length === 6); // If less than limit, no more pages
       setPage(pageNum);
     } catch (error) {
       console.error('Error fetching meals:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Refetch on filter or search change (reset page to 1 and replace data)
   useEffect(() => {
     fetchMeals(1, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, category, minPrice, maxPrice]);
 
   const loadMore = () => {
-    if (hasMore) fetchMeals(page + 1);
+    if (!loading && hasMore) {
+      fetchMeals(page + 1);
+    }
   };
 
   return (
@@ -67,6 +70,7 @@ const Meals = () => {
           onChange={(e) => setSearch(e.target.value)}
           className="input input-bordered flex-grow min-w-[180px] border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
@@ -78,6 +82,7 @@ const Meals = () => {
             </option>
           ))}
         </select>
+
         <input
           type="number"
           min="0"
@@ -96,7 +101,7 @@ const Meals = () => {
         />
       </div>
 
-      {/* Infinite Scroll */}
+      {/* Meal Cards with Infinite Scroll */}
       <InfiniteScroll
         dataLength={meals.length}
         next={loadMore}
@@ -123,9 +128,11 @@ const Meals = () => {
                 <h2 className="text-xl font-semibold text-gray-800 truncate">{meal.title}</h2>
                 <p className="text-sm text-blue-600 font-medium mt-1">{meal.category}</p>
                 <p className="text-gray-600 mt-3 text-sm line-clamp-3">{meal.description}</p>
-                <p className="text-lg font-semibold mt-4">${meal.price != null ? meal.price.toFixed(2) : '0.00'}</p>
+                <p className="text-lg font-semibold mt-4">
+                  ${meal.price != null ? meal.price.toFixed(2) : '0.00'}
+                </p>
                 <button
-                  onClick={() => alert(`Go to meal details of ${meal.title}`)}
+                  onClick={() => navigate(`/meal/${meal._id}`)}
                   className="mt-5 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-md transition-colors duration-300"
                 >
                   View Details
