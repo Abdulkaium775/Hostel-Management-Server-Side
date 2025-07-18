@@ -1,22 +1,42 @@
 import { useContext, useEffect, useState } from "react";
+import axiosInstance from "../Api/axios";
 import { AuthContext } from "../Auth/AuthContext";
-
 
 const useAdmin = () => {
   const { user } = useContext(AuthContext);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user?.email) return;
+    let isMounted = true;
 
-    // Example: fetch admin status from your server or check locally
-    fetch(`/api/admins/${user.email}`)
-      .then(res => res.json())
-      .then(data => setIsAdmin(data.isAdmin))
-      .catch(() => setIsAdmin(false));
+    const checkAdminStatus = async () => {
+      if (!user?.email) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await axiosInstance.get(`/api/users/admin/${user.email}`);
+        if (isMounted) {
+          setIsAdmin(response.data?.isAdmin || false);
+        }
+      } catch (error) {
+        console.error("❌ Error checking admin status:", error);
+        if (isMounted) setIsAdmin(false);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    checkAdminStatus();
+
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
-  return [isAdmin];
+  return [isAdmin, loading];
 };
 
 export default useAdmin;

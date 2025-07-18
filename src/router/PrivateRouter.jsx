@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
-import { AuthContext } from '../component/AuthProvider';
 import { Navigate, useLocation } from 'react-router-dom';
+import { AuthContext } from '../Auth/AuthContext';
 
-const Privateroute = ({ children }) => {
-  const { user, loading } = useContext(AuthContext); // ✅ useContext instead of use()
+const PrivateRoute = ({ children }) => {
+  const { user, loading } = useContext(AuthContext);
   const location = useLocation();
 
   if (loading) {
@@ -15,10 +15,10 @@ const Privateroute = ({ children }) => {
   }
 
   if (!user) {
-    return <Navigate to="/login" state={{ from: location }} replace />; // ✅ wrap state in an object
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   return children;
 };
 
-export default Privateroute;
+export default PrivateRoute;

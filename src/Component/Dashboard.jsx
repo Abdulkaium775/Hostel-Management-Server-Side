@@ -1,11 +1,19 @@
 import React from "react";
 import { GrUserAdmin } from "react-icons/gr";  // Admin icon
 import { FaUser } from "react-icons/fa";       // User icon
-import useAdmin from "../hooks/Admin";          // Your custom admin check hook
-import { Link, Outlet } from "react-router";
+import useAdmin from "../hooks/Admin";         // Your custom admin check hook
+import { Link, Outlet } from "react-router-dom"; // ✅ Corrected import
 
 const Dashboard = () => {
-  const [isAdmin] = useAdmin();
+  const [isAdmin, isLoading] = useAdmin(); // ✅ Handles loading if hook is async
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen text-xl font-semibold text-gray-600">
+        Loading Dashboard...
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -20,7 +28,7 @@ const Dashboard = () => {
           {isAdmin ? "Admin Dashboard" : "User Dashboard"}
         </h2>
 
-        {/* Navigation */}
+        {/* Navigation Links */}
         {isAdmin ? (
           <nav className="flex flex-col gap-4 text-gray-700 text-lg">
             <Link to="/dashboard/admin-profile" className="hover:text-blue-600 transition">Admin Profile</Link>
@@ -41,9 +49,9 @@ const Dashboard = () => {
         )}
       </aside>
 
-      {/* Main Content Area */}
+      {/* Main Content */}
       <main className="flex-1 p-8 bg-white overflow-auto">
-        <Outlet/> {/* Nested routes will render here */}
+        <Outlet /> {/* ✅ Renders nested dashboard routes here */}
       </main>
     </div>
   );

@@ -1,15 +1,16 @@
 import React, { useContext } from 'react';
-import { AuthContext } from '../component/AuthProvider';
-import { Navigate, useLocation } from 'react-router-dom';
 import useAdmin from '../hooks/Admin';
+import { Navigate, useLocation } from 'react-router';
+import { AuthContext } from '../Auth/AuthContext';
+
 
 const AdminRoute = ({ children }) => {
-  const { user, loading } = useContext(AuthContext); // Auth loading & user info
-  const [isAdmin] = useAdmin();                      // Your custom admin check hook
+  const { user, loading: authLoading } = useContext(AuthContext);
+  const [isAdmin, adminLoading] = useAdmin();
   const location = useLocation();
 
-  // Show loading spinner while auth or admin status is loading
-  if (loading) {
+  // Show loading spinner while auth or admin loading
+  if (authLoading || adminLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="w-12 h-12 border-4 border-dashed rounded-full animate-spin border-green-500"></div>
@@ -17,17 +18,17 @@ const AdminRoute = ({ children }) => {
     );
   }
 
-  // If user is not logged in, redirect to login page
+  // If not logged in, redirect to login
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // If logged in but NOT admin, redirect to unauthorized page
+  // If logged in but NOT admin, redirect to unauthorized
   if (!isAdmin) {
     return <Navigate to="/unauthorized" replace />;
   }
 
-  // If logged in AND admin, render the children (protected admin content)
+  // Logged in and admin: render protected content
   return children;
 };
 

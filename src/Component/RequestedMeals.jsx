@@ -1,76 +1,78 @@
 import React, { useEffect, useState } from 'react';
-
-import toast from 'react-hot-toast';
 import axiosInstance from '../Api/axios';
+import toast from 'react-hot-toast';
 
-const RequestedMeals = ({ userEmail }) => {
+
+const RequestedMeals= ({ userEmail }) => {
   const [requestedMeals, setRequestedMeals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [cancelLoadingId, setCancelLoadingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
-  // Fetch requested meals
   useEffect(() => {
     if (!userEmail) return;
-    setLoading(true);
-    axiosInstance.get(`/requested-meals/${userEmail}`)
-      .then(res => {
-        setRequestedMeals(res.data);
-      })
-      .catch(err => {
+
+    const fetchRequestedMeals = async () => {
+      try {
+        setLoading(true);
+        const { data } = await axiosInstance.get(`/requested-meals/${userEmail}`);
+        setRequestedMeals(data);
+      } catch (err) {
         console.error(err);
-        toast.error('Failed to load requested meals');
-      })
-      .finally(() => setLoading(false));
+        toast.error('Failed to fetch requested meals');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRequestedMeals();
   }, [userEmail]);
 
-  // Cancel meal request handler
-  const handleCancel = (id) => {
-    if (!window.confirm('Are you sure you want to cancel this request?')) return;
-    setCancelLoadingId(id);
-    axiosInstance.delete(`/meal-requests/${id}`)
-      .then(() => {
-        setRequestedMeals(prev => prev.filter(req => req._id !== id));
-        toast.success('Request canceled');
-      })
-      .catch(err => {
-        console.error(err);
-        toast.error('Failed to cancel request');
-      })
-      .finally(() => setCancelLoadingId(null));
+  const handleCancel = async (id) => {
+    if (!window.confirm('Are you sure you want to cancel this meal request?')) return;
+
+    try {
+      setDeletingId(id);
+      await axiosInstance.delete(`/meal-requests/${id}`);
+      toast.success('Meal request cancelled');
+      setRequestedMeals((prev) => prev.filter((meal) => meal._id !== id));
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to cancel meal request');
+    } finally {
+      setDeletingId(null);
+    }
   };
 
-  if (loading) return <p>Loading your requested meals...</p>;
-
-  if (requestedMeals.length === 0)
-    return <p>You have no requested meals yet.</p>;
+  if (loading) return <p>Loading...</p>;
+  if (requestedMeals.length === 0) return <p>No requested meals found.</p>;
 
   return (
-    <table className="table-auto border-collapse border border-gray-300 w-full">
+    <table className="requested-meals-table" border="1" cellPadding="8" style={{ width: '100%', borderCollapse: 'collapse' }}>
       <thead>
         <tr>
-          <th className="border border-gray-300 p-2">Meal Title</th>
-          <th className="border border-gray-300 p-2">Likes</th>
-          <th className="border border-gray-300 p-2">Reviews</th>
-          <th className="border border-gray-300 p-2">Status</th>
-          <th className="border border-gray-300 p-2">Requested At</th>
-          <th className="border border-gray-300 p-2">Actions</th>
+          <th>Meal Title</th>
+          <th>Likes</th>
+          <th>Reviews Count</th>
+          <th>Status</th>
+          <th>Requested At</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
         {requestedMeals.map(({ _id, mealTitle, likes, reviewCount, status, requestedAt }) => (
           <tr key={_id}>
-            <td className="border border-gray-300 p-2">{mealTitle}</td>
-            <td className="border border-gray-300 p-2 text-center">{likes || 0}</td>
-            <td className="border border-gray-300 p-2 text-center">{reviewCount || 0}</td>
-            <td className="border border-gray-300 p-2 text-center">{status}</td>
-            <td className="border border-gray-300 p-2 text-center">{new Date(requestedAt).toLocaleString()}</td>
-            <td className="border border-gray-300 p-2 text-center">
+            <td>{mealTitle}</td>
+            <td>{likes}</td>
+            <td>{reviewCount}</td>
+            <td>{status}</td>
+            <td>{new Date(requestedAt).toLocaleString()}</td>
+            <td>
               <button
-                disabled={cancelLoadingId === _id}
                 onClick={() => handleCancel(_id)}
-                className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50"
+                disabled={deletingId === _id}
+                style={{ cursor: deletingId === _id ? 'not-allowed' : 'pointer' }}
               >
-                {cancelLoadingId === _id ? 'Cancelling...' : 'Cancel'}
+                {deletingId === _id ? 'Cancelling...' : 'Cancel'}
               </button>
             </td>
           </tr>
