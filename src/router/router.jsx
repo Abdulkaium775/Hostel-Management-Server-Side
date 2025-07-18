@@ -12,15 +12,18 @@ import PaymentHistory from "../Component/PaymentHistory";
 import { AdminProfile } from "../Component/AdminProfile";
 import ManageUsers from "../Component/ManageUsers";
 import AddMeal from "../Component/AddMeal";
-import AllMeals from "../Component/AllMeals";
+
 import AllReviews from "../Component/AllReviews";
 import ServeMeals from "../Component/ServeMeals";
 import Meals from "../Component/Meals";
 import RequestedMeals from "../Component/RequestedMeals";
-import MyProfile from "../Component/MyProfile";
+
 import MealDetails from "../Component/MealDetails";
 
 import CheckoutPage from "../Component/CheckoutPage";  // <-- import CheckoutPage
+import MyProfile from "../Component/MyProfile";
+import EditReview from "../Component/EditReview";
+import AllMeals from "../Component/AllMeals";
 
 export const router = createBrowserRouter([
   {
@@ -44,15 +47,18 @@ export const router = createBrowserRouter([
         path: "dashboard",
         element: <Dashboard />,
         children: [
-          { path: "my-profile", element: <MyProfile /> },
+          { path: "my-profile", element: <MyProfile/> },
           { path: "requested-meals", element: <RequestedMeals /> },
           { path: "my-reviews", element: <MyReviews /> },
           { path: "payment-history", element: <PaymentHistory /> },
+      { path: "edit-review/:id", element: <EditReview /> },
+
+
 
           // Admin routes
           { path: "admin-profile", element: <AdminProfile /> },
           { path: "manage-users", element: <ManageUsers /> },
-          { path: "add-meal", element: <AddMeal /> },
+          { path: "add-meal", element: <AllMeals></AllMeals>},
           { path: "all-meals", element: <AllMeals /> },
           { path: "all-reviews", element: <AllReviews /> },
           { path: "serve-meals", element: <ServeMeals /> },

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import axiosInstance from '../Api/axios';
 import { AuthContext } from '../Auth/AuthContext';
-import toast from 'react-hot-toast';
+import Swal from 'sweetalert2';
 
 const MealDetails = () => {
   const { id } = useParams();
@@ -20,7 +20,7 @@ const MealDetails = () => {
   const [newReview, setNewReview] = useState('');
   const [postingReview, setPostingReview] = useState(false);
 
-  // Fetch meal details
+  // Fetch meal details and liked state
   useEffect(() => {
     const fetchMeal = async () => {
       setLoadingMeal(true);
@@ -28,15 +28,12 @@ const MealDetails = () => {
         const { data } = await axiosInstance.get(`/meals/${id}`);
         setMeal(data);
         setLikeCount(data.likes || 0);
+        setLiked(user?.email && data.likedBy?.includes(user.email));
       } catch (error) {
-        toast.error(
-          error?.response?.data?.message || 'Failed to load meal details'
-        );
-        console.error('❌ Error fetching meal details:', {
-          url: `/meals/${id}`,
-          status: error?.response?.status,
-          data: error?.response?.data,
-          message: error?.message,
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: error?.response?.data?.message || 'Failed to load meal details',
         });
         setMeal(null);
       } finally {
@@ -44,7 +41,7 @@ const MealDetails = () => {
       }
     };
     fetchMeal();
-  }, [id]);
+  }, [id, user?.email]);
 
   // Fetch reviews
   useEffect(() => {
@@ -53,48 +50,55 @@ const MealDetails = () => {
         const { data } = await axiosInstance.get(`/reviews/${id}`);
         setReviews(data);
         setReviewCount(data.length);
-      } catch (error) {
-        toast.error('Failed to load reviews');
-        console.error('❌ Error fetching reviews:', error);
+      } catch {
+        Swal.fire('Error', 'Failed to load reviews', 'error');
       }
     };
     fetchReviews();
   }, [id]);
 
-  // Like handler
+  // Check if user already requested
+  useEffect(() => {
+    if (!user || !meal) return;
+    const checkRequested = async () => {
+      try {
+        const { data } = await axiosInstance.get(`/requested-meals/${user.email}`);
+        const alreadyRequested = data.some(req => req.mealTitle === meal.title);
+        setRequested(alreadyRequested);
+      } catch {
+        // optional silent fail
+      }
+    };
+    checkRequested();
+  }, [user, meal]);
+
   const handleLike = async () => {
     if (!user) {
-      toast.error('Please login to like meals');
-      return;
+      return Swal.fire('Login Required', 'Please login to like meals.', 'warning');
     }
     if (liked) {
-      toast('You already liked this meal');
-      return;
+      return Swal.fire('Already Liked', 'You have already liked this meal.', 'info');
     }
+
     try {
-      await axiosInstance.patch(`/meals/${id}/like`);
-      setLikeCount((prev) => prev + 1);
+      await axiosInstance.patch(`/meals/${id}/like`, { userEmail: user.email });
+      setLikeCount(prev => prev + 1);
       setLiked(true);
-      toast.success('Meal liked');
-    } catch (error) {
-      toast.error('Failed to like meal');
-      console.error('❌ Error liking meal:', error);
+      Swal.fire('Liked!', 'Meal liked successfully.', 'success');
+    } catch {
+      Swal.fire('Error', 'Failed to like meal.', 'error');
     }
   };
 
-  // Request meal handler
   const handleRequestMeal = async () => {
     if (!user) {
-      toast.error('Please login to request meals');
-      return;
+      return Swal.fire('Login Required', 'Please login to request meals.', 'warning');
     }
     if (!user.badge || user.badge === 'Bronze') {
-      toast.error('Upgrade your package to request meals');
-      return;
+      return Swal.fire('Upgrade Required', 'Upgrade your package to request meals.', 'info');
     }
     if (requested) {
-      toast('You already requested this meal');
-      return;
+      return Swal.fire('Already Requested', 'You have already requested this meal.', 'info');
     }
 
     try {
@@ -104,25 +108,21 @@ const MealDetails = () => {
         userEmail: user.email,
         userName: user.displayName || user.email,
       });
-      toast.success('Meal requested successfully');
+      Swal.fire('Success!', 'Meal requested successfully.', 'success');
       setRequested(true);
-    } catch (error) {
-      toast.error('Failed to request meal');
-      console.error('❌ Error requesting meal:', error);
+    } catch {
+      Swal.fire('Error', 'Failed to request meal.', 'error');
     } finally {
       setRequesting(false);
     }
   };
 
-  // Post review handler
   const handlePostReview = async () => {
     if (!user) {
-      toast.error('Please login to post reviews');
-      return;
+      return Swal.fire('Login Required', 'Please login to post reviews.', 'warning');
     }
     if (!newReview.trim()) {
-      toast.error('Review cannot be empty');
-      return;
+      return Swal.fire('Empty Comment', 'Review cannot be empty.', 'error');
     }
 
     try {
@@ -134,15 +134,13 @@ const MealDetails = () => {
         comment: newReview.trim(),
       });
       setNewReview('');
-      toast.success('Review posted');
+      Swal.fire('Posted!', 'Your review has been posted.', 'success');
 
-      // Refresh reviews
       const { data } = await axiosInstance.get(`/reviews/${id}`);
       setReviews(data);
       setReviewCount(data.length);
-    } catch (error) {
-      toast.error('Failed to post review');
-      console.error('❌ Error posting review:', error);
+    } catch {
+      Swal.fire('Error', 'Failed to post review.', 'error');
     } finally {
       setPostingReview(false);
     }
@@ -153,24 +151,26 @@ const MealDetails = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md my-10">
-      <img src={meal.image} alt={meal.title} className="w-full h-64 object-cover rounded" />
+      <img
+        src={meal.image || 'https://via.placeholder.com/600x400?text=No+Image'}
+        alt={meal.title}
+        className="w-full h-64 object-cover rounded"
+      />
       <h1 className="text-3xl font-bold mt-4">{meal.title}</h1>
       <p className="text-gray-600 mt-1">Distributor: {meal.distributor || 'Unknown'}</p>
-      <p className="mt-2 text-gray-800">{meal.description}</p>
+      <p className="mt-2 text-gray-800">{meal.description || 'No description available.'}</p>
       <p className="mt-2">
-        <strong>Ingredients:</strong> {meal.ingredients}
+        <strong>Ingredients:</strong> {meal.ingredients || 'Not listed'}
       </p>
       <p className="text-sm text-gray-400 mt-1">
         Posted: {new Date(meal.postedAt || meal.createdAt).toLocaleString()}
       </p>
 
-      {/* Rating */}
       <div className="text-yellow-500 text-lg mt-2">
         {'★'.repeat(Math.round(meal.rating || 0))}
         {'☆'.repeat(5 - Math.round(meal.rating || 0))}
       </div>
 
-      {/* Like and Request buttons */}
       <div className="flex gap-4 mt-4">
         <button
           onClick={handleLike}
@@ -194,7 +194,6 @@ const MealDetails = () => {
         </button>
       </div>
 
-      {/* Reviews Section */}
       <section className="mt-10">
         <h2 className="text-2xl font-semibold mb-2">Reviews ({reviewCount})</h2>
 
@@ -210,7 +209,7 @@ const MealDetails = () => {
             <button
               onClick={handlePostReview}
               disabled={postingReview}
-              className="mt-2 px-4 py-2 bg-indigo-600 text-white rounded"
+              className="mt-2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
             >
               {postingReview ? 'Posting...' : 'Post Review'}
             </button>
@@ -223,7 +222,7 @@ const MealDetails = () => {
           {reviews.length === 0 && <p>No reviews yet.</p>}
           {reviews.map((review) => (
             <li key={review._id} className="border p-4 rounded shadow-sm bg-gray-50">
-              <p className="font-semibold">{review.userName}</p>
+              <p className="font-semibold">{review.userName || review.userEmail}</p>
               <p className="text-xs text-gray-500">{new Date(review.createdAt).toLocaleString()}</p>
               <p className="mt-2">{review.comment}</p>
             </li>
