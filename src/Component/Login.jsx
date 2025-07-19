@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
@@ -6,20 +6,30 @@ import { toast } from "react-toastify";
 import { AuthContext } from "../Auth/AuthContext";
 import { motion, useAnimation } from "framer-motion";
 import { useForm } from "react-hook-form";
+import axiosInstance from "../Api/axios";
 
 const CartoonCharacter = () => {
   const controls = useAnimation();
+  const isMounted = useRef(false);
 
-  React.useEffect(() => {
-    const sequence = async () => {
-      while (true) {
+  useEffect(() => {
+    isMounted.current = true;
+
+    const blinkLoop = async () => {
+      while (isMounted.current) {
         await controls.start({ scaleY: 1, transition: { duration: 0.1 } });
-        await new Promise((r) => setTimeout(r, 2000));
+        await new Promise((res) => setTimeout(res, 2000));
+        if (!isMounted.current) break;
         await controls.start({ scaleY: 0.1, transition: { duration: 0.1 } });
-        await new Promise((r) => setTimeout(r, 200));
+        await new Promise((res) => setTimeout(res, 200));
       }
     };
-    sequence();
+
+    blinkLoop();
+
+    return () => {
+      isMounted.current = false; // stop loop on unmount
+    };
   }, [controls]);
 
   return (
@@ -67,6 +77,13 @@ const Login = () => {
     try {
       const userCredential = await loginUser(email, password);
       const currentUser = userCredential.user;
+
+      await axiosInstance.post("/users/upsert", {
+        email: currentUser.email,
+        displayName: currentUser.displayName,
+        photoURL: currentUser.photoURL,
+      });
+
       toast.success(`Welcome back ${currentUser.displayName}`);
       navigate(location?.state || "/");
     } catch (error) {
@@ -74,17 +91,23 @@ const Login = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    createUserWithGoogle()
-      .then((result) => {
-        const currentUser = result.user;
-        setUser(currentUser);
-        toast.success(`Welcome back ${currentUser.displayName}`);
-        navigate(location?.state || "/");
-      })
-      .catch(() => {
-        toast.error("Google login failed.");
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await createUserWithGoogle();
+      const currentUser = result.user;
+
+      await axiosInstance.post("/users/upsert", {
+        email: currentUser.email,
+        displayName: currentUser.displayName,
+        photoURL: currentUser.photoURL,
       });
+
+      setUser(currentUser);
+      toast.success(`Welcome back ${currentUser.displayName}`);
+      navigate(location?.state || "/");
+    } catch (error) {
+      toast.error("Google login failed.");
+    }
   };
 
   return (
@@ -130,8 +153,6 @@ const Login = () => {
                 <span
                   onClick={togglePassword}
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
-                  title={showPassword ? "Hide Password" : "Show Password"}
-                  aria-label={showPassword ? "Hide Password" : "Show Password"}
                 >
                   {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
                 </span>

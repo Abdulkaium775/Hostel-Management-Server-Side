@@ -50,13 +50,8 @@ const Navbar = () => {
           className="flex items-center space-x-2 font-bold text-xl"
           onClick={handleNavLinkClick}
         >
-          {/* Replace '/logo.png' with your actual logo path or remove this img if no logo */}
-          <img
-            src=""
-            alt="Logo"
-            className="h-8 w-8"
-          />
-          <span>Hostel Management </span>
+          {/* Removed empty img src to fix the warning */}
+          <span>Hostel Management</span>
         </Link>
 
         {/* Middle: Navigation Links for md+ */}

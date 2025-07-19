@@ -6,10 +6,11 @@ import { toast } from "react-toastify";
 import { motion, useAnimation } from "framer-motion";
 import { AuthContext } from "../Auth/AuthContext";
 import { useForm } from "react-hook-form";
+import axiosInstance from "../Api/axios";
+
 
 const CartoonCharacterRegister = () => {
   const controls = useAnimation();
-
   React.useEffect(() => {
     controls.start({
       rotate: [0, 15, -15, 15, 0],
@@ -55,90 +56,63 @@ const Register = () => {
     formState: { errors },
   } = useForm();
 
-  const saveUserToDB = async (userData) => {
-    // Adjust this endpoint to your backend API
+  const upsertUserToDB = async (user) => {
     try {
-      const res = await fetch("/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userData),
+      await axiosInstance.post("/users/upsert", {
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
       });
-      if (!res.ok) throw new Error("Failed to save user data");
-      return true;
     } catch (err) {
-      console.error(err);
-      toast.error("Could not save user data");
-      return false;
+      console.error("User upsert failed:", err);
+      toast.error("Could not save user to DB");
     }
   };
 
   const onSubmit = async (data) => {
     const { name, email, password, photoUrl } = data;
 
-    // Password validations:
-    if (!/[A-Z]/.test(password)) {
-      toast.error("Password must contain at least one uppercase letter.");
-      return;
-    }
-    if (!/[a-z]/.test(password)) {
-      toast.error("Password must contain at least one lowercase letter.");
-      return;
-    }
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters long.");
-      return;
-    }
+    // 🔒 Password validation
+    if (!/[A-Z]/.test(password)) return toast.error("At least one uppercase letter required");
+    if (!/[a-z]/.test(password)) return toast.error("At least one lowercase letter required");
+    if (password.length < 6) return toast.error("Password must be at least 6 characters");
 
     try {
       const userCredential = await createUser(email, password);
-      const currentUser = userCredential.user;
+      const user = userCredential.user;
+
       await updateUser({ displayName: name, photoURL: photoUrl });
 
-      // Prepare user data with default Bronze badge
-      const userDataToSave = {
-        uid: currentUser.uid,
-        name,
-        email,
+      await upsertUserToDB({
+        email: user.email,
+        displayName: name,
         photoURL: photoUrl || "",
-        badge: "Bronze",
-        createdAt: new Date().toISOString(),
-      };
+      });
 
-      const saved = await saveUserToDB(userDataToSave);
-
-      if (saved) {
-        toast.success("Account created successfully!");
-        navigate(location?.state || "/");
-      }
+      toast.success("Account created successfully!");
+      navigate(location?.state || "/");
     } catch (error) {
       toast.error(error.message || "Something went wrong.");
     }
   };
 
-  const handleGoogleLogin = () => {
-    createUserWithGoogle()
-      .then(async (result) => {
-        const currentUser = result.user;
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await createUserWithGoogle();
+      const user = result.user;
 
-        // Prepare user data with default Bronze badge
-        const userDataToSave = {
-          uid: currentUser.uid,
-          name: currentUser.displayName || "",
-          email: currentUser.email,
-          photoURL: currentUser.photoURL || "",
-          badge: "Bronze",
-          createdAt: new Date().toISOString(),
-        };
-
-        await saveUserToDB(userDataToSave);
-
-        toast.success(`Welcome back ${currentUser.displayName}`);
-        navigate(location?.state || "/");
-      })
-      .catch((error) => {
-        toast.error("Google login failed.");
-        console.log(error);
+      await upsertUserToDB({
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL || "",
       });
+
+      toast.success(`Welcome ${user.displayName}`);
+      navigate(location?.state || "/");
+    } catch (err) {
+      console.error(err);
+      toast.error("Google login failed");
+    }
   };
 
   return (
@@ -187,7 +161,6 @@ const Register = () => {
               <span
                 onClick={togglePassword}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 cursor-pointer"
-                title={showPassword ? "Hide Password" : "Show Password"}
               >
                 {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
               </span>
@@ -211,13 +184,11 @@ const Register = () => {
             </motion.button>
           </form>
 
-          <p className="text-black text-center pt-2">Don’t have an account?{" "}</p>
-
           <motion.button
             onClick={handleGoogleLogin}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="mt-2 w-full bg-white text-black border p-3 rounded-md flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition font-semibold"
+            className="mt-4 w-full bg-white text-black border p-3 rounded-md flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition font-semibold"
           >
             <FcGoogle size={24} />
             Register with Google

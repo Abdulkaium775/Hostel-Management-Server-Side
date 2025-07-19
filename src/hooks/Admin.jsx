@@ -1,42 +1,32 @@
-import { useContext, useEffect, useState } from "react";
 import axiosInstance from "../Api/axios";
-import { AuthContext } from "../Auth/AuthContext";
+import { useEffect, useState } from "react";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-const useAdmin = () => {
-  const { user } = useContext(AuthContext);
-  const [isAdmin, setIsAdmin] = useState(false);
+const useRole = () => {
+  const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
+  const auth = getAuth();
 
   useEffect(() => {
-    let isMounted = true;
-
-    const checkAdminStatus = async () => {
-      if (!user?.email) {
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await axiosInstance.get(`/api/users/admin/${user.email}`);
-        if (isMounted) {
-          setIsAdmin(response.data?.isAdmin || false);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user?.email) {
+        try {
+          const res = await axiosInstance.get(`/users/${user.email}`);
+          setRole(res.data.role || "user");  // Make sure your DB has role field
+        } catch (err) {
+          console.error("Failed to fetch role:", err);
+          setRole("user");
         }
-      } catch (error) {
-        console.error("❌ Error checking admin status:", error);
-        if (isMounted) setIsAdmin(false);
-      } finally {
-        if (isMounted) setLoading(false);
+      } else {
+        setRole(null);
       }
-    };
+      setLoading(false);
+    });
 
-    checkAdminStatus();
+    return () => unsubscribe();
+  }, [auth]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, [user]);
-
-  return [isAdmin, loading];
+  return [role, loading];
 };
 
-export default useAdmin;
+export default useRole;
