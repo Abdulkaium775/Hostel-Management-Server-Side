@@ -8,7 +8,6 @@ import JoinUs from "../Component/JoinUs";
 import Dashboard from "../Component/Dashboard";
 import MyReviews from "../Component/MyReviews";
 import PaymentHistory from "../Component/PaymentHistory";
-import { AdminProfile } from "../Component/AdminProfile";
 import ManageUsers from "../Component/ManageUsers";
 import AddMeal from "../Component/AddMeal";
 import AllReviews from "../Component/AllReviews";
@@ -23,6 +22,8 @@ import AllMeals from "../Component/AllMeals";
 import Unauthorized from "../Component/Unauthorized";
 import UserRoute from "./UserRoute";
 import AdminRoute from "./AdminRoute";
+import { AdminProfile } from "../Component/AdminProfile";
+
 
 export const router = createBrowserRouter([
   {
