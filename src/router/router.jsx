@@ -8,7 +8,7 @@ import JoinUs from "../Component/JoinUs";
 import Dashboard from "../Component/Dashboard";
 import MyReviews from "../Component/MyReviews";
 import PaymentHistory from "../Component/PaymentHistory";
-import ManageUsers from "../Component/ManageUsers";
+
 import AddMeal from "../Component/AddMeal";
 import AllReviews from "../Component/AllReviews";
 import ServeMeals from "../Component/ServeMeals";
@@ -22,7 +22,11 @@ import AllMeals from "../Component/AllMeals";
 import Unauthorized from "../Component/Unauthorized";
 import UserRoute from "./UserRoute";
 import AdminRoute from "./AdminRoute";
+import ManageUsers from "../Component/ManageUsers";
+import ViewMeals from "../Component/ViewMeals";
 import { AdminProfile } from "../Component/AdminProfile";
+import UpdateMeal from "../Component/UpdateMeal";
+
 
 
 export const router = createBrowserRouter([
@@ -33,21 +37,29 @@ export const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
+
+      // Meals and related public routes
       { path: "meals", element: <Meals /> },
+
+      // MealDetails public route
       { path: "meal/:id", element: <MealDetails /> },
+
+      // Optional: public ViewMeal route outside dashboard
+      // { path: "view-meal/:id", element: <ViewMeal /> },
+
       { path: "upcoming-meals", element: <UpcomingMeals /> },
       { path: "join-us", element: <JoinUs /> },
       { path: "checkout/:packageName", element: <CheckoutPage /> },
 
-      // ❌ Unauthorized Access
+      // Unauthorized page
       { path: "unauthorized", element: <Unauthorized /> },
 
-      // ✅ Dashboard Routes
+      // Dashboard routes (protected)
       {
         path: "dashboard",
         element: <Dashboard />,
         children: [
-          // 🔐 User-only Routes
+          // User-only routes
           {
             path: "my-profile",
             element: (
@@ -89,7 +101,7 @@ export const router = createBrowserRouter([
             ),
           },
 
-          // 🔐 Admin-only Routes
+          // Admin-only routes
           {
             path: "admin-profile",
             element: (
@@ -122,6 +134,27 @@ export const router = createBrowserRouter([
               </AdminRoute>
             ),
           },
+
+          // Update Meal (Admin only)
+          {
+            path: "meals/update/:id",
+            element: (
+              <AdminRoute>
+                <UpdateMeal />
+              </AdminRoute>
+            ),
+          },
+
+          // ViewMeal inside dashboard if needed (usually public outside)
+          {
+            path: "view-meal/:id",
+            element: (
+              <AdminRoute>
+                <ViewMeals />
+              </AdminRoute>
+            ),
+          },
+
           {
             path: "all-reviews",
             element: (
