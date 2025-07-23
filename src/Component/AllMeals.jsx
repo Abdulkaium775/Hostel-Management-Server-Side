@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axiosInstance from "../Api/axios";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
+import { AuthContext } from "../Auth/AuthContext";
 
 const AllMeals = () => {
+  const { user } = useContext(AuthContext);
+
   const navigate = useNavigate();
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -32,21 +36,42 @@ const AllMeals = () => {
     fetchMeals();
   }, [sortBy, order, page]);
 
- const handleDelete = async (mealId) => {
-  if (!window.confirm("Are you sure you want to delete this meal?")) return;
 
-  try {
-    const adminEmail = "admin@example.com"; // Replace with actual logged-in admin email
-    await axiosInstance.delete(`/meals/${mealId}`, {
-      headers: {
-        'x-admin-email': adminEmail,
-      },
+  const handleDelete = async (mealId) => {
+    const confirm = await Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
     });
-    fetchMeals();
-  } catch (error) {
-    alert("Failed to delete meal");
-  }
-};
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const res = await axiosInstance.delete(`/meals/${mealId}`, {
+        headers: {
+          "x-admin-email": user?.email || "",
+        },
+      });
+
+      if (res.data.success) {
+        fetchMeals(); // Refresh meals after deletion
+        Swal.fire("Deleted!", "The meal has been deleted.", "success");
+      } else {
+        Swal.fire("Error", res.data.message || "Deletion failed", "error");
+      }
+    } catch (err) {
+      console.error("Delete Error:", err);
+      Swal.fire(
+        "Error",
+        err?.response?.data?.message || "Failed to delete meal.",
+        "error"
+      );
+    }
+  };
 
 
   return (
@@ -126,13 +151,13 @@ const AllMeals = () => {
                       Update
                     </button>
                     <button
-                      onClick={() => handleDelete(meal._id)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm"
-                    >
-                      Delete
-                    </button>
+  onClick={() => handleDelete(meal._id)}
+  className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm"
+>
+  Delete
+</button>
                     <button
-                      onClick={() => (window.location.href = `/meals/${meal._id}`)}
+                       onClick={() => navigate(`/meal/${meal._id}`)}
                       className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
                     >
                       View

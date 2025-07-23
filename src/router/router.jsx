@@ -26,6 +26,7 @@ import ManageUsers from "../Component/ManageUsers";
 import ViewMeals from "../Component/ViewMeals";
 import { AdminProfile } from "../Component/AdminProfile";
 import UpdateMeal from "../Component/UpdateMeal";
+import UpcomingMealsAdminTable from "../Component/UpcomingMeals";
 
 
 
@@ -175,7 +176,7 @@ export const router = createBrowserRouter([
             path: "upcoming-meals",
             element: (
               <AdminRoute>
-                <UpcomingMeals />
+                <UpcomingMealsAdminTable />
               </AdminRoute>
             ),
           },
