@@ -16,7 +16,7 @@ const AddMeal = () => {
     formState: { errors, isSubmitting },
   } = useForm();
 
-  const IMAGEBB_API_KEY = "YOUR_ACTUAL_IMAGEBB_API_KEY";
+  const IMAGEBB_API_KEY = "4794f23cddfe3b9c5c2c2c6797bc5878";
 
   // Convert file to base64 string (without prefix)
   const convertToBase64 = (file) => {
@@ -42,6 +42,7 @@ const AddMeal = () => {
       const url = `https://api.imgbb.com/1/upload?key=${IMAGEBB_API_KEY}`;
 
       const response = await axios.post(url, formData);
+      console.log(response.data)  
       if (response.data && response.data.data && response.data.data.url) {
         return response.data.data.url;
       } else {
@@ -76,7 +77,7 @@ const AddMeal = () => {
 
       // Send data to backend
       const response = await axiosInstance.post(
-        `${process.env.REACT_APP_API_BASE_URL || "http://localhost:5000"}/meals`,
+        `${import.meta.env.REACT_APP_API_BASE_URL || "http://localhost:5000"}/meals`,
         payload
       );
 

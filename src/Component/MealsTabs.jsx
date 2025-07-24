@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../Api/axios';
 
+
 const categories = ['All', 'Breakfast', 'Lunch', 'Dinner'];
 
 const MealsTabs = () => {
