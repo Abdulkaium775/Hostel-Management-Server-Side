@@ -4,7 +4,7 @@ import { AuthContext } from "../Auth/AuthContext";
 const MyProfile = () => {
   const { user } = useContext(AuthContext);
 
-  if (!user) return <p>Loading user info...</p>;
+  if (!user) return <p className="text-center mt-10 text-gray-500">Loading user info...</p>;
 
   // Determine badge color and label (default Bronze)
   const badgeLabel = user.badge || "Bronze";
@@ -15,21 +15,19 @@ const MyProfile = () => {
   else if (badgeLabel === "Platinum") badgeClass = "bg-purple-700";
 
   return (
-    <div className="p-5 space-y-4">
-      <h2 className="text-2xl font-bold">My Profile</h2>
-      <div className="bg-white p-6 rounded shadow-md w-full max-w-md mx-auto space-y-4">
+    <div className="p-5 max-w-xl mx-auto space-y-6">
+      <h2 className="text-3xl font-bold text-center md:text-left">My Profile</h2>
+      <div className="bg-white p-6 rounded-lg shadow-md w-full flex flex-col items-center md:items-start md:flex-row md:gap-8">
         <img
           src={user.photoURL || "https://via.placeholder.com/96"}
           alt="Profile"
-          className="w-24 h-24 rounded-full mx-auto object-cover"
+          className="w-24 h-24 rounded-full object-cover mb-4 md:mb-0"
         />
-        <h3 className="text-xl font-semibold text-center">
-          {user.displayName || "No Name"}
-        </h3>
-        <p className="text-center text-gray-600">{user.email || "No Email"}</p>
-        <div className="text-center">
+        <div className="text-center md:text-left">
+          <h3 className="text-2xl font-semibold">{user.displayName || "No Name"}</h3>
+          <p className="text-gray-600 mb-3">{user.email || "No Email"}</p>
           <span
-            className={`inline-block px-4 py-1 rounded-full text-white font-medium ${badgeClass}`}
+            className={`inline-block px-5 py-1 rounded-full text-white font-semibold ${badgeClass}`}
           >
             {badgeLabel}
           </span>

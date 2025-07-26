@@ -48,16 +48,18 @@ export const AdminProfile = () => {
   if (!adminData) return null;
 
   return (
-    <div className="max-w-md mx-auto bg-white shadow-lg rounded-xl p-8 mt-8">
-      <div className="flex flex-col items-center">
+    <div className="max-w-md mx-auto bg-white shadow-lg rounded-xl p-6 mt-8 sm:p-8">
+      <div className="flex flex-col items-center text-center px-4">
         <img
           src={adminData.image || user.photoURL || "https://via.placeholder.com/150"}
           alt={adminData.name || user.displayName || "Admin"}
-          className="w-32 h-32 rounded-full object-cover mb-6 border-4 border-indigo-500 shadow-md"
+          className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover mb-6 border-4 border-indigo-500 shadow-md"
         />
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">{adminData.name || user.displayName}</h2>
-        <p className="text-gray-600 mb-4">{adminData.email || user.email}</p>
-        <div className="bg-indigo-100 text-indigo-800 px-4 py-2 rounded-full font-semibold text-lg">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 truncate max-w-full">
+          {adminData.name || user.displayName}
+        </h2>
+        <p className="text-gray-600 mb-4 truncate max-w-full">{adminData.email || user.email}</p>
+        <div className="bg-indigo-100 text-indigo-800 px-4 py-2 rounded-full font-semibold text-base sm:text-lg whitespace-nowrap">
           Meals Added: {adminData.mealsAddedCount ?? 0}
         </div>
       </div>

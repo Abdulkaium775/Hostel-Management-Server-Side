@@ -2,8 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../Api/axios';
 
-
 const categories = ['All', 'Breakfast', 'Lunch', 'Dinner'];
+
+const gradients = [
+  'bg-gradient-to-r from-purple-400 via-pink-500 to-red-500',
+  'bg-gradient-to-r from-green-400 via-blue-500 to-purple-600',
+  'bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500',
+  'bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500',
+  'bg-gradient-to-r from-teal-400 via-cyan-500 to-blue-500',
+];
 
 const MealsTabs = () => {
   const [activeTab, setActiveTab] = useState('All');
@@ -16,7 +23,6 @@ const MealsTabs = () => {
     const fetchMeals = async () => {
       setLoading(true);
       try {
-        // Don't send category param when activeTab is 'All'
         const params = { limit: 3 };
         if (activeTab !== 'All') params.category = activeTab;
 
@@ -40,7 +46,7 @@ const MealsTabs = () => {
           <button
             key={cat}
             onClick={() => setActiveTab(cat)}
-            className={`px-5 py-2 rounded-full text-sm sm:text-base font-semibold transition duration-300 ${
+            className={`px-4 sm:px-6 py-2 text-sm sm:text-base font-semibold rounded-full transition duration-300 ${
               activeTab === cat
                 ? 'bg-indigo-600 text-white shadow-md'
                 : 'bg-white text-indigo-600 border border-indigo-600 hover:bg-indigo-100'
@@ -62,36 +68,42 @@ const MealsTabs = () => {
             </p>
           )}
 
-          {meals.map((meal) => (
-            <div
-              key={meal._id}
-              className="bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden"
-            >
-              <img
-                src={meal.image || 'https://via.placeholder.com/400x240?text=No+Image'}
-                alt={meal.title}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4 sm:p-5">
-                <h2 className="text-xl sm:text-2xl font-semibold text-gray-900 truncate">
-                  {meal.title}
-                </h2>
-                <p className="mt-2 text-yellow-500 text-sm sm:text-base font-semibold">
-                  {Array(Math.round(meal.rating || 0)).fill('★').join('')}
-                  {Array(5 - Math.round(meal.rating || 0)).fill('☆').join('')}
-                </p>
-                <p className="text-lg sm:text-xl font-bold mt-3">
-                  ${meal.price != null ? meal.price.toFixed(2) : '0.00'}
-                </p>
-                <button
-                  onClick={() => navigate(`/meal/${meal._id}`)}
-                  className="mt-5 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 sm:py-3 rounded-md font-semibold transition"
-                >
-                  Details
-                </button>
+          {meals.map((meal, index) => {
+            const gradientClass = gradients[index % gradients.length];
+            return (
+              <div
+                key={meal._id}
+                className={`rounded-xl overflow-hidden shadow-md hover:shadow-xl transition duration-300 flex flex-col ${gradientClass}`}
+              >
+                <img
+                  src={meal.image || 'https://via.placeholder.com/400x240?text=No+Image'}
+                  alt={meal.title}
+                  className="w-full h-44 sm:h-48 md:h-52 object-cover"
+                />
+                <div className="p-4 sm:p-5 flex flex-col flex-grow text-white">
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-bold truncate">
+                    {meal.title}
+                  </h2>
+
+                  <p className="mt-1 text-yellow-300 text-sm sm:text-base font-semibold">
+                    {Array(Math.round(meal.rating || 0)).fill('★').join('')}
+                    {Array(5 - Math.round(meal.rating || 0)).fill('☆').join('')}
+                  </p>
+
+                  <p className="text-base sm:text-lg md:text-xl font-bold mt-2">
+                    ${meal.price != null ? meal.price.toFixed(2) : '0.00'}
+                  </p>
+
+                  <button
+                    onClick={() => navigate(`/meal/${meal._id}`)}
+                    className="mt-auto mt-4 bg-white bg-opacity-20 hover:bg-opacity-40 text-black py-2 sm:py-3 rounded-md font-semibold transition text-sm sm:text-base"
+                  >
+                    Details
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

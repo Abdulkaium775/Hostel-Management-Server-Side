@@ -36,7 +36,7 @@ const CartoonCharacter = () => {
     <motion.div
       animate={{ y: [0, -20, 0] }}
       transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-      className="fixed top-8 left-8 w-24 h-24 bg-yellow-400 rounded-full flex flex-col items-center justify-center shadow-lg cursor-default select-none"
+      className="mx-auto mb-6 w-24 h-24 bg-yellow-400 rounded-full flex flex-col items-center justify-center shadow-lg cursor-default select-none"
       title="Hey! Welcome to the login page"
     >
       <div className="flex justify-between w-12">
@@ -112,16 +112,19 @@ const Login = () => {
 
   return (
     <>
-      <CartoonCharacter />
-
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-[#6a11cb] to-[#2575fc] p-6"
+        className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-tr from-[#6a11cb] to-[#2575fc] p-4 sm:p-6"
       >
-        <div className="bg-white w-full max-w-md p-8 rounded-xl shadow-xl">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">Login</h2>
+        {/* Cartoon emoji inside normal flow */}
+        <CartoonCharacter />
+
+        <div className="bg-white w-full max-w-md sm:max-w-lg md:max-w-xl p-6 sm:p-8 rounded-xl shadow-xl">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-800 mb-6">
+            Login
+          </h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
@@ -136,9 +139,11 @@ const Login = () => {
                     message: "Invalid email address",
                   },
                 })}
-                className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none"
+                className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none text-sm sm:text-base"
               />
-              {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
+              {errors.email && (
+                <p className="text-red-600 text-xs sm:text-sm">{errors.email.message}</p>
+              )}
             </div>
 
             <div>
@@ -148,7 +153,7 @@ const Login = () => {
                   type={showPassword ? "text" : "password"}
                   placeholder="Type your password"
                   {...register("password", { required: "Password is required" })}
-                  className="w-full px-4 py-2 border rounded-md pr-10 focus:ring-2 focus:ring-indigo-400 outline-none"
+                  className="w-full px-4 py-2 border rounded-md pr-10 focus:ring-2 focus:ring-indigo-400 outline-none text-sm sm:text-base"
                 />
                 <span
                   onClick={togglePassword}
@@ -157,7 +162,9 @@ const Login = () => {
                   {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
                 </span>
               </div>
-              {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
+              {errors.password && (
+                <p className="text-red-600 text-xs sm:text-sm">{errors.password.message}</p>
+              )}
             </div>
 
             <div className="text-right">
@@ -170,13 +177,15 @@ const Login = () => {
               type="submit"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="w-full py-2 bg-gradient-to-r from-[#8e2de2] to-[#4a00e0] text-white rounded-md font-semibold hover:opacity-90 transition"
+              className="w-full py-2 bg-gradient-to-r from-[#8e2de2] to-[#4a00e0] text-white rounded-md font-semibold hover:opacity-90 transition text-sm sm:text-base"
             >
               LOGIN
             </motion.button>
           </form>
 
-          <div className="my-4 text-center text-gray-500">Or Sign In using</div>
+          <div className="my-4 text-center text-gray-500 text-sm sm:text-base">
+            Or Sign In using
+          </div>
 
           <motion.div
             className="flex justify-center gap-4 mb-4"
@@ -188,10 +197,10 @@ const Login = () => {
               onClick={handleGoogleLogin}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              className="text-xl px-4 bg-gradient-to-r from-[#8e2de2] to-[#4a00e0] rounded-md"
+              className="mt-4 w-full bg-white text-black border p-3 rounded-md flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition font-semibold text-sm sm:text-base"
               aria-label="Sign in with Google"
             >
-              <FcGoogle size={28} />
+              <FcGoogle size={28} /><p>Register with Google</p>
             </motion.button>
           </motion.div>
 

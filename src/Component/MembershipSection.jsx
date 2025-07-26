@@ -30,22 +30,22 @@ const MembershipSection = () => {
   ];
 
   return (
-    <section className="py-16 px-4 md:px-8 lg:px-16 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <section className="py-16 px-4 sm:px-6 lg:px-16 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <div className="text-center mb-12">
-        <h2 className="text-4xl font-extrabold text-indigo-700 mb-3">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-indigo-700 mb-3">
           Upgrade Your Experience
         </h2>
-        <p className="text-gray-600 text-lg">
+        <p className="text-gray-600 text-base sm:text-lg max-w-2xl mx-auto">
           Choose a premium plan and unlock exclusive features
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
         {packages.map((pkg) => (
           <Link
             to={`/checkout/${pkg.name.toLowerCase()}`}
             key={pkg.name}
-            className={`relative rounded-3xl p-6 shadow-xl border-t-4 border-indigo-100 hover:shadow-2xl transform hover:scale-105 transition-all duration-300 ${pkg.bg} ring-2 ${pkg.ring} flex flex-col`}
+            className={`relative rounded-3xl p-6 sm:p-7 md:p-8 shadow-xl border-t-4 border-indigo-100 hover:shadow-2xl transform hover:scale-[1.03] transition-all duration-300 ${pkg.bg} ring-2 ${pkg.ring} flex flex-col`}
           >
             {/* Ribbon for Gold plan */}
             {pkg.name === "Gold" && (
@@ -56,13 +56,13 @@ const MembershipSection = () => {
 
             <div className="flex flex-col items-center text-center flex-grow">
               <div className="mb-4">{pkg.icon}</div>
-              <h3 className="text-2xl font-bold text-indigo-700 mb-2">
+              <h3 className="text-xl sm:text-2xl font-bold text-indigo-700 mb-2">
                 {pkg.name} Package
               </h3>
-              <p className="text-xl font-semibold text-indigo-600 mb-4">
+              <p className="text-lg sm:text-xl font-semibold text-indigo-600 mb-4">
                 {pkg.price}
               </p>
-              <ul className="text-gray-700 text-sm space-y-2 mb-6">
+              <ul className="text-gray-700 text-sm sm:text-base space-y-2 mb-6">
                 {pkg.benefits.map((item, index) => (
                   <li
                     key={index}
@@ -76,7 +76,7 @@ const MembershipSection = () => {
 
             <button
               type="button"
-              className="mt-auto px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-medium shadow"
+              className="mt-auto w-full px-5 py-2 sm:py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full font-medium shadow transition duration-300"
             >
               Choose {pkg.name}
             </button>

@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
-
-// Floating leaf SVG component
 const Leaf = ({ className, style }) => (
   <svg
     className={className}
@@ -25,7 +23,6 @@ const RealTimeRequests = () => {
   const [count, setCount] = useState(0);
   const targetCount = 1523;
 
-  // Counter animation
   useEffect(() => {
     let start = 0;
     const duration = 2000;
@@ -42,9 +39,7 @@ const RealTimeRequests = () => {
     return () => clearInterval(interval);
   }, [targetCount]);
 
-  // Cancel button handler with SweetAlert2
   const handleCancel = async () => {
-    console.log('handleCancel called');
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "Do you want to cancel this action?",
@@ -62,113 +57,97 @@ const RealTimeRequests = () => {
   };
 
   return (
-    <section className="relative overflow-hidden py-20 text-center mb-8 text-white px-4 bg-gradient-to-r from-teal-800 via-purple-500 to-cyan-600">
-      {/* Radial gradient overlay */}
+    <section className="relative overflow-hidden py-20 sm:py-24 px-4 sm:px-6 lg:px-8 text-center mb-8 text-white bg-gradient-to-r from-teal-800 via-purple-500 to-cyan-600">
+      {/* Background overlays and animated elements */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-radial opacity-30"></div>
-
-      {/* Blurred animated circles */}
       <div
-        className="absolute top-12 left-12 w-44 h-44 rounded-full opacity-25 filter blur-3xl animate-float"
+        className="absolute top-12 left-12 w-44 h-44 rounded-full opacity-25 blur-3xl animate-float"
         style={{ backgroundColor: "rgba(20, 184, 166, 0.4)", animationDuration: "7s" }}
       />
       <div
-        className="absolute bottom-24 right-24 w-72 h-72 rounded-full opacity-15 filter blur-3xl animate-float"
+        className="absolute bottom-24 right-24 w-72 h-72 rounded-full opacity-15 blur-3xl animate-float"
         style={{ backgroundColor: "rgba(59, 130, 246, 0.3)", animationDuration: "9s", animationDelay: "2s" }}
       />
-
-      {/* Floating leaf elements */}
-      <Leaf
-        className="absolute top-10 right-1/4 animate-float-slow"
-        style={{ color: "rgba(79, 209, 197, 0.25)", animationDuration: "12s" }}
-      />
-      <Leaf
-        className="absolute bottom-16 left-1/3 animate-float-slow"
-        style={{ color: "rgba(96, 165, 250, 0.2)", animationDuration: "10s", animationDelay: "3s" }}
-      />
-      <Leaf
-        className="absolute top-1/3 left-1/4 animate-float-slow"
-        style={{ color: "rgba(52, 211, 153, 0.22)", animationDuration: "14s", animationDelay: "5s" }}
-      />
-      <Leaf
-        className="absolute bottom-28 right-1/3 animate-float-slow"
-        style={{ color: "rgba(6, 182, 212, 0.2)", animationDuration: "11s", animationDelay: "1s" }}
-      />
+      <Leaf className="absolute top-10 right-1/4 animate-float-slow" style={{ color: "rgba(79, 209, 197, 0.25)", animationDuration: "12s" }} />
+      <Leaf className="absolute bottom-16 left-1/3 animate-float-slow" style={{ color: "rgba(96, 165, 250, 0.2)", animationDuration: "10s", animationDelay: "3s" }} />
+      <Leaf className="absolute top-1/3 left-1/4 animate-float-slow" style={{ color: "rgba(52, 211, 153, 0.22)", animationDuration: "14s", animationDelay: "5s" }} />
+      <Leaf className="absolute bottom-28 right-1/3 animate-float-slow" style={{ color: "rgba(6, 182, 212, 0.2)", animationDuration: "11s", animationDelay: "1s" }} />
 
       {/* Heading */}
-      <h2 className="relative inline-block text-4xl font-extrabold mb-6 after:absolute after:left-0 after:bottom-0 after:w-full after:h-1 after:bg-gradient-to-r after:from-cyan-400 after:via-blue-400 after:to-teal-400 after:rounded after:animate-glow">
+      <h2 className="relative inline-block text-3xl sm:text-4xl md:text-5xl font-extrabold mb-6 after:absolute after:left-0 after:bottom-0 after:w-full after:h-1 after:bg-gradient-to-r after:from-cyan-400 after:via-blue-400 after:to-teal-400 after:rounded after:animate-glow">
         Meals Served So Far
       </h2>
 
-      {/* Meal count */}
+      {/* Animated Counter */}
       <p
         key={count}
-        className="text-7xl font-extrabold tracking-widest bg-gradient-to-r from-cyan-400 via-blue-400 to-teal-400 bg-clip-text text-transparent drop-shadow-lg animate-bounce-slow"
+        className="text-5xl sm:text-6xl md:text-7xl font-extrabold tracking-widest bg-gradient-to-r from-cyan-400 via-blue-400 to-teal-400 bg-clip-text text-transparent drop-shadow-lg animate-bounce-slow"
       >
         {count.toLocaleString()}
       </p>
 
-      <p className="mt-5 text-xl opacity-80 max-w-xl mx-auto">
+      <p className="mt-4 text-base sm:text-lg md:text-xl opacity-80 max-w-xl mx-auto">
         and counting! Join us to enjoy your delicious meal.
       </p>
 
       {/* Cancel Button */}
       <button
         onClick={handleCancel}
-        className="mt-6 px-6 py-2 bg-red-600 hover:bg-red-700 transition text-white font-medium rounded"
+        className="mt-6 px-6 py-2 text-sm sm:text-base bg-red-600 hover:bg-red-700 transition text-white font-medium rounded"
       >
         Cancel Action
       </button>
 
-      {/* Custom CSS */}
+      {/* Animations */}
       <style>{`
-          @keyframes glow {
-            0%, 100% {
-              box-shadow: 0 0 6px 2px rgba(79, 209, 197, 0.7);
-            }
-            50% {
-              box-shadow: 0 0 12px 4px rgba(79, 209, 197, 1);
-            }
+        @keyframes glow {
+          0%, 100% {
+            box-shadow: 0 0 6px 2px rgba(79, 209, 197, 0.7);
           }
-          @keyframes float {
-            0%, 100% {
-              transform: translateY(0);
-            }
-            50% {
-              transform: translateY(-15px);
-            }
+          50% {
+            box-shadow: 0 0 12px 4px rgba(79, 209, 197, 1);
           }
-          @keyframes floatSlow {
-            0%, 100% {
-              transform: translateY(0);
-            }
-            50% {
-              transform: translateY(-8px);
-            }
+        }
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0);
           }
-          @keyframes bounce-slow {
-            0%, 100% {
-              transform: translateY(0);
-            }
-            50% {
-              transform: translateY(-10px);
-            }
+          50% {
+            transform: translateY(-15px);
           }
-          .animate-glow {
-            animation: glow 2s ease-in-out infinite;
+        }
+        @keyframes floatSlow {
+          0%, 100% {
+            transform: translateY(0);
           }
-          .animate-float {
-            animation: float 6s ease-in-out infinite;
+          50% {
+            transform: translateY(-8px);
           }
-          .animate-float-slow {
-            animation: floatSlow 10s ease-in-out infinite;
+        }
+        @keyframes bounce-slow {
+          0%, 100% {
+            transform: translateY(0);
           }
-          .animate-bounce-slow {
-            animation: bounce-slow 1.5s ease-in-out;
+          50% {
+            transform: translateY(-10px);
           }
-          .bg-gradient-radial {
-            background: radial-gradient(circle at center, rgba(255 255 255 / 0.15), transparent);
-          }
-        `}</style>
+        }
+        .animate-glow {
+          animation: glow 2s ease-in-out infinite;
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        .animate-float-slow {
+          animation: floatSlow 10s ease-in-out infinite;
+        }
+        .animate-bounce-slow {
+          animation: bounce-slow 1.5s ease-in-out;
+        }
+        .bg-gradient-radial {
+          background: radial-gradient(circle at center, rgba(255 255 255 / 0.15), transparent);
+        }
+      `}</style>
     </section>
   );
 };

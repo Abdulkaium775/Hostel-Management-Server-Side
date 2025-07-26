@@ -8,7 +8,6 @@ import { AuthContext } from "../Auth/AuthContext";
 import { useForm } from "react-hook-form";
 import axiosInstance from "../Api/axios";
 
-
 const CartoonCharacterRegister = () => {
   const controls = useAnimation();
   React.useEffect(() => {
@@ -21,9 +20,9 @@ const CartoonCharacterRegister = () => {
   return (
     <motion.div
       animate={controls}
-      className="fixed top-8 left-8 w-24 h-24 rounded-full bg-red-400 shadow-lg flex flex-col items-center justify-center cursor-default select-none"
+      className="mx-auto mb-6 w-24 h-24 rounded-full bg-red-400 shadow-lg flex flex-col items-center justify-center cursor-default select-none"
       title="Welcome! Register here"
-      style={{ position: "fixed", zIndex: 1000 }}
+      style={{ maxWidth: 96 /* 24rem */ }}
     >
       <div className="relative w-16 h-16 bg-pink-200 rounded-full flex items-center justify-center">
         <div className="flex justify-between w-10 absolute top-5 left-3">
@@ -72,10 +71,12 @@ const Register = () => {
   const onSubmit = async (data) => {
     const { name, email, password, photoUrl } = data;
 
-    // 🔒 Password validation
-    if (!/[A-Z]/.test(password)) return toast.error("At least one uppercase letter required");
-    if (!/[a-z]/.test(password)) return toast.error("At least one lowercase letter required");
-    if (password.length < 6) return toast.error("Password must be at least 6 characters");
+    if (!/[A-Z]/.test(password))
+      return toast.error("At least one uppercase letter required");
+    if (!/[a-z]/.test(password))
+      return toast.error("At least one lowercase letter required");
+    if (password.length < 6)
+      return toast.error("Password must be at least 6 characters");
 
     try {
       const userCredential = await createUser(email, password);
@@ -116,93 +117,100 @@ const Register = () => {
   };
 
   return (
-    <>
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-r from-[#8e2de2] to-[#4a00e0] p-4 sm:p-6"
+    >
+      {/* Cartoon placed here, inside normal flow, so it scrolls with content */}
       <CartoonCharacterRegister />
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className="min-h-screen flex justify-center items-center bg-gradient-to-r from-[#8e2de2] to-[#4a00e0] p-6"
-      >
-        <div className="w-full max-w-md bg-white rounded-xl shadow-xl p-8 text-gray-900">
-          <h2 className="text-3xl font-bold text-center mb-6 text-gray-900">Register</h2>
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl bg-white rounded-xl shadow-xl p-6 sm:p-8 text-gray-900">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-gray-900">
+          Register
+        </h2>
 
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+        <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <input
+            className="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none text-sm sm:text-base"
+            type="text"
+            placeholder="Name"
+            {...register("name", { required: "Name is required" })}
+          />
+          {errors.name && (
+            <p className="text-red-600 text-xs sm:text-sm">{errors.name.message}</p>
+          )}
+
+          <input
+            className="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none text-sm sm:text-base"
+            type="email"
+            placeholder="Email"
+            {...register("email", {
+              required: "Email is required",
+              pattern: {
+                value: /^\S+@\S+$/i,
+                message: "Invalid email address",
+              },
+            })}
+          />
+          {errors.email && (
+            <p className="text-red-600 text-xs sm:text-sm">{errors.email.message}</p>
+          )}
+
+          <div className="relative">
             <input
-              className="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none"
-              type="text"
-              placeholder="Name"
-              {...register("name", { required: "Name is required" })}
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              className="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none text-sm sm:text-base"
+              {...register("password", { required: "Password is required" })}
             />
-            {errors.name && <p className="text-red-600 text-sm">{errors.name.message}</p>}
-
-            <input
-              className="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none"
-              type="email"
-              placeholder="Email"
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^\S+@\S+$/i,
-                  message: "Invalid email address",
-                },
-              })}
-            />
-            {errors.email && <p className="text-red-600 text-sm">{errors.email.message}</p>}
-
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                placeholder="Password"
-                className="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none"
-                {...register("password", { required: "Password is required" })}
-              />
-              <span
-                onClick={togglePassword}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 cursor-pointer"
-              >
-                {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
-              </span>
-              {errors.password && <p className="text-red-600 text-sm">{errors.password.message}</p>}
-            </div>
-
-            <input
-              className="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none"
-              type="url"
-              placeholder="Photo URL (Optional)"
-              {...register("photoUrl")}
-            />
-
-            <motion.button
-              type="submit"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-full bg-gradient-to-r from-[#8e2de2] to-[#4a00e0] text-white py-3 rounded-md font-semibold hover:opacity-90 transition"
+            <span
+              onClick={togglePassword}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 cursor-pointer"
             >
-              Register
-            </motion.button>
-          </form>
+              {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+            </span>
+            {errors.password && (
+              <p className="text-red-600 text-xs sm:text-sm">{errors.password.message}</p>
+            )}
+          </div>
+
+          <input
+            className="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none text-sm sm:text-base"
+            type="url"
+            placeholder="Photo URL (Optional)"
+            {...register("photoUrl")}
+          />
 
           <motion.button
-            onClick={handleGoogleLogin}
+            type="submit"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="mt-4 w-full bg-white text-black border p-3 rounded-md flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition font-semibold"
+            className="w-full bg-gradient-to-r from-[#8e2de2] to-[#4a00e0] text-white py-3 rounded-md font-semibold hover:opacity-90 transition text-sm sm:text-base"
           >
-            <FcGoogle size={24} />
-            Register with Google
+            Register
           </motion.button>
+        </form>
 
-          <p className="mt-4 text-center text-gray-700">
-            Already have an account?{" "}
-            <Link to="/login" className="text-indigo-600 font-medium underline">
-              Login here
-            </Link>
-          </p>
-        </div>
-      </motion.div>
-    </>
+        <motion.button
+          onClick={handleGoogleLogin}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="mt-4 w-full bg-white text-black border p-3 rounded-md flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition font-semibold text-sm sm:text-base"
+        >
+          <FcGoogle size={24} />
+          Register with Google
+        </motion.button>
+
+        <p className="mt-4 text-center text-gray-700 text-xs sm:text-sm">
+          Already have an account?{" "}
+          <Link to="/login" className="text-indigo-600 font-medium underline">
+            Login here
+          </Link>
+        </p>
+      </div>
+    </motion.div>
   );
 };
 

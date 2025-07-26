@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -35,7 +36,6 @@ const Navbar = () => {
     }
   };
 
-  // Close dropdown or mobile menu on navigation
   const handleNavLinkClick = () => {
     closeDropdown();
     closeMobileMenu();
@@ -44,17 +44,16 @@ const Navbar = () => {
   return (
     <nav className="bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 shadow-md sticky top-0 z-50 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
-        {/* Left: Logo + Site Name */}
+        {/* Logo + Website Name */}
         <Link
           to="/"
           className="flex items-center space-x-2 font-bold text-xl"
           onClick={handleNavLinkClick}
         >
-          {/* Removed empty img src to fix the warning */}
           <span>Hostel Management</span>
         </Link>
 
-        {/* Middle: Navigation Links for md+ */}
+        {/* Navigation Links (Desktop) */}
         <div className="hidden md:flex space-x-6">
           {["/", "/meals", "/upcoming-meals"].map((path) => {
             const text =
@@ -81,9 +80,9 @@ const Navbar = () => {
           })}
         </div>
 
-        {/* Mobile menu button */}
+        {/* Mobile Buttons */}
         <div className="md:hidden flex items-center space-x-2">
-          {/* Notification Icon */}
+          {/* Notification */}
           <button
             aria-label="Notifications"
             className="relative text-white hover:text-lime-100 focus:outline-none transition-colors duration-300"
@@ -110,7 +109,7 @@ const Navbar = () => {
             </span>
           </button>
 
-          {/* Hamburger menu button */}
+          {/* Hamburger */}
           <button
             onClick={toggleMobileMenu}
             className="text-white focus:outline-none"
@@ -118,34 +117,18 @@ const Navbar = () => {
             aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? (
-              // Close icon
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-              // Hamburger icon
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
           </button>
         </div>
 
-        {/* Right: User avatar or Join Us for md+ */}
+        {/* Right Section: Avatar or Join Us (Desktop) */}
         <div className="hidden md:flex items-center space-x-4">
           {!user ? (
             <Link
@@ -169,37 +152,42 @@ const Navbar = () => {
                 />
               </button>
 
-              {dropdownOpen && (
-                <div
-                  className="absolute right-0 mt-2 w-48 bg-white text-gray-700 rounded-md shadow-lg py-2 z-50"
-                  onMouseLeave={closeDropdown}
-                >
-                  <div className="px-4 py-2 border-b border-gray-200">
-                    <p className="truncate font-semibold">
-                      {user.displayName || user.email}
-                    </p>
-                  </div>
-                  <Link
-                    to="/dashboard"
-                    className="block px-4 py-2 hover:bg-gray-100"
-                    onClick={closeDropdown}
+              <AnimatePresence>
+                {dropdownOpen && (
+                  <motion.div
+                    key="dropdown"
+                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 mt-2 w-48 bg-white text-gray-700 rounded-md shadow-lg py-2 z-50"
+                    onMouseLeave={closeDropdown}
                   >
-                    Dashboard
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                </div>
-              )}
+                    <div className="px-4 py-2 border-b border-gray-200">
+                      <p className="truncate font-semibold">{user.displayName || user.email}</p>
+                    </div>
+                    <Link
+                      to="/dashboard"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                      onClick={closeDropdown}
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      Logout
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           )}
         </div>
       </div>
 
-      {/* Mobile menu dropdown */}
+      {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-indigo-900/95 px-4 pt-2 pb-4 space-y-1">
           <NavLink

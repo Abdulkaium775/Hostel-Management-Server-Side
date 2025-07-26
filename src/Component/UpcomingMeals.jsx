@@ -75,18 +75,18 @@ const UpcomingMeals = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6">
-      <h2 className="text-3xl font-extrabold text-center mb-10 text-pink-600 drop-shadow-sm">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <h2 className="text-3xl font-extrabold text-center mb-12 text-pink-600 drop-shadow-sm">
         🌟 Upcoming Meals
       </h2>
 
       <div
         className="
-          grid 
-          gap-6 
-          grid-cols-1 
-          sm:grid-cols-2 
-          md:grid-cols-3 
+          grid
+          gap-6
+          grid-cols-1
+          sm:grid-cols-2
+          md:grid-cols-3
           lg:grid-cols-4
           px-2
         "
@@ -115,9 +115,7 @@ const UpcomingMeals = () => {
 
                 <p className="text-sm text-gray-500 mb-1">
                   📅{" "}
-                  <span className="font-medium text-gray-700">
-                    Publish Date:
-                  </span>{" "}
+                  <span className="font-medium text-gray-700">Publish Date:</span>{" "}
                   {new Date(meal.publishDate).toLocaleDateString()}
                 </p>
                 <p className="text-sm text-gray-500 mb-5">

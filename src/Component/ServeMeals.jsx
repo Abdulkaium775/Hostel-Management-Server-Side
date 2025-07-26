@@ -80,8 +80,10 @@ const ServeMeals = () => {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Serve Meals</h2>
+    <div className="max-w-7xl mx-auto p-4 sm:p-6">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center sm:text-left">
+        Serve Meals
+      </h2>
 
       <input
         type="text"
@@ -91,70 +93,87 @@ const ServeMeals = () => {
           setPage(1);
           setSearch(e.target.value);
         }}
-        className="border p-2 mb-4 w-full md:w-1/2"
+        className="border p-2 mb-4 w-full sm:w-1/2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
       />
 
       {loading ? (
-        <p>Loading requested meals...</p>
+        <p className="text-center text-gray-600 py-8 text-lg">Loading requested meals...</p>
       ) : requests.length === 0 ? (
-        <p>No meal requests found.</p>
+        <p className="text-center text-gray-500 py-8 text-lg">No meal requests found.</p>
       ) : (
         <>
-          <table className="min-w-full border border-gray-300">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="p-2 border">Meal Title</th>
-                <th className="p-2 border">User Name</th>
-                <th className="p-2 border">User Email</th>
-                <th className="p-2 border">Status</th>
-                <th className="p-2 border">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {requests.map((req) => (
-                <tr key={req._id} className="hover:bg-gray-100">
-                  <td className="p-2 border">{req.mealTitle}</td>
-                  <td className="p-2 border">{req.userName}</td>
-                  <td className="p-2 border">{req.userEmail}</td>
-                  <td className="p-2 border capitalize">{req.status}</td>
-                  <td className="p-2 border">
-                    {req.status !== "delivered" ? (
-                      <button
-                        onClick={() => handleServe(req._id)}
-                        disabled={servingId === req._id}
-                        className={`px-3 py-1 rounded text-white ${
-                          servingId === req._id
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-green-500 hover:bg-green-600"
-                        }`}
-                      >
-                        {servingId === req._id ? "Serving..." : "Serve"}
-                      </button>
-                    ) : (
-                      <span className="text-gray-500">Delivered</span>
-                    )}
-                  </td>
+          <div className="overflow-x-auto rounded-lg border border-gray-300 bg-white shadow-sm">
+            <table className="min-w-[600px] w-full table-auto border-collapse">
+              <thead className="bg-gray-200">
+                <tr>
+                  <th className="p-3 border text-left text-sm sm:text-base whitespace-nowrap">
+                    Meal Title
+                  </th>
+                  <th className="p-3 border text-left text-sm sm:text-base whitespace-nowrap">
+                    User Name
+                  </th>
+                  <th className="p-3 border text-left text-sm sm:text-base whitespace-nowrap">
+                    User Email
+                  </th>
+                  <th className="p-3 border text-center text-sm sm:text-base whitespace-nowrap">
+                    Status
+                  </th>
+                  <th className="p-3 border text-center text-sm sm:text-base whitespace-nowrap">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {requests.map((req) => (
+                  <tr
+                    key={req._id}
+                    className="hover:bg-gray-100 transition-colors duration-150"
+                  >
+                    <td className="p-3 border text-sm sm:text-base">{req.mealTitle}</td>
+                    <td className="p-3 border text-sm sm:text-base">{req.userName}</td>
+                    <td className="p-3 border text-sm sm:text-base">{req.userEmail}</td>
+                    <td className="p-3 border text-center text-sm sm:text-base capitalize">
+                      {req.status}
+                    </td>
+                    <td className="p-3 border text-center">
+                      {req.status !== "delivered" ? (
+                        <button
+                          onClick={() => handleServe(req._id)}
+                          disabled={servingId === req._id}
+                          className={`px-4 py-1 rounded text-white text-sm sm:text-base w-full sm:w-auto ${
+                            servingId === req._id
+                              ? "bg-gray-400 cursor-not-allowed"
+                              : "bg-green-500 hover:bg-green-600"
+                          }`}
+                        >
+                          {servingId === req._id ? "Serving..." : "Serve"}
+                        </button>
+                      ) : (
+                        <span className="text-gray-500 text-sm sm:text-base">Delivered</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
           {/* Pagination */}
-          <div className="flex justify-center space-x-2 mt-4">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mt-6">
             <button
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
-              className="px-3 py-1 bg-gray-300 rounded disabled:opacity-50"
+              className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50 w-full sm:w-auto"
             >
               Prev
             </button>
-            <span className="px-3 py-1">
+            <span className="font-semibold text-gray-700 text-center w-full sm:w-auto">
               Page {page} of {totalPages}
             </span>
             <button
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-              className="px-3 py-1 bg-gray-300 rounded disabled:opacity-50"
+              className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50 w-full sm:w-auto"
             >
               Next
             </button>

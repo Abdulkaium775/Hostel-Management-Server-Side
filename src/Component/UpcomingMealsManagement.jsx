@@ -106,80 +106,79 @@ const UpcomingMealsAdmin = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h2 className="mb-4">Upcoming Meals (Sorted by Likes)</h2>
-      <button className="btn btn-primary mb-3" onClick={() => setShowModal(true)}>
+    <div className="max-w-7xl mx-auto p-4 sm:p-6">
+      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center sm:text-left">
+        Upcoming Meals (Sorted by Likes)
+      </h2>
+
+      <button
+        onClick={() => setShowModal(true)}
+        className="mb-6 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      >
         Add Upcoming Meal
       </button>
 
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-center text-gray-600 text-lg py-8">Loading...</p>
       ) : upcomingMeals.length === 0 ? (
-        <p>No upcoming meals found</p>
+        <p className="text-center text-gray-500 text-lg py-8">No upcoming meals found</p>
       ) : (
-        <table className="table table-bordered table-hover">
-          <thead className="table-dark">
-            <tr>
-              <th>Title</th>
-              <th>Category</th>
-              <th>Description</th>
-              <th>Distributor</th>
-              <th>Likes</th>
-              <th>Publish Date</th>
-              <th>Publish</th>
-            </tr>
-          </thead>
-          <tbody>
-            {upcomingMeals.map((meal) => (
-              <tr key={meal._id}>
-                <td>{meal.title}</td>
-                <td>{meal.category}</td>
-                <td>{meal.description}</td>
-                <td>{meal.distributorName}</td>
-                <td>{meal.likes || 0}</td>
-                <td>{new Date(meal.publishDate).toLocaleDateString()}</td>
-                <td>
-                  <button
-                    className="btn btn-success btn-sm"
-                    onClick={() => handlePublish(meal._id)}
-                    disabled={publishingId === meal._id}
-                  >
-                    {publishingId === meal._id ? "Publishing..." : "Publish"}
-                  </button>
-                </td>
+        <div className="overflow-x-auto rounded-lg border border-gray-300 shadow-sm bg-white">
+          <table className="min-w-[700px] w-full table-auto border-collapse">
+            <thead className="bg-gray-200">
+              <tr>
+                <th className="p-3 border text-left text-sm sm:text-base whitespace-nowrap">Title</th>
+                <th className="p-3 border text-left text-sm sm:text-base whitespace-nowrap">Category</th>
+                <th className="p-3 border text-left text-sm sm:text-base whitespace-nowrap">Description</th>
+                <th className="p-3 border text-left text-sm sm:text-base whitespace-nowrap">Distributor</th>
+                <th className="p-3 border text-center text-sm sm:text-base whitespace-nowrap">Likes</th>
+                <th className="p-3 border text-center text-sm sm:text-base whitespace-nowrap">Publish Date</th>
+                <th className="p-3 border text-center text-sm sm:text-base whitespace-nowrap">Publish</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {upcomingMeals.map((meal) => (
+                <tr key={meal._id} className="hover:bg-gray-100 transition-colors duration-150">
+                  <td className="p-3 border text-sm sm:text-base">{meal.title}</td>
+                  <td className="p-3 border text-sm sm:text-base">{meal.category}</td>
+                  <td className="p-3 border text-sm sm:text-base">{meal.description}</td>
+                  <td className="p-3 border text-sm sm:text-base">{meal.distributorName}</td>
+                  <td className="p-3 border text-center text-sm sm:text-base">{meal.likes || 0}</td>
+                  <td className="p-3 border text-center text-sm sm:text-base">
+                    {new Date(meal.publishDate).toLocaleDateString()}
+                  </td>
+                  <td className="p-3 border text-center">
+                    <button
+                      className={`px-4 py-1 rounded text-white text-sm sm:text-base ${
+                        publishingId === meal._id
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-green-600 hover:bg-green-700"
+                      }`}
+                      onClick={() => handlePublish(meal._id)}
+                      disabled={publishingId === meal._id}
+                    >
+                      {publishingId === meal._id ? "Publishing..." : "Publish"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {/* Modal */}
       {showModal && (
         <div
-          className="modal fade show"
-          style={{
-            display: "block",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 1050,
-          }}
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4"
+          onClick={() => setShowModal(false)}
         >
           <div
-            className="modal-dialog"
-            style={{
-              maxWidth: 600,
-              margin: "3rem auto",
-              background: "#fff",
-              padding: 20,
-              borderRadius: 8,
-            }}
+            className="bg-white rounded-lg max-w-md w-full p-6"
+            onClick={(e) => e.stopPropagation()}
           >
-            <h4>Add Upcoming Meal</h4>
-            <form onSubmit={handleSubmit}>
+            <h4 className="text-xl font-semibold mb-4">Add Upcoming Meal</h4>
+            <form onSubmit={handleSubmit} className="space-y-3">
               <input
                 type="text"
                 name="title"
@@ -187,7 +186,7 @@ const UpcomingMealsAdmin = () => {
                 value={formData.title}
                 onChange={handleChange}
                 required
-                className="form-control mb-2"
+                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <input
                 type="text"
@@ -196,7 +195,7 @@ const UpcomingMealsAdmin = () => {
                 value={formData.category}
                 onChange={handleChange}
                 required
-                className="form-control mb-2"
+                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <input
                 type="text"
@@ -205,7 +204,7 @@ const UpcomingMealsAdmin = () => {
                 value={formData.image}
                 onChange={handleChange}
                 required
-                className="form-control mb-2"
+                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <input
                 type="text"
@@ -214,7 +213,7 @@ const UpcomingMealsAdmin = () => {
                 value={formData.ingredients}
                 onChange={handleChange}
                 required
-                className="form-control mb-2"
+                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <textarea
                 name="description"
@@ -222,7 +221,8 @@ const UpcomingMealsAdmin = () => {
                 value={formData.description}
                 onChange={handleChange}
                 required
-                className="form-control mb-2"
+                rows={3}
+                className="w-full border border-gray-300 rounded px-3 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <input
                 type="number"
@@ -231,9 +231,9 @@ const UpcomingMealsAdmin = () => {
                 value={formData.price}
                 onChange={handleChange}
                 required
-                className="form-control mb-2"
                 step="0.01"
                 min="0"
+                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <input
                 type="date"
@@ -242,7 +242,7 @@ const UpcomingMealsAdmin = () => {
                 value={formData.publishDate}
                 onChange={handleChange}
                 required
-                className="form-control mb-2"
+                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
               <input
                 type="text"
@@ -251,19 +251,23 @@ const UpcomingMealsAdmin = () => {
                 value={formData.distributorName}
                 onChange={handleChange}
                 required
-                className="form-control mb-2"
+                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
 
-              <div className="d-flex justify-content-end gap-2 mt-3">
+              <div className="flex justify-end gap-3 mt-4">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="btn btn-secondary"
                   disabled={adding}
+                  className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400"
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary" disabled={adding}>
+                <button
+                  type="submit"
+                  disabled={adding}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
                   {adding ? "Adding..." : "Add Meal"}
                 </button>
               </div>

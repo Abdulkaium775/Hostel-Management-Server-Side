@@ -24,7 +24,6 @@ const AddMeal = () => {
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
-        // Remove the "data:*/*;base64," prefix to get clean base64 string
         const base64String = reader.result.split(",")[1];
         resolve(base64String);
       };
@@ -42,8 +41,7 @@ const AddMeal = () => {
       const url = `https://api.imgbb.com/1/upload?key=${IMAGEBB_API_KEY}`;
 
       const response = await axios.post(url, formData);
-      console.log(response.data)  
-      if (response.data && response.data.data && response.data.data.url) {
+      if (response.data?.data?.url) {
         return response.data.data.url;
       } else {
         throw new Error("Failed to upload image");
@@ -58,11 +56,9 @@ const AddMeal = () => {
     try {
       setUploading(true);
 
-      // Get image file from input
       const imageFile = data.image[0];
       const imageUrl = await uploadImageToImageBB(imageFile);
 
-      // Prepare meal data payload
       const payload = {
         title: data.title,
         category: data.category,
@@ -75,7 +71,6 @@ const AddMeal = () => {
         addedByEmail: user.email,
       };
 
-      // Send data to backend
       const response = await axiosInstance.post(
         `${import.meta.env.REACT_APP_API_BASE_URL || "http://localhost:5000"}/meals`,
         payload
@@ -88,7 +83,6 @@ const AddMeal = () => {
         Swal.fire("Error", "Failed to add meal", "error");
       }
     } catch (error) {
-      console.error(error);
       Swal.fire("Error", "Something went wrong. Please try again.", "error");
     } finally {
       setUploading(false);
@@ -96,129 +90,169 @@ const AddMeal = () => {
   };
 
   return (
-    <div className="max-w-xl mx-auto p-6 bg-white rounded shadow">
-      <h2 className="text-2xl font-semibold mb-4">Add New Meal</h2>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <div className="max-w-xl mx-auto p-6 bg-white rounded-lg shadow-md mt-8">
+      <h2 className="text-3xl font-semibold mb-6 text-gray-800 text-center">Add New Meal</h2>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
         {/* Title */}
         <div>
-          <label className="block mb-1 font-medium">Title</label>
+          <label htmlFor="title" className="block mb-2 font-medium text-gray-700">
+            Title <span className="text-red-500">*</span>
+          </label>
           <input
+            id="title"
             type="text"
             {...register("title", { required: "Title is required" })}
-            className="w-full border rounded px-3 py-2"
+            className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.title ? "border-red-500" : "border-gray-300"
+            }`}
+            placeholder="Enter meal title"
           />
-          {errors.title && <p className="text-red-600">{errors.title.message}</p>}
+          {errors.title && <p className="mt-1 text-red-600 text-sm">{errors.title.message}</p>}
         </div>
 
         {/* Category */}
         <div>
-          <label className="block mb-1 font-medium">Category</label>
+          <label htmlFor="category" className="block mb-2 font-medium text-gray-700">
+            Category <span className="text-red-500">*</span>
+          </label>
           <select
+            id="category"
             {...register("category", { required: "Category is required" })}
-            className="w-full border rounded px-3 py-2"
+            className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.category ? "border-red-500" : "border-gray-300"
+            }`}
             defaultValue=""
           >
-            <option value="" disabled>Select Category</option>
+            <option value="" disabled>
+              Select Category
+            </option>
             <option value="Breakfast">Breakfast</option>
             <option value="Lunch">Lunch</option>
             <option value="Dinner">Dinner</option>
             <option value="Snacks">Snacks</option>
           </select>
-          {errors.category && <p className="text-red-600">{errors.category.message}</p>}
+          {errors.category && <p className="mt-1 text-red-600 text-sm">{errors.category.message}</p>}
         </div>
 
         {/* Image */}
         <div>
-          <label className="block mb-1 font-medium">Image</label>
+          <label htmlFor="image" className="block mb-2 font-medium text-gray-700">
+            Image <span className="text-red-500">*</span>
+          </label>
           <input
+            id="image"
             type="file"
             accept="image/*"
             {...register("image", { required: "Image is required" })}
-            className="w-full"
+            className={`w-full text-gray-700 ${
+              errors.image ? "border-red-500" : ""
+            }`}
           />
-          {errors.image && <p className="text-red-600">{errors.image.message}</p>}
+          {errors.image && <p className="mt-1 text-red-600 text-sm">{errors.image.message}</p>}
         </div>
 
         {/* Ingredients */}
         <div>
-          <label className="block mb-1 font-medium">Ingredients</label>
+          <label htmlFor="ingredients" className="block mb-2 font-medium text-gray-700">
+            Ingredients <span className="text-red-500">*</span>
+          </label>
           <textarea
+            id="ingredients"
             {...register("ingredients", { required: "Ingredients are required" })}
             rows={3}
-            className="w-full border rounded px-3 py-2"
+            className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.ingredients ? "border-red-500" : "border-gray-300"
+            }`}
             placeholder="Separate ingredients by commas"
           />
-          {errors.ingredients && <p className="text-red-600">{errors.ingredients.message}</p>}
+          {errors.ingredients && <p className="mt-1 text-red-600 text-sm">{errors.ingredients.message}</p>}
         </div>
 
         {/* Description */}
         <div>
-          <label className="block mb-1 font-medium">Description</label>
+          <label htmlFor="description" className="block mb-2 font-medium text-gray-700">
+            Description <span className="text-red-500">*</span>
+          </label>
           <textarea
+            id="description"
             {...register("description", { required: "Description is required" })}
             rows={4}
-            className="w-full border rounded px-3 py-2"
+            className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.description ? "border-red-500" : "border-gray-300"
+            }`}
+            placeholder="Describe the meal"
           />
-          {errors.description && <p className="text-red-600">{errors.description.message}</p>}
+          {errors.description && <p className="mt-1 text-red-600 text-sm">{errors.description.message}</p>}
         </div>
 
         {/* Price */}
         <div>
-          <label className="block mb-1 font-medium">Price (USD)</label>
+          <label htmlFor="price" className="block mb-2 font-medium text-gray-700">
+            Price (USD) <span className="text-red-500">*</span>
+          </label>
           <input
+            id="price"
             type="number"
             step="0.01"
             {...register("price", {
               required: "Price is required",
               min: { value: 0, message: "Price must be positive" },
             })}
-            className="w-full border rounded px-3 py-2"
+            className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.price ? "border-red-500" : "border-gray-300"
+            }`}
+            placeholder="Enter price in USD"
           />
-          {errors.price && <p className="text-red-600">{errors.price.message}</p>}
+          {errors.price && <p className="mt-1 text-red-600 text-sm">{errors.price.message}</p>}
         </div>
 
         {/* Post Time */}
         <div>
-          <label className="block mb-1 font-medium">Post Time</label>
+          <label htmlFor="postTime" className="block mb-2 font-medium text-gray-700">
+            Post Time <span className="text-red-500">*</span>
+          </label>
           <input
+            id="postTime"
             type="datetime-local"
             {...register("postTime", { required: "Post time is required" })}
-            className="w-full border rounded px-3 py-2"
+            className={`w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              errors.postTime ? "border-red-500" : "border-gray-300"
+            }`}
           />
-          {errors.postTime && <p className="text-red-600">{errors.postTime.message}</p>}
+          {errors.postTime && <p className="mt-1 text-red-600 text-sm">{errors.postTime.message}</p>}
         </div>
 
-        {/* Distributor Name (readonly) */}
+        {/* Distributor Name */}
         <div>
-          <label className="block mb-1 font-medium">Distributor Name</label>
+          <label className="block mb-2 font-medium text-gray-700">Distributor Name</label>
           <input
             type="text"
             value={user.displayName || ""}
             readOnly
-            className="w-full border rounded px-3 py-2 bg-gray-100"
+            className="w-full border rounded-md px-4 py-2 bg-gray-100 cursor-not-allowed"
           />
         </div>
 
-        {/* Email (readonly) */}
+        {/* Email */}
         <div>
-          <label className="block mb-1 font-medium">Email</label>
+          <label className="block mb-2 font-medium text-gray-700">Email</label>
           <input
             type="email"
             value={user.email || ""}
             readOnly
-            className="w-full border rounded px-3 py-2 bg-gray-100"
+            className="w-full border rounded-md px-4 py-2 bg-gray-100 cursor-not-allowed"
           />
         </div>
 
-        {/* Submit button */}
+        {/* Submit */}
         <button
           type="submit"
           disabled={isSubmitting || uploading}
-          className={`w-full py-2 rounded ${
+          className={`w-full py-3 rounded-md text-white font-semibold transition-colors duration-200 ${
             isSubmitting || uploading
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 text-white"
+              : "bg-blue-600 hover:bg-blue-700"
           }`}
         >
           {uploading ? "Uploading..." : "Add Meal"}

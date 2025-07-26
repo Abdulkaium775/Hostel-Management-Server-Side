@@ -63,8 +63,8 @@ const ManageUsers = () => {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Manage Users</h2>
+    <div className="p-4 max-w-7xl mx-auto">
+      <h2 className="text-2xl font-bold mb-4 text-gray-800">Manage Users</h2>
 
       <input
         type="text"
@@ -74,75 +74,76 @@ const ManageUsers = () => {
           setSearch(e.target.value);
           setPage(1); // Reset to first page on new search
         }}
-        className="mb-4 px-3 py-2 border rounded w-full max-w-sm"
+        className="mb-4 px-3 py-2 border rounded w-full max-w-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
 
       {loading ? (
-        <p>Loading users...</p>
+        <p className="text-center text-gray-600">Loading users...</p>
       ) : (
         <>
-          <div className="overflow-x-auto">
-            <table className="min-w-full border border-gray-200">
+          <div className="overflow-x-auto rounded shadow border border-gray-200">
+            <table className="min-w-full table-auto divide-y divide-gray-200">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="px-4 py-2 border">#</th>
-                  <th className="px-4 py-2 border">Username</th>
-                  <th className="px-4 py-2 border">Email</th>
-                  <th className="px-4 py-2 border">Subscription</th>
-                  <th className="px-4 py-2 border">Role</th>
-                  <th className="px-4 py-2 border">Action</th>
+                  <th className="px-3 py-2 border whitespace-nowrap text-left text-sm font-semibold text-gray-700">#</th>
+                  <th className="px-3 py-2 border whitespace-nowrap text-left text-sm font-semibold text-gray-700">Username</th>
+                  <th className="px-3 py-2 border whitespace-nowrap text-left text-sm font-semibold text-gray-700">Email</th>
+                  <th className="px-3 py-2 border whitespace-nowrap text-left text-sm font-semibold text-gray-700">Subscription</th>
+                  <th className="px-3 py-2 border whitespace-nowrap text-left text-sm font-semibold text-gray-700">Role</th>
+                  <th className="px-3 py-2 border whitespace-nowrap text-center text-sm font-semibold text-gray-700">Action</th>
                 </tr>
               </thead>
-              <tbody>
-                {users.length === 0 && (
+              <tbody className="bg-white divide-y divide-gray-200">
+                {users.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="text-center py-4">
+                    <td colSpan="6" className="text-center py-6 text-gray-500">
                       No users found
                     </td>
                   </tr>
+                ) : (
+                  users.map((user, idx) => (
+                    <tr key={user._id} className="hover:bg-gray-50">
+                      <td className="px-3 py-2 border whitespace-nowrap text-sm text-gray-700">{(page - 1) * limit + idx + 1}</td>
+                      <td className="px-3 py-2 border whitespace-nowrap text-sm text-gray-700">{user.displayName || 'N/A'}</td>
+                      <td className="px-3 py-2 border whitespace-nowrap text-sm text-gray-700">{user.email}</td>
+                      <td className="px-3 py-2 border whitespace-nowrap text-sm text-gray-700">{user.badge || 'Bronze'}</td>
+                      <td className="px-3 py-2 border whitespace-nowrap text-sm text-gray-700">{user.role}</td>
+                      <td className="px-3 py-2 border whitespace-nowrap text-center text-sm">
+                        {user.role === 'admin' ? (
+                          <span className="text-green-600 font-semibold">Admin</span>
+                        ) : (
+                          <button
+                            onClick={() => makeAdmin(user._id, user.email)}
+                            className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded transition duration-200"
+                          >
+                            Make Admin
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
                 )}
-                {users.map((user, idx) => (
-                  <tr key={user._id} className="text-center">
-                    <td className="px-4 py-2 border">{(page - 1) * limit + idx + 1}</td>
-                    <td className="px-4 py-2 border">{user.displayName || 'N/A'}</td>
-                    <td className="px-4 py-2 border">{user.email}</td>
-                    <td className="px-4 py-2 border">{user.badge || 'Bronze'}</td>
-                    <td className="px-4 py-2 border">{user.role}</td>
-                    <td className="px-4 py-2 border">
-                      {user.role === 'admin' ? (
-                        <span className="text-green-600 font-bold">Admin</span>
-                      ) : (
-                        <button
-                          onClick={() => makeAdmin(user._id, user.email)}
-                          className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                        >
-                          Make Admin
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
               </tbody>
             </table>
           </div>
 
           {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="mt-4 flex justify-center gap-2">
+            <div className="mt-4 flex flex-col sm:flex-row justify-center items-center gap-3 text-sm text-gray-700">
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => Math.max(p - 1, 1))}
-                className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition"
               >
                 Prev
               </button>
-              <span className="px-3 py-1 rounded border">
-                Page {page} of {totalPages}
+              <span>
+                Page <strong>{page}</strong> of <strong>{totalPages}</strong>
               </span>
               <button
                 disabled={page === totalPages}
                 onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-                className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+                className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50 hover:bg-gray-300 transition"
               >
                 Next
               </button>
