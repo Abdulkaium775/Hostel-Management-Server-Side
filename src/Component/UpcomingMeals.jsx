@@ -2,23 +2,34 @@ import React, { useEffect, useState, useContext } from "react";
 import axiosInstance from "../Api/axios";
 import { AuthContext } from "../Auth/AuthContext";
 import toast from "react-hot-toast";
-
+import { getAuth } from "firebase/auth";
 const UpcomingMeals = () => {
   const { user } = useContext(AuthContext);
   const [meals, setMeals] = useState([]);
   const [userBadge, setUserBadge] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUpcomingMeals = async () => {
-    try {
-      const res = await axiosInstance.get("/upcoming-meals");
-      setMeals(res.data);
-    } catch {
-      toast.error("Failed to fetch upcoming meals");
-    } finally {
-      setLoading(false);
-    }
-  };
+ const fetchUpcomingMeals = async () => {
+  try {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const token = await user.getIdToken();
+
+    const res = await axiosInstance.get("/upcoming-meals", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    setMeals(res.data);
+  } catch {
+    toast.error("Failed to fetch upcoming meals");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const fetchUserBadge = async () => {
     if (!user?.email) return;
@@ -130,7 +141,7 @@ const UpcomingMeals = () => {
                     className={`w-full py-2 rounded-xl text-white font-semibold text-center transition ${
                       alreadyLiked
                         ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-pink-600 hover:bg-pink-700 focus:outline-none focus:ring-4 focus:ring-pink-300"
+                        : "bg-black hover:bg-pink-700 focus:outline-none focus:ring-4 focus:ring-pink-300"
                     }`}
                     aria-disabled={alreadyLiked}
                     aria-label={alreadyLiked ? "Already liked" : "Like this meal"}

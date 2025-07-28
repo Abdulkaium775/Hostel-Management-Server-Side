@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../Api/axios';
-
+// import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 const categories = ['All', 'Breakfast', 'Lunch', 'Dinner'];
 
 const gradients = [
@@ -19,24 +20,41 @@ const MealsTabs = () => {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchMeals = async () => {
-      setLoading(true);
-      try {
-        const params = { limit: 3 };
-        if (activeTab !== 'All') params.category = activeTab;
 
-        const { data } = await axiosInstance.get('/meals', { params });
-        setMeals(data.meals || []);
-      } catch (error) {
-        console.error('Error fetching meals:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchMeals();
-  }, [activeTab]);
+useEffect(() => {
+  const fetchMeals = async (token) => {
+    setLoading(true);
+    try {
+      const params = { limit: 3 };
+      if (activeTab !== 'All') params.category = activeTab;
+
+      const { data } = await axiosInstance.get('/meals', {
+        params,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setMeals(data.meals || []);
+    } catch (error) {
+      console.error('Error fetching meals:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const auth = getAuth();
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      const token = await user.getIdToken();
+      fetchMeals(token);
+    } else {
+      console.log("No user logged in, skipping /meals request");
+    }
+  });
+}, [activeTab]);
+
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 min-h-screen bg-gray-50">

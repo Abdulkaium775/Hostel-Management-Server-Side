@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axiosInstance from '../Api/axios';
 import toast from 'react-hot-toast';
+import Swal from 'sweetalert2'; 
 import { AuthContext } from '../Auth/AuthContext';
 
 const RequestedMeals = () => {
@@ -15,7 +16,14 @@ const RequestedMeals = () => {
     const fetchRequestedMeals = async () => {
       try {
         setLoading(true);
-        const { data } = await axiosInstance.get(`/requested-meals/${user.email}`);
+
+        const token = await user.getIdToken(); 
+        const { data } = await axiosInstance.get(`/requested-meals/${user.email}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         setRequestedMeals(data);
       } catch (err) {
         console.error(err);
@@ -29,7 +37,19 @@ const RequestedMeals = () => {
   }, [user?.email]);
 
   const handleCancel = async (id) => {
-    if (!window.confirm('Are you sure you want to cancel this meal request?')) return;
+    // SweetAlert2 confirmation dialog
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "Do you want to cancel this meal request?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, cancel it!',
+      cancelButtonText: 'No, keep it',
+    });
+
+    if (!result.isConfirmed) return;
 
     try {
       setDeletingId(id);

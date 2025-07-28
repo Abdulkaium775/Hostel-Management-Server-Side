@@ -4,33 +4,46 @@ import { AuthContext } from '../Auth/AuthContext';
 import toast from 'react-hot-toast';
 import axiosInstance from '../Api/axios';
 import Swal from 'sweetalert2';
-
+import { getAuth } from "firebase/auth";
 const MyReviews = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+useEffect(() => {
+  if (!user?.email) {
+    setReviews([]);
+    setLoading(false);
+    return;
+  }
 
-  useEffect(() => {
-    if (!user?.email) {
-      setReviews([]);
-      setLoading(false);
-      return;
-    }
+  const fetchMyReviews = async () => {
+    try {
+      setLoading(true);
 
-    setLoading(true);
-    axiosInstance
-      .get(`/my-reviews/${user.email}`)
-      .then((res) => {
-        setReviews(res.data || []);
-      })
-      .catch(() => {
-        toast.error('Failed to load your reviews.');
-      })
-      .finally(() => {
-        setLoading(false);
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+
+      const token = await currentUser.getIdToken();
+
+      const res = await axiosInstance.get(`/my-reviews/${user.email}`, {
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ Token পাঠাও
+        },
       });
-  }, [user?.email]);
+
+      setReviews(res.data || []);
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load your reviews.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchMyReviews();
+}, [user?.email]);
 
   const handleDelete = (reviewId) => {
     Swal.fire({

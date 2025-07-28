@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../Api/axios";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const categories = ["All", "Breakfast", "Lunch", "Dinner"];
 
@@ -23,29 +24,32 @@ const Meals = () => {
   const [category, setCategory] = useState("All");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [token, setToken] = useState(null);
 
   const navigate = useNavigate();
 
-  const fetchMeals = async (pageNum = 1, replace = false) => {
+  // ✅ Fetch meals function with token
+  const fetchMeals = async (pageNum = 1, replace = false, userToken = token) => {
+    if (!userToken) return; // token না থাকলে skip
+
     try {
       setLoading(true);
+
       const { data } = await axiosInstance.get("/meals", {
         params: {
           search: search.trim() || undefined,
           category: category !== "All" ? category : undefined,
-          minPrice: minPrice !== "" ? minPrice : undefined,
-          maxPrice: maxPrice !== "" ? maxPrice : undefined,
+          minPrice: minPrice || undefined,
+          maxPrice: maxPrice || undefined,
           page: pageNum,
           limit: 6,
         },
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
       });
 
-      if (replace) {
-        setMeals(data.meals);
-      } else {
-        setMeals((prev) => [...prev, ...data.meals]);
-      }
-
+      setMeals(replace ? data.meals : (prev) => [...prev, ...data.meals]);
       setHasMore(data.meals.length === 6);
       setPage(pageNum);
     } catch (error) {
@@ -55,8 +59,22 @@ const Meals = () => {
     }
   };
 
+  // ✅ Listen for Firebase user and get token
   useEffect(() => {
-    fetchMeals(1, true);
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userToken = await user.getIdToken();
+        setToken(userToken);
+        fetchMeals(1, true, userToken);
+      } else {
+        console.warn("No user logged in!");
+        setToken(null);
+        setMeals([]); // user না থাকলে meals clear
+      }
+    });
+
+    return () => unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [search, category, minPrice, maxPrice]);
 
