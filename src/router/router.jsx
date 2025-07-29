@@ -26,41 +26,36 @@ import ManageUsers from "../Component/ManageUsers";
 import ViewMeals from "../Component/ViewMeals";
 import { AdminProfile } from "../Component/AdminProfile";
 import UpdateMeal from "../Component/UpdateMeal";
-import UpcomingMealsAdminTable from "../Component/UpcomingMeals";
-
-
+import UpcomingMealsAdmin from "../Component/UpcomingMealsManagement";
+import ErrorPage from "../Component/Error";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
+    errorElement: <ErrorPage />, // Global error page
+
     children: [
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
 
-      // Meals and related public routes
+      // Public Meals routes
       { path: "meals", element: <Meals /> },
-
-      // MealDetails public route
       { path: "meal/:id", element: <MealDetails /> },
+      { path: "upcoming-meals", element: <UpcomingMeals /> }, // Public Upcoming Meals
 
-      // Optional: public ViewMeal route outside dashboard
-      // { path: "view-meal/:id", element: <ViewMeal /> },
-
-      { path: "upcoming-meals", element: <UpcomingMeals /> },
       { path: "join-us", element: <JoinUs /> },
       { path: "checkout/:packageName", element: <CheckoutPage /> },
 
-      // Unauthorized page
       { path: "unauthorized", element: <Unauthorized /> },
 
-      // Dashboard routes (protected)
+      // Dashboard routes - Protected
       {
         path: "dashboard",
         element: <Dashboard />,
         children: [
-          // User-only routes
+          // User Routes
           {
             path: "my-profile",
             element: (
@@ -102,7 +97,7 @@ export const router = createBrowserRouter([
             ),
           },
 
-          // Admin-only routes
+          // Admin Routes
           {
             path: "admin-profile",
             element: (
@@ -135,8 +130,6 @@ export const router = createBrowserRouter([
               </AdminRoute>
             ),
           },
-
-          // Update Meal (Admin only)
           {
             path: "meals/update/:id",
             element: (
@@ -145,8 +138,6 @@ export const router = createBrowserRouter([
               </AdminRoute>
             ),
           },
-
-          // ViewMeal inside dashboard if needed (usually public outside)
           {
             path: "view-meal/:id",
             element: (
@@ -155,7 +146,6 @@ export const router = createBrowserRouter([
               </AdminRoute>
             ),
           },
-
           {
             path: "all-reviews",
             element: (
@@ -176,11 +166,19 @@ export const router = createBrowserRouter([
             path: "upcoming-meals",
             element: (
               <AdminRoute>
-                <UpcomingMealsAdminTable />
+                <UpcomingMealsAdmin />
               </AdminRoute>
             ),
           },
+
+          // Optional: Add Upcoming Meal modal can be integrated inside UpcomingMealsAdmin component
         ],
+      },
+
+      // Catch-all for unknown routes (404)
+      {
+        path: "*",
+        element: <ErrorPage />,
       },
     ],
   },

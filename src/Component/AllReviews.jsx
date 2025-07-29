@@ -4,7 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000", // change if needed
+  baseURL: "https://hotel-server-side-beta.vercel.app", // change if needed
 });
 
 const AllReviews = () => {
@@ -13,11 +13,20 @@ const AllReviews = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch all reviews with meal info
-  const fetchAllReviews = async () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10; // items per page
+
+  // Fetch all reviews with pagination
+  const fetchAllReviews = async (page = 1) => {
+    setLoading(true);
     try {
-      const res = await axiosInstance.get("/all-reviews");
-      setReviews(Array.isArray(res.data) ? res.data : []);
+      const res = await axiosInstance.get(`/all-reviews?page=${page}&limit=${limit}`);
+      const data = res.data;
+
+      setReviews(Array.isArray(data.reviews) ? data.reviews : []);
+      setCurrentPage(data.currentPage || 1);
+      setTotalPages(data.totalPages || 1);
     } catch (error) {
       console.error("Error fetching all reviews:", error);
       Swal.fire("Error", "Failed to load reviews", "error");
@@ -27,8 +36,8 @@ const AllReviews = () => {
   };
 
   useEffect(() => {
-    fetchAllReviews();
-  }, []);
+    fetchAllReviews(currentPage);
+  }, [currentPage]);
 
   // Delete review by id
   const handleDelete = async (reviewId) => {
@@ -44,6 +53,7 @@ const AllReviews = () => {
       try {
         await axiosInstance.delete(`/reviews/${reviewId}`);
         Swal.fire("Deleted!", "Review has been deleted.", "success");
+        // Remove deleted review from state (without refetch)
         setReviews((prev) => prev.filter((r) => r._id !== reviewId));
       } catch (error) {
         console.error("Delete review error:", error);
@@ -128,6 +138,29 @@ const AllReviews = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex justify-center items-center space-x-4 mt-4">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
+
+        <button
+          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

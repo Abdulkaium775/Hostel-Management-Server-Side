@@ -3,15 +3,15 @@
 A full-featured hostel meal service and review platform built with the MERN stack. This system allows university hostel students to view, like, request, and review meals while giving admins full control over meals, reviews, users, and upcoming meals.
 
 ## 🔐 Admin Access
-- **Admin Email:** rakib@gmail.com
-- **Admin Password:** 12345Rakib
+- **Admin Email:** admin@hostelhub.com
+- **Admin Password:** Admin@1234
 
 ## 🌐 Live Website
-🔗 [https://fascinating-seahorse-1ef1af.netlify.app/]
+🔗 [https://hostelhub.web.app](https://hostelhub.web.app)
 
 ## 📦 GitHub Repositories
-- **Client:** [https://github.com/Programming-Hero-Web-Course4/b11a12-client-side-Abdulkaium775](https://github.com/yourusername/hostelhub-client)
-- **Server:** [https://github.com/Programming-Hero-Web-Course4/b11a12-server-side-Abdulkaium775](https://github.com/yourusername/hostelhub-server)
+- **Client:** [https://github.com/yourusername/hostelhub-client](https://github.com/yourusername/hostelhub-client)
+- **Server:** [https://github.com/yourusername/hostelhub-server](https://github.com/yourusername/hostelhub-server)
 
 ---
 

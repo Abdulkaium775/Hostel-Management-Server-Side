@@ -7,14 +7,19 @@ import { AuthContext } from "../Auth/AuthContext";
 const AllMeals = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
   const [sortBy, setSortBy] = useState("likes");
   const [order, setOrder] = useState("desc");
+
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const limit = 10;
+
+  const totalPages = Math.ceil(total / limit);
 
   const fetchMeals = async () => {
     setLoading(true);
@@ -25,7 +30,7 @@ const AllMeals = () => {
       );
       setMeals(response.data.meals);
       setTotal(response.data.total);
-    } catch {
+    } catch (err) {
       setError("Failed to load meals");
     }
     setLoading(false);
@@ -56,8 +61,8 @@ const AllMeals = () => {
       });
 
       if (res.data.success) {
-        fetchMeals();
         Swal.fire("Deleted!", "The meal has been deleted.", "success");
+        fetchMeals();
       } else {
         Swal.fire("Error", res.data.message || "Deletion failed", "error");
       }
@@ -239,14 +244,14 @@ const AllMeals = () => {
         </button>
 
         <span className="font-semibold text-gray-700 whitespace-nowrap">
-          Page {page} of {Math.ceil(total / limit)}
+          Page {page} of {totalPages}
         </span>
 
         <button
-          onClick={() => setPage((p) => (p * limit < total ? p + 1 : p))}
-          disabled={page * limit >= total}
+          onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+          disabled={page >= totalPages}
           className={`px-4 py-2 rounded-md transition-colors duration-200 ${
-            page * limit >= total
+            page >= totalPages
               ? "bg-gray-300 cursor-not-allowed"
               : "bg-indigo-600 text-white hover:bg-indigo-700"
           }`}

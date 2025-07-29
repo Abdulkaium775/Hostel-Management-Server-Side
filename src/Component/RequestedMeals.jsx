@@ -1,46 +1,56 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axiosInstance from '../Api/axios';
 import toast from 'react-hot-toast';
-import Swal from 'sweetalert2'; 
+import Swal from 'sweetalert2';
 import { AuthContext } from '../Auth/AuthContext';
+
+const ITEMS_PER_PAGE = 10;
 
 const RequestedMeals = () => {
   const { user } = useContext(AuthContext);
+
   const [requestedMeals, setRequestedMeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
+  const fetchRequestedMeals = async (page = 1) => {
     if (!user?.email) return;
 
-    const fetchRequestedMeals = async () => {
-      try {
-        setLoading(true);
+    try {
+      setLoading(true);
 
-        const token = await user.getIdToken(); 
-        const { data } = await axiosInstance.get(`/requested-meals/${user.email}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      const token = await user.getIdToken();
+      const { data } = await axiosInstance.get(`/requested-meals/${user.email}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          page,
+          limit: ITEMS_PER_PAGE,
+        },
+      });
 
-        setRequestedMeals(data);
-      } catch (err) {
-        console.error(err);
-        toast.error('Failed to fetch requested meals');
-      } finally {
-        setLoading(false);
-      }
-    };
+      setRequestedMeals(data.requests);
+      setCurrentPage(data.currentPage);
+      setTotalPages(data.totalPages);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to fetch requested meals');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchRequestedMeals();
-  }, [user?.email]);
+  useEffect(() => {
+    fetchRequestedMeals(currentPage);
+  }, [user?.email, currentPage]);
 
   const handleCancel = async (id) => {
-    // SweetAlert2 confirmation dialog
     const result = await Swal.fire({
       title: 'Are you sure?',
-      text: "Do you want to cancel this meal request?",
+      text: 'Do you want to cancel this meal request?',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
@@ -55,7 +65,8 @@ const RequestedMeals = () => {
       setDeletingId(id);
       await axiosInstance.delete(`/meal-requests/${id}`);
       toast.success('Meal request cancelled');
-      setRequestedMeals((prev) => prev.filter((meal) => meal._id !== id));
+      // Refetch current page after cancellation
+      fetchRequestedMeals(currentPage);
     } catch (err) {
       console.error(err);
       toast.error('Failed to cancel meal request');
@@ -64,8 +75,14 @@ const RequestedMeals = () => {
     }
   };
 
+  const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
   if (loading) return <p className="text-center mt-6 text-gray-600">Loading your requested meals...</p>;
-  if (requestedMeals.length === 0) return <p className="text-center mt-6 text-gray-600">No requested meals found.</p>;
+  if (requestedMeals.length === 0)
+    return <p className="text-center mt-6 text-gray-600">No requested meals found.</p>;
 
   return (
     <div className="max-w-6xl mx-auto px-4 mt-10">
@@ -105,6 +122,29 @@ const RequestedMeals = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Pagination Footer */}
+      <div className="flex justify-center mt-6 space-x-2">
+        <button
+          onClick={() => goToPage(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+
+        <span className="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700">
+          Page {currentPage} of {totalPages}
+        </span>
+
+        <button
+          onClick={() => goToPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
       </div>
     </div>
   );

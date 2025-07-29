@@ -3,34 +3,44 @@ import axiosInstance from "../Api/axios";
 import { AuthContext } from "../Auth/AuthContext";
 import toast from "react-hot-toast";
 import { getAuth } from "firebase/auth";
+
 const UpcomingMeals = () => {
   const { user } = useContext(AuthContext);
   const [meals, setMeals] = useState([]);
   const [userBadge, setUserBadge] = useState(null);
   const [loading, setLoading] = useState(true);
 
- const fetchUpcomingMeals = async () => {
-  try {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (!user) return;
+  // Fetch upcoming meals with auth token from Firebase
+  const fetchUpcomingMeals = async () => {
+    try {
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        setMeals([]);
+        setLoading(false);
+        return;
+      }
 
-    const token = await user.getIdToken();
+      const token = await currentUser.getIdToken();
 
-    const res = await axiosInstance.get("/upcoming-meals", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      const res = await axiosInstance.get("/upcoming-meals", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    setMeals(res.data);
-  } catch {
-    toast.error("Failed to fetch upcoming meals");
-  } finally {
-    setLoading(false);
-  }
-};
+      console.log("Upcoming meals fetched:", res.data); // Debug log here to check data
 
+      setMeals(res.data);
+    } catch (error) {
+      toast.error("Failed to fetch upcoming meals");
+      setMeals([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch user badge from backend
   const fetchUserBadge = async () => {
     if (!user?.email) return;
     try {
@@ -38,9 +48,11 @@ const UpcomingMeals = () => {
       setUserBadge(res.data.badge || null);
     } catch {
       toast.error("Failed to fetch user badge");
+      setUserBadge(null);
     }
   };
 
+  // Handle like click for a meal
   const handleLike = async (mealId) => {
     if (!user?.email) {
       toast.error("Please login to like meals");
@@ -50,13 +62,51 @@ const UpcomingMeals = () => {
       toast.error("Only premium users can like meals");
       return;
     }
+
+    const meal = meals.find((m) => m._id === mealId);
+    if (!meal) return;
+
+    const alreadyLiked = meal.likedBy?.includes(user.email);
+    if (alreadyLiked) {
+      toast.error("You already liked this meal");
+      return;
+    }
+
     try {
-      const res = await axiosInstance.patch(`/upcoming-meals/${mealId}/like`, {
-        userEmail: user.email,
-      });
+      const auth = getAuth();
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        toast.error("User not authenticated");
+        return;
+      }
+
+      const token = await currentUser.getIdToken();
+
+      const res = await axiosInstance.patch(
+        `/upcoming-meals/${mealId}/like`,
+        { userEmail: user.email },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       if (res.data.success) {
         toast.success("Liked the meal!");
-        fetchUpcomingMeals();
+
+        // Update local state
+        setMeals((prevMeals) =>
+          prevMeals.map((m) =>
+            m._id === mealId
+              ? {
+                  ...m,
+                  likes: (m.likes || 0) + 1,
+                  likedBy: [...(m.likedBy || []), user.email],
+                }
+              : m
+          )
+        );
       }
     } catch (err) {
       const msg = err.response?.data?.message || "Failed to like meal";
@@ -64,9 +114,11 @@ const UpcomingMeals = () => {
     }
   };
 
+  // Load meals and user badge on mount or when user changes
   useEffect(() => {
-    fetchUpcomingMeals();
+    setLoading(true);
     fetchUserBadge();
+    fetchUpcomingMeals();
   }, [user]);
 
   if (loading) {
@@ -91,19 +143,28 @@ const UpcomingMeals = () => {
         🌟 Upcoming Meals
       </h2>
 
-      <div
-        className="
-          grid
-          gap-6
-          grid-cols-1
-          sm:grid-cols-2
-          md:grid-cols-3
-          lg:grid-cols-4
-          px-2
-        "
-      >
+      <p className="text-sm text-gray-600 mb-4 text-center">
+        Showing {meals.length} upcoming meal{meals.length > 1 ? "s" : ""}
+      </p>
+
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-2">
         {meals.map((meal) => {
           const alreadyLiked = meal.likedBy?.includes(user?.email);
+          const canLike =
+            user &&
+            userBadge &&
+            ["Silver", "Gold", "Platinum"].includes(userBadge) &&
+            !alreadyLiked;
+
+          // Safely parse date
+          let formattedDate = "No date";
+          if (meal.publishDate) {
+            const dateObj = new Date(meal.publishDate);
+            if (!isNaN(dateObj)) {
+              formattedDate = dateObj.toLocaleDateString();
+            }
+          }
+
           return (
             <article
               key={meal._id}
@@ -112,7 +173,7 @@ const UpcomingMeals = () => {
             >
               <img
                 src={meal.image}
-                alt={meal.title}
+                alt={meal.title || "Upcoming meal"}
                 className="h-48 w-full object-cover rounded-t-2xl"
                 loading="lazy"
               />
@@ -127,30 +188,36 @@ const UpcomingMeals = () => {
                 <p className="text-sm text-gray-500 mb-1">
                   📅{" "}
                   <span className="font-medium text-gray-700">Publish Date:</span>{" "}
-                  {new Date(meal.publishDate).toLocaleDateString()}
+                  {formattedDate}
                 </p>
                 <p className="text-sm text-gray-500 mb-5">
                   ❤️ <span className="font-medium text-gray-700">Likes:</span>{" "}
                   {meal.likes || 0}
                 </p>
 
-                {user && userBadge && ["Silver", "Gold", "Platinum"].includes(userBadge) ? (
-                  <button
-                    onClick={() => handleLike(meal._id)}
-                    disabled={alreadyLiked}
-                    className={`w-full py-2 rounded-xl text-white font-semibold text-center transition ${
-                      alreadyLiked
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-black hover:bg-pink-700 focus:outline-none focus:ring-4 focus:ring-pink-300"
-                    }`}
-                    aria-disabled={alreadyLiked}
-                    aria-label={alreadyLiked ? "Already liked" : "Like this meal"}
-                  >
-                    {alreadyLiked ? "Liked ❤️" : "Like ❤️"}
-                  </button>
+                {user ? (
+                  ["Silver", "Gold", "Platinum"].includes(userBadge) ? (
+                    <button
+                      onClick={() => handleLike(meal._id)}
+                      disabled={!canLike}
+                      className={`w-full py-2 rounded-xl text-white font-semibold text-center transition ${
+                        !canLike
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-black hover:bg-pink-700 focus:outline-none focus:ring-4 focus:ring-pink-300"
+                      }`}
+                      aria-disabled={!canLike}
+                      aria-label={alreadyLiked ? "Already liked" : "Like this meal"}
+                    >
+                      {alreadyLiked ? "Liked ❤️" : "Like ❤️"}
+                    </button>
+                  ) : (
+                    <p className="text-xs text-red-500 font-semibold mt-auto text-center">
+                      Only premium users can like
+                    </p>
+                  )
                 ) : (
                   <p className="text-xs text-red-500 font-semibold mt-auto text-center">
-                    Only premium users can like
+                    Please login to like meals
                   </p>
                 )}
               </div>

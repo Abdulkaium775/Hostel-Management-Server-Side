@@ -1,163 +1,250 @@
-import React, { useEffect, useState } from "react";
-import axiosInstance from "../Api/axios";
+import React, { useEffect, useState } from 'react';
+import axiosInstance from '../Api/axios';
+import Swal from 'sweetalert2';
 
 const UpcomingMealsAdmin = () => {
-  const [upcomingMeals, setUpcomingMeals] = useState([]);
+  const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [publishingId, setPublishingId] = useState(null);
   const [adding, setAdding] = useState(false);
+  const [publishingId, setPublishingId] = useState(null);
 
   const [formData, setFormData] = useState({
-    title: "",
-    category: "",
-    image: "",
-    ingredients: "",
-    description: "",
-    price: "",
-    publishDate: "",
-    distributorName: "",
+    title: '',
+    category: '',
+    image: '',
+    ingredients: '',
+    description: '',
+    price: '',
+    publishDate: '',
+    distributorName: '',
   });
 
-  // Fetch meals and sort by likes descending
-  const fetchUpcomingMeals = async () => {
-    setLoading(true);
+  // Fetch meals from backend, sorted by likes descending (client-side)
+  const fetchMeals = async () => {
     try {
-      const res = await axiosInstance.get("/upcoming-meals");
-      const sorted = res.data.sort((a, b) => (b.likes || 0) - (a.likes || 0));
-      setUpcomingMeals(sorted);
-    } catch (error) {
-      alert("Failed to load upcoming meals");
+      setLoading(true);
+      const res = await axiosInstance.get('/upcoming-meals');
+      if (Array.isArray(res.data)) {
+        const sortedMeals = res.data.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+        setMeals(sortedMeals);
+      } else {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Unexpected Data',
+          text: 'Unexpected data format from server',
+        });
+      }
+    } catch (err) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Fetch Failed',
+        text: 'Failed to fetch upcoming meals',
+      });
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUpcomingMeals();
+    fetchMeals();
   }, []);
 
+  // Update form state
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
+  // Validate and add new meal
+  const handleAddMeal = async (e) => {
     e.preventDefault();
 
-    const required = [
-      "title",
-      "category",
-      "image",
-      "ingredients",
-      "description",
-      "price",
-      "publishDate",
-      "distributorName",
-    ];
-
-    for (const field of required) {
-      if (!formData[field]) {
-        alert(`Field ${field} is required`);
+    for (const key in formData) {
+      if (formData[key] === '') {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Missing Field',
+          text: `Please fill in ${key}`,
+        });
         return;
       }
     }
 
+    if (isNaN(formData.price) || Number(formData.price) <= 0) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Invalid Price',
+        text: 'Please enter a valid positive price',
+      });
+      return;
+    }
+
+    if (isNaN(new Date(formData.publishDate).getTime())) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Invalid Date',
+        text: 'Please enter a valid publish date',
+      });
+      return;
+    }
+
     try {
       setAdding(true);
-      await axiosInstance.post("/upcoming-meals", {
+      const res = await axiosInstance.post('/upcoming-meals', {
         ...formData,
         price: parseFloat(formData.price),
+        publishDate: formData.publishDate,
       });
-      alert("Meal added successfully");
-      setFormData({
-        title: "",
-        category: "",
-        image: "",
-        ingredients: "",
-        description: "",
-        price: "",
-        publishDate: "",
-        distributorName: "",
+      if (res.data.success) {
+        await Swal.fire({
+          icon: 'success',
+          title: 'Success!',
+          text: 'Upcoming meal added successfully',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        setShowModal(false);
+        setFormData({
+          title: '',
+          category: '',
+          image: '',
+          ingredients: '',
+          description: '',
+          price: '',
+          publishDate: '',
+          distributorName: '',
+        });
+        fetchMeals();
+      } else {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Failed',
+          text: 'Failed to add upcoming meal',
+        });
+      }
+    } catch (err) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Server Error',
+        text: 'Server error while adding meal',
       });
-      setShowModal(false);
-      fetchUpcomingMeals();
-    } catch (error) {
-      alert("Failed to add meal");
+      console.error(err);
     } finally {
       setAdding(false);
     }
   };
 
+  // Publish meal with SweetAlert confirmation
   const handlePublish = async (mealId) => {
-    if (!window.confirm("Are you sure to publish this meal?")) return;
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to publish this meal?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#22c55e', // green-600
+      cancelButtonColor: '#6b7280', // gray-500
+      confirmButtonText: 'Yes, publish it!',
+      reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       setPublishingId(mealId);
-      await axiosInstance.post("/upcoming-meals/publish", { mealId });
-      alert("Meal published successfully");
-      fetchUpcomingMeals();
-    } catch (error) {
-      alert("Failed to publish meal");
+      await axiosInstance.post('/upcoming-meals/publish', {
+        mealId,
+        addedByEmail: 'admin@example.com',
+      });
+      await Swal.fire({
+        icon: 'success',
+        title: 'Published!',
+        text: 'Meal published successfully',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      await fetchMeals();
+    } catch (err) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Failed',
+        text: 'Failed to publish meal',
+      });
+      console.error(err);
     } finally {
       setPublishingId(null);
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6">
-      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center sm:text-left">
-        Upcoming Meals (Sorted by Likes)
-      </h2>
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
+      <h1 className="text-2xl sm:text-3xl font-extrabold mb-6 text-gray-800">Upcoming Meals Admin</h1>
 
+      {/* Add Upcoming Meal Button */}
       <button
         onClick={() => setShowModal(true)}
-        className="mb-6 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="mb-6 inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-lg shadow-lg hover:from-blue-700 hover:to-indigo-700 transition duration-300 text-sm sm:text-base"
+        aria-label="Add upcoming meal"
       >
-        Add Upcoming Meal
+        + Add Upcoming Meal
       </button>
 
+      {/* Meals Table */}
       {loading ? (
-        <p className="text-center text-gray-600 text-lg py-8">Loading...</p>
-      ) : upcomingMeals.length === 0 ? (
-        <p className="text-center text-gray-500 text-lg py-8">No upcoming meals found</p>
+        <p className="text-center text-gray-500">Loading upcoming meals...</p>
+      ) : meals.length === 0 ? (
+        <p className="text-center text-gray-500">No upcoming meals found.</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-gray-300 shadow-sm bg-white">
-          <table className="min-w-[700px] w-full table-auto border-collapse">
-            <thead className="bg-gray-200">
+        <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-md">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-indigo-50">
               <tr>
-                <th className="p-3 border text-left text-sm sm:text-base whitespace-nowrap">Title</th>
-                <th className="p-3 border text-left text-sm sm:text-base whitespace-nowrap">Category</th>
-                <th className="p-3 border text-left text-sm sm:text-base whitespace-nowrap">Description</th>
-                <th className="p-3 border text-left text-sm sm:text-base whitespace-nowrap">Distributor</th>
-                <th className="p-3 border text-center text-sm sm:text-base whitespace-nowrap">Likes</th>
-                <th className="p-3 border text-center text-sm sm:text-base whitespace-nowrap">Publish Date</th>
-                <th className="p-3 border text-center text-sm sm:text-base whitespace-nowrap">Publish</th>
+                {['Title', 'Category', 'Likes', 'Publish Date', 'Distributor', 'Actions'].map((head) => (
+                  <th
+                    key={head}
+                    scope="col"
+                    className="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-indigo-600 uppercase tracking-wider"
+                  >
+                    {head}
+                  </th>
+                ))}
               </tr>
             </thead>
-            <tbody>
-              {upcomingMeals.map((meal) => (
-                <tr key={meal._id} className="hover:bg-gray-100 transition-colors duration-150">
-                  <td className="p-3 border text-sm sm:text-base">{meal.title}</td>
-                  <td className="p-3 border text-sm sm:text-base">{meal.category}</td>
-                  <td className="p-3 border text-sm sm:text-base">{meal.description}</td>
-                  <td className="p-3 border text-sm sm:text-base">{meal.distributorName}</td>
-                  <td className="p-3 border text-center text-sm sm:text-base">{meal.likes || 0}</td>
-                  <td className="p-3 border text-center text-sm sm:text-base">
+            <tbody className="bg-white divide-y divide-gray-200">
+              {meals.map((meal) => (
+                <tr key={meal._id?.toString() || meal._id} className="hover:bg-indigo-50 transition-colors">
+                  <td
+                    className="px-4 sm:px-6 py-3 whitespace-nowrap text-gray-800 font-medium max-w-xs truncate"
+                    title={meal.title}
+                  >
+                    {meal.title}
+                  </td>
+                  <td className="px-4 sm:px-6 py-3 whitespace-nowrap text-gray-600">{meal.category}</td>
+                  <td className="px-4 sm:px-6 py-3 whitespace-nowrap text-center text-gray-700 font-semibold">{meal.likes || 0}</td>
+                  <td className="px-4 sm:px-6 py-3 whitespace-nowrap text-gray-600">
                     {new Date(meal.publishDate).toLocaleDateString()}
                   </td>
-                  <td className="p-3 border text-center">
+                  <td
+                    className="px-4 sm:px-6 py-3 whitespace-nowrap text-gray-600 max-w-xs truncate"
+                    title={meal.distributorName}
+                  >
+                    {meal.distributorName}
+                  </td>
+                  <td className="px-4 sm:px-6 py-3 whitespace-nowrap text-center">
                     <button
-                      className={`px-4 py-1 rounded text-white text-sm sm:text-base ${
-                        publishingId === meal._id
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-green-600 hover:bg-green-700"
-                      }`}
-                      onClick={() => handlePublish(meal._id)}
                       disabled={publishingId === meal._id}
+                      onClick={() => handlePublish(meal._id)}
+                      className={`inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-semibold rounded-md shadow-sm
+                        ${
+                          publishingId === meal._id
+                            ? 'bg-gray-400 cursor-not-allowed'
+                            : 'bg-green-600 hover:bg-green-700 text-white'
+                        }
+                        transition duration-150`}
+                      aria-label={`Publish meal ${meal.title}`}
                     >
-                      {publishingId === meal._id ? "Publishing..." : "Publish"}
+                      {publishingId === meal._id ? 'Publishing...' : 'Publish'}
                     </button>
                   </td>
                 </tr>
@@ -170,105 +257,162 @@ const UpcomingMealsAdmin = () => {
       {/* Modal */}
       {showModal && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4"
-          onClick={() => setShowModal(false)}
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-upcoming-meal-title"
         >
-          <div
-            className="bg-white rounded-lg max-w-md w-full p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h4 className="text-xl font-semibold mb-4">Add Upcoming Meal</h4>
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <input
-                type="text"
-                name="title"
-                placeholder="Title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-              <input
-                type="text"
-                name="category"
-                placeholder="Category"
-                value={formData.category}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-              <input
-                type="text"
-                name="image"
-                placeholder="Image URL"
-                value={formData.image}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-              <input
-                type="text"
-                name="ingredients"
-                placeholder="Ingredients (comma separated)"
-                value={formData.ingredients}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-              <textarea
-                name="description"
-                placeholder="Description"
-                value={formData.description}
-                onChange={handleChange}
-                required
-                rows={3}
-                className="w-full border border-gray-300 rounded px-3 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-              <input
-                type="number"
-                name="price"
-                placeholder="Price"
-                value={formData.price}
-                onChange={handleChange}
-                required
-                step="0.01"
-                min="0"
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-              <input
-                type="date"
-                name="publishDate"
-                placeholder="Publish Date"
-                value={formData.publishDate}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
-              <input
-                type="text"
-                name="distributorName"
-                placeholder="Distributor Name"
-                value={formData.distributorName}
-                onChange={handleChange}
-                required
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              />
+          <div className="bg-white rounded-xl shadow-xl max-w-lg sm:max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 relative">
+            <h2 id="add-upcoming-meal-title" className="text-xl sm:text-2xl font-semibold text-gray-900 mb-6">
+              Add Upcoming Meal
+            </h2>
+            <form onSubmit={handleAddMeal} className="space-y-4">
+              <div>
+                <label htmlFor="title" className="block text-gray-700 font-medium mb-1">
+                  Title
+                </label>
+                <input
+                  id="title"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleChange}
+                  type="text"
+                  placeholder="Meal title"
+                  required
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
 
-              <div className="flex justify-end gap-3 mt-4">
+              <div>
+                <label htmlFor="category" className="block text-gray-700 font-medium mb-1">
+                  Category
+                </label>
+                <input
+                  id="category"
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  type="text"
+                  placeholder="Category"
+                  required
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="image" className="block text-gray-700 font-medium mb-1">
+                  Image URL
+                </label>
+                <input
+                  id="image"
+                  name="image"
+                  value={formData.image}
+                  onChange={handleChange}
+                  type="url"
+                  placeholder="Image URL"
+                  required
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="ingredients" className="block text-gray-700 font-medium mb-1">
+                  Ingredients
+                </label>
+                <textarea
+                  id="ingredients"
+                  name="ingredients"
+                  value={formData.ingredients}
+                  onChange={handleChange}
+                  placeholder="List of ingredients"
+                  rows={3}
+                  required
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="description" className="block text-gray-700 font-medium mb-1">
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Description"
+                  rows={3}
+                  required
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="price" className="block text-gray-700 font-medium mb-1">
+                    Price
+                  </label>
+                  <input
+                    id="price"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleChange}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="Price"
+                    required
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="publishDate" className="block text-gray-700 font-medium mb-1">
+                    Publish Date
+                  </label>
+                  <input
+                    id="publishDate"
+                    name="publishDate"
+                    value={formData.publishDate}
+                    onChange={handleChange}
+                    type="date"
+                    required
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="distributorName" className="block text-gray-700 font-medium mb-1">
+                  Distributor Name
+                </label>
+                <input
+                  id="distributorName"
+                  name="distributorName"
+                  value={formData.distributorName}
+                  onChange={handleChange}
+                  type="text"
+                  placeholder="Distributor Name"
+                  required
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="flex justify-end space-x-3 mt-6">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
                   disabled={adding}
-                  className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                  className="px-4 sm:px-5 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={adding}
-                  className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="px-4 sm:px-5 py-2 rounded-md bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition"
                 >
-                  {adding ? "Adding..." : "Add Meal"}
+                  {adding ? 'Adding...' : 'Add Meal'}
                 </button>
               </div>
             </form>

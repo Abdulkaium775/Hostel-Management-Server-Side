@@ -1,21 +1,21 @@
-import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import React, { useState, useEffect, useCallback } from "react";
 import Swal from "sweetalert2";
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000", // change if needed
+  baseURL: "https://hotel-server-side-beta.vercel.app", // change to your backend URL
 });
 
 const ServeMeals = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [servingId, setServingId] = useState(null); // For disabling serve button
+  const [servingId, setServingId] = useState(null); // to disable serving button while processing
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const limit = 10; // items per page
+  const limit = 10;
 
-  // Debounce search input (300ms)
+  // debounce helper
   const debounce = (func, delay) => {
     let timer;
     return (...args) => {
@@ -24,6 +24,7 @@ const ServeMeals = () => {
     };
   };
 
+  // fetch meal requests from backend
   const fetchRequests = async (searchTerm, currentPage) => {
     setLoading(true);
     try {
@@ -33,14 +34,14 @@ const ServeMeals = () => {
       setRequests(res.data.requests);
       setTotal(res.data.total);
     } catch (error) {
-      console.error("Error fetching serve meals:", error);
+      console.error("Failed to fetch meal requests:", error);
       Swal.fire("Error", "Failed to load requested meals", "error");
     } finally {
       setLoading(false);
     }
   };
 
-  // Wrapped debounced version of fetchRequests
+  // debounced fetchRequests so it doesn't flood backend on every keystroke
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedFetch = useCallback(
     debounce((searchTerm, currentPage) => {
@@ -49,25 +50,25 @@ const ServeMeals = () => {
     []
   );
 
+  // effect to call API when search or page changes
   useEffect(() => {
     debouncedFetch(search, page);
   }, [search, page, debouncedFetch]);
 
+  // handler for serving a meal request
   const handleServe = async (requestId) => {
-    const result = await Swal.fire({
+    const confirm = await Swal.fire({
       title: "Serve this meal?",
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "Yes, serve it!",
     });
-
-    if (!result.isConfirmed) return;
+    if (!confirm.isConfirmed) return;
 
     try {
       setServingId(requestId);
       await axiosInstance.put(`/serve-meals/${requestId}/serve`);
-      Swal.fire("Served!", "Meal request marked as delivered.", "success");
-      // Refresh list after serving
+      Swal.fire("Success", "Meal request marked as delivered.", "success");
       fetchRequests(search, page);
     } catch (error) {
       console.error("Error serving meal request:", error);
@@ -158,7 +159,7 @@ const ServeMeals = () => {
             </table>
           </div>
 
-          {/* Pagination */}
+          {/* Pagination Controls */}
           <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mt-6">
             <button
               disabled={page <= 1}
@@ -167,9 +168,11 @@ const ServeMeals = () => {
             >
               Prev
             </button>
+
             <span className="font-semibold text-gray-700 text-center w-full sm:w-auto">
               Page {page} of {totalPages}
             </span>
+
             <button
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}

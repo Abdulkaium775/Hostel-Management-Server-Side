@@ -14,7 +14,7 @@ export const AdminProfile = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`http://localhost:5000/admin/profile/${user.email}`);
+        const res = await fetch(`https://hotel-server-side-beta.vercel.app/admin/profile/${user.email}`);
         if (!res.ok) {
           const errorData = await res.json();
           throw new Error(errorData.message || "Failed to fetch admin profile");

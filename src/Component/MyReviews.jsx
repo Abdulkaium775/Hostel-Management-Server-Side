@@ -5,45 +5,59 @@ import toast from 'react-hot-toast';
 import axiosInstance from '../Api/axios';
 import Swal from 'sweetalert2';
 import { getAuth } from "firebase/auth";
+
+const ITEMS_PER_PAGE = 10;
+
 const MyReviews = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-useEffect(() => {
-  if (!user?.email) {
-    setReviews([]);
-    setLoading(false);
-    return;
-  }
 
-  const fetchMyReviews = async () => {
-    try {
-      setLoading(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-      const auth = getAuth();
-      const currentUser = auth.currentUser;
-      if (!currentUser) return;
-
-      const token = await currentUser.getIdToken();
-
-      const res = await axiosInstance.get(`/my-reviews/${user.email}`, {
-        headers: {
-          Authorization: `Bearer ${token}`, // ✅ Token পাঠাও
-        },
-      });
-
-      setReviews(res.data || []);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load your reviews.");
-    } finally {
+  useEffect(() => {
+    if (!user?.email) {
+      setReviews([]);
       setLoading(false);
+      return;
     }
-  };
 
-  fetchMyReviews();
-}, [user?.email]);
+    const fetchMyReviews = async (page = 1) => {
+      try {
+        setLoading(true);
+
+        const auth = getAuth();
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+
+        const token = await currentUser.getIdToken();
+
+        const res = await axiosInstance.get(`/my-reviews/${user.email}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            page,
+            limit: ITEMS_PER_PAGE,
+          },
+        });
+
+        setReviews(res.data.reviews || []);
+        setCurrentPage(res.data.currentPage || 1);
+        setTotalPages(res.data.totalPages || 1);
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load your reviews.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMyReviews(currentPage);
+  }, [user?.email, currentPage]);
 
   const handleDelete = (reviewId) => {
     Swal.fire({
@@ -59,6 +73,7 @@ useEffect(() => {
         axiosInstance
           .delete(`/reviews/${reviewId}`)
           .then(() => {
+            // Refetch current page after delete to update UI and pagination
             setReviews((prev) => prev.filter((r) => r._id !== reviewId));
             Swal.fire({
               title: 'Deleted!',
@@ -73,6 +88,11 @@ useEffect(() => {
           });
       }
     });
+  };
+
+  const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
   };
 
   if (loading) {
@@ -130,6 +150,29 @@ useEffect(() => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Pagination Footer */}
+      <div className="flex justify-center mt-6 space-x-2">
+        <button
+          onClick={() => goToPage(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Previous
+        </button>
+
+        <span className="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700">
+          Page {currentPage} of {totalPages}
+        </span>
+
+        <button
+          onClick={() => goToPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          Next
+        </button>
       </div>
     </div>
   );
