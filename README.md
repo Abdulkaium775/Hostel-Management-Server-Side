@@ -3,8 +3,8 @@
 A full-featured hostel meal service and review platform built with the MERN stack. This system allows university hostel students to view, like, request, and review meals while giving admins full control over meals, reviews, users, and upcoming meals.
 
 ## 🔐 Admin Access
-- **Admin Email:** rakib@gmail.com
-- **Admin Password:** 12345Rakib
+- **Admin Email:** sumu@suma.com
+- **Admin Password:** 12345Sumu
 
 ## 🌐 Live Website
 🔗 [https://fascinating-seahorse-1ef1af.netlify.app/]
