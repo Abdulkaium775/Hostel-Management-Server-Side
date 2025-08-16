@@ -10,7 +10,6 @@ const UpcomingMeals = () => {
   const [userBadge, setUserBadge] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch upcoming meals with auth token from Firebase
   const fetchUpcomingMeals = async () => {
     try {
       const auth = getAuth();
@@ -20,17 +19,10 @@ const UpcomingMeals = () => {
         setLoading(false);
         return;
       }
-
       const token = await currentUser.getIdToken();
-
       const res = await axiosInstance.get("/upcoming-meals", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      console.log("Upcoming meals fetched:", res.data); // Debug log here to check data
-
       setMeals(res.data);
     } catch (error) {
       toast.error("Failed to fetch upcoming meals");
@@ -40,7 +32,6 @@ const UpcomingMeals = () => {
     }
   };
 
-  // Fetch user badge from backend
   const fetchUserBadge = async () => {
     if (!user?.email) return;
     try {
@@ -52,7 +43,6 @@ const UpcomingMeals = () => {
     }
   };
 
-  // Handle like click for a meal
   const handleLike = async (mealId) => {
     if (!user?.email) {
       toast.error("Please login to like meals");
@@ -81,29 +71,18 @@ const UpcomingMeals = () => {
       }
 
       const token = await currentUser.getIdToken();
-
       const res = await axiosInstance.patch(
         `/upcoming-meals/${mealId}/like`,
         { userEmail: user.email },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (res.data.success) {
         toast.success("Liked the meal!");
-
-        // Update local state
         setMeals((prevMeals) =>
           prevMeals.map((m) =>
             m._id === mealId
-              ? {
-                  ...m,
-                  likes: (m.likes || 0) + 1,
-                  likedBy: [...(m.likedBy || []), user.email],
-                }
+              ? { ...m, likes: (m.likes || 0) + 1, likedBy: [...(m.likedBy || []), user.email] }
               : m
           )
         );
@@ -114,7 +93,6 @@ const UpcomingMeals = () => {
     }
   };
 
-  // Load meals and user badge on mount or when user changes
   useEffect(() => {
     setLoading(true);
     fetchUserBadge();
@@ -123,7 +101,7 @@ const UpcomingMeals = () => {
 
   if (loading) {
     return (
-      <div className="text-center py-12 text-lg font-medium text-gray-700">
+      <div className="text-center py-20 text-lg font-medium text-slate-700">
         Loading upcoming meals...
       </div>
     );
@@ -131,23 +109,23 @@ const UpcomingMeals = () => {
 
   if (meals.length === 0) {
     return (
-      <div className="text-center py-12 text-lg font-medium text-gray-500">
+      <div className="text-center py-20 text-lg font-medium text-gray-500">
         No upcoming meals found.
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <h2 className="text-3xl font-extrabold text-center mb-12 text-pink-600 drop-shadow-sm">
+    <div className="bg-gray-50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+      <h2 className="text-4xl font-extrabold text-center mb-8 text-slate-900 drop-shadow-md">
         🌟 Upcoming Meals
       </h2>
 
-      <p className="text-sm text-gray-600 mb-4 text-center">
+      <p className="text-sm text-gray-600 mb-10 text-center">
         Showing {meals.length} upcoming meal{meals.length > 1 ? "s" : ""}
       </p>
 
-      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-2">
+      <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {meals.map((meal) => {
           const alreadyLiked = meal.likedBy?.includes(user?.email);
           const canLike =
@@ -156,43 +134,43 @@ const UpcomingMeals = () => {
             ["Silver", "Gold", "Platinum"].includes(userBadge) &&
             !alreadyLiked;
 
-          // Safely parse date
           let formattedDate = "No date";
           if (meal.publishDate) {
             const dateObj = new Date(meal.publishDate);
-            if (!isNaN(dateObj)) {
-              formattedDate = dateObj.toLocaleDateString();
-            }
+            if (!isNaN(dateObj)) formattedDate = dateObj.toLocaleDateString();
           }
 
           return (
             <article
               key={meal._id}
-              className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-shadow duration-300 flex flex-col"
+              className="bg-white rounded-3xl shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col overflow-hidden"
               aria-label={`Upcoming meal: ${meal.title}`}
             >
-              <img
-                src={meal.image}
-                alt={meal.title || "Upcoming meal"}
-                className="h-48 w-full object-cover rounded-t-2xl"
-                loading="lazy"
-              />
+              <div className="h-48 w-full relative">
+                <img
+                  src={meal.image}
+                  alt={meal.title || "Upcoming meal"}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+                {meal.likes > 0 && (
+                  <span className="absolute top-3 right-3 bg-indigo-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow-md">
+                    ❤️ {meal.likes}
+                  </span>
+                )}
+              </div>
+
               <div className="p-5 flex flex-col flex-grow">
-                <h3 className="text-xl font-semibold mb-2 text-gray-900 truncate">
+                <h3 className="text-xl font-semibold mb-2 text-slate-900 truncate">
                   {meal.title}
                 </h3>
                 <p className="text-gray-600 text-sm mb-3 flex-grow line-clamp-3">
                   {meal.description}
                 </p>
 
-                <p className="text-sm text-gray-500 mb-1">
-                  📅{" "}
-                  <span className="font-medium text-gray-700">Publish Date:</span>{" "}
-                  {formattedDate}
-                </p>
                 <p className="text-sm text-gray-500 mb-5">
-                  ❤️ <span className="font-medium text-gray-700">Likes:</span>{" "}
-                  {meal.likes || 0}
+                  📅 <span className="font-medium text-slate-700">Publish:</span>{" "}
+                  {formattedDate}
                 </p>
 
                 {user ? (
@@ -200,13 +178,12 @@ const UpcomingMeals = () => {
                     <button
                       onClick={() => handleLike(meal._id)}
                       disabled={!canLike}
-                      className={`w-full py-2 rounded-xl text-white font-semibold text-center transition ${
+                      className={`w-full py-2 rounded-xl font-semibold text-white transition ${
                         !canLike
                           ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-black hover:bg-pink-700 focus:outline-none focus:ring-4 focus:ring-pink-300"
+                          : "bg-gradient-to-r from-indigo-600 to-cyan-500 hover:from-indigo-700 hover:to-cyan-600 focus:outline-none focus:ring-4 focus:ring-cyan-300"
                       }`}
                       aria-disabled={!canLike}
-                      aria-label={alreadyLiked ? "Already liked" : "Like this meal"}
                     >
                       {alreadyLiked ? "Liked ❤️" : "Like ❤️"}
                     </button>

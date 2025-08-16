@@ -50,16 +50,15 @@ const Navbar = () => {
           className="flex items-center space-x-2 font-bold text-xl text-white"
           onClick={handleNavLinkClick}
         >
-          {/* Logo Image */}
           <img
             src="/logo.png"
             alt="Logo"
             className="w-10 h-10 rounded-lg object-contain"
           />
-          <span className="text-white">Hostel Management</span>
+          <span>Hostel Management</span>
         </Link>
 
-        {/* Navigation Links (Desktop) */}
+        {/* Desktop Navigation */}
         <div className="hidden md:flex space-x-6">
           {["/", "/meals", "/upcoming-meals"].map((path) => {
             const text =
@@ -88,7 +87,7 @@ const Navbar = () => {
 
         {/* Mobile Buttons */}
         <div className="md:hidden flex items-center space-x-2">
-          {/* Notification */}
+          {/* Notification Icon */}
           <button
             aria-label="Notifications"
             className="relative text-white hover:text-cyan-400 focus:outline-none transition-colors duration-300"
@@ -99,7 +98,6 @@ const Navbar = () => {
               stroke="currentColor"
               strokeWidth={2}
               viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
             >
               <path
                 strokeLinecap="round"
@@ -146,7 +144,7 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Right Section: Avatar or Join Us (Desktop) */}
+        {/* Desktop Right Section */}
         <div className="hidden md:flex items-center space-x-4">
           {!user ? (
             <Link
@@ -160,8 +158,6 @@ const Navbar = () => {
               <button
                 onClick={toggleDropdown}
                 className="focus:outline-none rounded-full overflow-hidden border-2 border-cyan-400"
-                aria-haspopup="true"
-                aria-expanded={dropdownOpen}
               >
                 <img
                   src={user.photoURL || "/default-avatar.png"}
@@ -178,22 +174,22 @@ const Navbar = () => {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-2 w-48 bg-white text-dark-slate-700 rounded-md shadow-lg py-2 z-50"
+                    className="absolute right-0 mt-2 w-48 bg-white text-darkText rounded-md shadow-lg py-2 z-50"
                     onMouseLeave={closeDropdown}
                   >
                     <div className="px-4 py-2 border-b border-gray-200">
-                      <p className="truncate font-semibold text-dark-slate-700">{user.displayName || user.email}</p>
+                      <p className="truncate font-semibold text-darkText">{user.displayName || user.email}</p>
                     </div>
                     <Link
                       to="/dashboard"
-                      className="block px-4 py-2 hover:bg-gray-100 text-dark-slate-700"
+                      className="block px-4 py-2 hover:bg-gray-100 text-darkText"
                       onClick={closeDropdown}
                     >
                       Dashboard
                     </Link>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100 text-dark-slate-700"
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 text-darkText"
                     >
                       Logout
                     </button>
@@ -205,9 +201,9 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Dropdown Menu */}
+      {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-indigo-700/95 px-4 pt-2 pb-4 space-y-1">
+        <div className="md:hidden bg-indigo-700/95 px-4 pt-2 pb-4 space-y-2">
           {["/", "/meals", "/upcoming-meals"].map((path) => {
             const text =
               path === "/"
@@ -237,33 +233,38 @@ const Navbar = () => {
               <Link
                 to="/join-us"
                 onClick={handleNavLinkClick}
-                className="block px-4 py-2 bg-cyan-400 text-indigo-900 rounded font-semibold hover:bg-cyan-300 transition duration-300"
+                className="block px-4 py-2 bg-cyan-400 text-indigo-900 rounded-lg font-semibold hover:bg-cyan-300 transition duration-300"
               >
                 Join Us
               </Link>
             ) : (
               <>
-                <div className="flex items-center space-x-3 px-4 py-2">
+                {/* User Info */}
+                <div className="flex items-center space-x-3 px-4 py-3 bg-neutral-50 rounded-lg mb-2 shadow-inner">
                   <img
                     src={user.photoURL || "/default-avatar.png"}
                     alt="User Avatar"
                     className="h-10 w-10 rounded-full object-cover border-2 border-cyan-400"
                   />
-                  <p className="text-white truncate">{user.displayName || user.email}</p>
+                  <p className="text-darkText truncate font-medium">{user.displayName || user.email}</p>
                 </div>
+
+                {/* Dashboard Link */}
                 <Link
                   to="/dashboard"
                   onClick={handleNavLinkClick}
-                  className="block px-4 py-2 text-white hover:bg-cyan-400 rounded"
+                  className="block px-4 py-2 text-black bg-primary hover:bg-indigo-700 rounded-lg transition duration-300 font-medium"
                 >
                   Dashboard
                 </Link>
+
+                {/* Logout Button */}
                 <button
                   onClick={() => {
                     handleLogout();
                     closeMobileMenu();
                   }}
-                  className="block w-full text-left px-4 py-2 text-white hover:bg-cyan-400 rounded"
+                  className="block w-full text-left px-4 py-2 text-black bg-primary hover:bg-indigo-700 rounded-lg transition duration-300 font-medium mt-1"
                 >
                   Logout
                 </button>

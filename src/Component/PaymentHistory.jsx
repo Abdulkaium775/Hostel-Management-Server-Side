@@ -34,7 +34,7 @@ const PaymentHistory = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-20 text-gray-500 text-lg">
+      <div className="flex justify-center items-center py-20 text-darkText/70 text-lg">
         Loading payment history...
       </div>
     );
@@ -49,38 +49,40 @@ const PaymentHistory = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
-      <h2 className="text-3xl font-semibold text-center mb-8 text-gray-800">
+    <div className="max-w-7xl mx-auto p-6 bg-neutralBg rounded-xl shadow-lg mt-10">
+      <h2 className="text-3xl font-bold mb-8 text-center md:text-left text-darkText">
         Payment History
       </h2>
-      <div className="overflow-x-auto rounded-lg shadow border border-gray-200">
-        <table className="min-w-full table-auto divide-y divide-gray-200">
-          <thead className="bg-blue-600 text-white">
+
+      <div className="overflow-x-auto rounded-lg shadow border border-neutralBg">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-primary text-white">
             <tr>
-              <th className="text-left px-4 py-3 uppercase font-medium text-sm border-r border-blue-500 whitespace-nowrap">
+              <th className="px-4 py-3 text-left text-sm font-semibold border-r border-primary whitespace-nowrap">
                 Package Name
               </th>
-              <th className="text-left px-4 py-3 uppercase font-medium text-sm border-r border-blue-500 whitespace-nowrap">
+              <th className="px-4 py-3 text-left text-sm font-semibold border-r border-primary whitespace-nowrap">
                 Amount (USD)
               </th>
-              <th className="text-left px-4 py-3 uppercase font-medium text-sm border-r border-blue-500 whitespace-nowrap">
+              <th className="px-4 py-3 text-left text-sm font-semibold border-r border-primary whitespace-nowrap">
                 Status
               </th>
-              <th className="text-left px-4 py-3 uppercase font-medium text-sm whitespace-nowrap">
+              <th className="px-4 py-3 text-left text-sm font-semibold whitespace-nowrap">
                 Purchased At
               </th>
             </tr>
           </thead>
+
           <tbody className="bg-white divide-y divide-gray-200">
             {payments.map((payment) => (
               <tr
                 key={payment._id}
-                className="hover:bg-gray-50 transition-colors"
+                className="hover:bg-neutralBg/50 transition-colors"
               >
-                <td className="px-4 py-3 text-gray-700 font-medium whitespace-nowrap">
+                <td className="px-4 py-3 text-darkText font-medium whitespace-nowrap">
                   {payment.packageName}
                 </td>
-                <td className="px-4 py-3 text-gray-700 whitespace-nowrap">
+                <td className="px-4 py-3 text-darkText whitespace-nowrap">
                   ${(payment.amount / 100).toFixed(2)}
                 </td>
                 <td
@@ -92,7 +94,7 @@ const PaymentHistory = () => {
                 >
                   {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
                 </td>
-                <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
+                <td className="px-4 py-3 text-darkText/70 whitespace-nowrap">
                   {new Date(payment.purchasedAt).toLocaleString()}
                 </td>
               </tr>

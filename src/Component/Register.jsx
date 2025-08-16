@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { FcGoogle } from "react-icons/fc";
@@ -10,7 +10,7 @@ import axiosInstance from "../Api/axios";
 
 const CartoonCharacterRegister = () => {
   const controls = useAnimation();
-  React.useEffect(() => {
+  useEffect(() => {
     controls.start({
       rotate: [0, 15, -15, 15, 0],
       transition: { repeat: Infinity, duration: 4, ease: "easeInOut" },
@@ -20,9 +20,8 @@ const CartoonCharacterRegister = () => {
   return (
     <motion.div
       animate={controls}
-      className="mx-auto mb-6 w-24 h-24 rounded-full bg-red-400 shadow-lg flex flex-col items-center justify-center cursor-default select-none"
+      className="mx-auto mb-6 w-24 h-24 rounded-full bg-yellow-400 shadow-2xl flex flex-col items-center justify-center"
       title="Welcome! Register here"
-      style={{ maxWidth: 96 /* 24rem */ }}
     >
       <div className="relative w-16 h-16 bg-pink-200 rounded-full flex items-center justify-center">
         <div className="flex justify-between w-10 absolute top-5 left-3">
@@ -33,7 +32,7 @@ const CartoonCharacterRegister = () => {
         <motion.div
           animate={{ rotate: [0, 20, -20, 20, 0] }}
           transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-          className="w-6 h-6 bg-pink-500 rounded-full absolute top-1 right-0 shadow"
+          className="w-6 h-6 bg-pink-500 rounded-full absolute top-1 right-0 shadow-lg"
           style={{ transformOrigin: "bottom center" }}
         />
       </div>
@@ -71,12 +70,9 @@ const Register = () => {
   const onSubmit = async (data) => {
     const { name, email, password, photoUrl } = data;
 
-    if (!/[A-Z]/.test(password))
-      return toast.error("At least one uppercase letter required");
-    if (!/[a-z]/.test(password))
-      return toast.error("At least one lowercase letter required");
-    if (password.length < 6)
-      return toast.error("Password must be at least 6 characters");
+    if (!/[A-Z]/.test(password)) return toast.error("At least one uppercase letter required");
+    if (!/[a-z]/.test(password)) return toast.error("At least one lowercase letter required");
+    if (password.length < 6) return toast.error("Password must be at least 6 characters");
 
     try {
       const userCredential = await createUser(email, password);
@@ -121,48 +117,38 @@ const Register = () => {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-r from-[#8e2de2] to-[#4a00e0] p-4 sm:p-6"
+      className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-tr from-indigo-600 to-cyan-500 p-4 sm:p-6"
     >
-      {/* Cartoon placed here, inside normal flow, so it scrolls with content */}
       <CartoonCharacterRegister />
 
-      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl bg-white rounded-xl shadow-xl p-6 sm:p-8 text-gray-900">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 text-gray-900">
-          Register
-        </h2>
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl bg-neutral-50 rounded-2xl shadow-2xl p-6 sm:p-8 text-slate-900">
+        <h2 className="text-3xl font-bold text-center mb-6 text-darkText">Register</h2>
 
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <input
-            className="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none text-sm sm:text-base"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm sm:text-base transition"
             type="text"
             placeholder="Name"
             {...register("name", { required: "Name is required" })}
           />
-          {errors.name && (
-            <p className="text-red-600 text-xs sm:text-sm">{errors.name.message}</p>
-          )}
+          {errors.name && <p className="text-red-600 text-xs sm:text-sm">{errors.name.message}</p>}
 
           <input
-            className="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none text-sm sm:text-base"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm sm:text-base transition"
             type="email"
             placeholder="Email"
             {...register("email", {
               required: "Email is required",
-              pattern: {
-                value: /^\S+@\S+$/i,
-                message: "Invalid email address",
-              },
+              pattern: { value: /^\S+@\S+$/i, message: "Invalid email address" },
             })}
           />
-          {errors.email && (
-            <p className="text-red-600 text-xs sm:text-sm">{errors.email.message}</p>
-          )}
+          {errors.email && <p className="text-red-600 text-xs sm:text-sm">{errors.email.message}</p>}
 
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none text-sm sm:text-base"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm sm:text-base transition"
               {...register("password", { required: "Password is required" })}
             />
             <span
@@ -171,13 +157,11 @@ const Register = () => {
             >
               {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
             </span>
-            {errors.password && (
-              <p className="text-red-600 text-xs sm:text-sm">{errors.password.message}</p>
-            )}
+            {errors.password && <p className="text-red-600 text-xs sm:text-sm">{errors.password.message}</p>}
           </div>
 
           <input
-            className="w-full p-3 border rounded-md focus:ring-2 focus:ring-indigo-400 outline-none text-sm sm:text-base"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm sm:text-base transition"
             type="url"
             placeholder="Photo URL (Optional)"
             {...register("photoUrl")}
@@ -187,7 +171,7 @@ const Register = () => {
             type="submit"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-full bg-gradient-to-r from-[#8e2de2] to-[#4a00e0] text-white py-3 rounded-md font-semibold hover:opacity-90 transition text-sm sm:text-base"
+            className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:opacity-90 transition text-sm sm:text-base"
           >
             Register
           </motion.button>
@@ -197,15 +181,15 @@ const Register = () => {
           onClick={handleGoogleLogin}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="mt-4 w-full bg-white text-black border p-3 rounded-md flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition font-semibold text-sm sm:text-base"
+          className="mt-4 w-full bg-white text-darkText border p-3 rounded-lg flex items-center justify-center gap-2 shadow hover:shadow-lg transition font-semibold text-sm sm:text-base"
         >
           <FcGoogle size={24} />
           Register with Google
         </motion.button>
 
-        <p className="mt-4 text-center text-gray-700 text-xs sm:text-sm">
+        <p className="mt-4 text-center text-darkText text-xs sm:text-sm">
           Already have an account?{" "}
-          <Link to="/login" className="text-indigo-600 font-medium underline">
+          <Link to="/login" className="text-primary font-medium underline">
             Login here
           </Link>
         </p>

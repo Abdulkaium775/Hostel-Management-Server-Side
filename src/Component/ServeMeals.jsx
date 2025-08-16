@@ -9,7 +9,7 @@ const axiosInstance = axios.create({
 const ServeMeals = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [servingId, setServingId] = useState(null); // to disable serving button while processing
+  const [servingId, setServingId] = useState(null);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -24,7 +24,6 @@ const ServeMeals = () => {
     };
   };
 
-  // fetch meal requests from backend
   const fetchRequests = async (searchTerm, currentPage) => {
     setLoading(true);
     try {
@@ -41,26 +40,22 @@ const ServeMeals = () => {
     }
   };
 
-  // debounced fetchRequests so it doesn't flood backend on every keystroke
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedFetch = useCallback(
-    debounce((searchTerm, currentPage) => {
-      fetchRequests(searchTerm, currentPage);
-    }, 300),
+    debounce((searchTerm, currentPage) => fetchRequests(searchTerm, currentPage), 300),
     []
   );
 
-  // effect to call API when search or page changes
   useEffect(() => {
     debouncedFetch(search, page);
   }, [search, page, debouncedFetch]);
 
-  // handler for serving a meal request
   const handleServe = async (requestId) => {
     const confirm = await Swal.fire({
       title: "Serve this meal?",
       icon: "question",
       showCancelButton: true,
+      confirmButtonColor: "#4F46E5",
+      cancelButtonColor: "#06B6D4",
       confirmButtonText: "Yes, serve it!",
     });
     if (!confirm.isConfirmed) return;
@@ -81,8 +76,8 @@ const ServeMeals = () => {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6">
-      <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center sm:text-left">
+    <div className="max-w-7xl mx-auto p-6 sm:p-8 bg-[#F8FAFC] rounded-xl shadow-lg mt-10">
+      <h2 className="text-3xl sm:text-4xl font-bold mb-6 text-[#1E293B] text-center sm:text-left">
         Serve Meals
       </h2>
 
@@ -94,49 +89,41 @@ const ServeMeals = () => {
           setPage(1);
           setSearch(e.target.value);
         }}
-        className="border p-2 mb-4 w-full sm:w-1/2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="border border-gray-300 p-2 mb-4 w-full sm:w-1/2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#4F46E5] text-[#1E293B]"
       />
 
       {loading ? (
-        <p className="text-center text-gray-600 py-8 text-lg">Loading requested meals...</p>
+        <p className="text-center text-[#1E293B] py-8 text-lg">Loading requested meals...</p>
       ) : requests.length === 0 ? (
         <p className="text-center text-gray-500 py-8 text-lg">No meal requests found.</p>
       ) : (
         <>
           <div className="overflow-x-auto rounded-lg border border-gray-300 bg-white shadow-sm">
             <table className="min-w-[600px] w-full table-auto border-collapse">
-              <thead className="bg-gray-200">
+              <thead className="bg-[#4F46E5] text-white">
                 <tr>
-                  <th className="p-3 border text-left text-sm sm:text-base whitespace-nowrap">
-                    Meal Title
-                  </th>
-                  <th className="p-3 border text-left text-sm sm:text-base whitespace-nowrap">
-                    User Name
-                  </th>
-                  <th className="p-3 border text-left text-sm sm:text-base whitespace-nowrap">
-                    User Email
-                  </th>
-                  <th className="p-3 border text-center text-sm sm:text-base whitespace-nowrap">
-                    Status
-                  </th>
-                  <th className="p-3 border text-center text-sm sm:text-base whitespace-nowrap">
-                    Actions
-                  </th>
+                  <th className="p-3 text-left text-sm sm:text-base whitespace-nowrap">Meal Title</th>
+                  <th className="p-3 text-left text-sm sm:text-base whitespace-nowrap">User Name</th>
+                  <th className="p-3 text-left text-sm sm:text-base whitespace-nowrap">User Email</th>
+                  <th className="p-3 text-center text-sm sm:text-base whitespace-nowrap">Status</th>
+                  <th className="p-3 text-center text-sm sm:text-base whitespace-nowrap">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {requests.map((req) => (
+                {requests.map((req, i) => (
                   <tr
                     key={req._id}
-                    className="hover:bg-gray-100 transition-colors duration-150"
+                    className={`hover:bg-[#E0F2FE] transition-colors duration-150 ${
+                      i % 2 === 0 ? "bg-[#F8FAFC]" : "bg-white"
+                    }`}
                   >
-                    <td className="p-3 border text-sm sm:text-base">{req.mealTitle}</td>
-                    <td className="p-3 border text-sm sm:text-base">{req.userName}</td>
-                    <td className="p-3 border text-sm sm:text-base">{req.userEmail}</td>
-                    <td className="p-3 border text-center text-sm sm:text-base capitalize">
+                    <td className="p-3 text-sm sm:text-base text-[#1E293B]">{req.mealTitle}</td>
+                    <td className="p-3 text-sm sm:text-base text-[#1E293B]">{req.userName}</td>
+                    <td className="p-3 text-sm sm:text-base text-[#1E293B]">{req.userEmail}</td>
+                    <td className="p-3 text-center text-sm sm:text-base capitalize text-[#1E293B]">
                       {req.status}
                     </td>
-                    <td className="p-3 border text-center">
+                    <td className="p-3 text-center flex flex-col sm:flex-row justify-center items-center gap-2">
                       {req.status !== "delivered" ? (
                         <button
                           onClick={() => handleServe(req._id)}
@@ -144,7 +131,7 @@ const ServeMeals = () => {
                           className={`px-4 py-1 rounded text-white text-sm sm:text-base w-full sm:w-auto ${
                             servingId === req._id
                               ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-green-500 hover:bg-green-600"
+                              : "bg-[#4F46E5] hover:bg-[#4338CA]"
                           }`}
                         >
                           {servingId === req._id ? "Serving..." : "Serve"}
@@ -159,24 +146,24 @@ const ServeMeals = () => {
             </table>
           </div>
 
-          {/* Pagination Controls */}
+          {/* Pagination */}
           <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mt-6">
             <button
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
-              className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50 w-full sm:w-auto"
+              className="px-4 py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded disabled:opacity-50 w-full sm:w-auto"
             >
               Prev
             </button>
 
-            <span className="font-semibold text-gray-700 text-center w-full sm:w-auto">
+            <span className="font-semibold text-[#1E293B] text-center w-full sm:w-auto">
               Page {page} of {totalPages}
             </span>
 
             <button
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-              className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50 w-full sm:w-auto"
+              className="px-4 py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded disabled:opacity-50 w-full sm:w-auto"
             >
               Next
             </button>

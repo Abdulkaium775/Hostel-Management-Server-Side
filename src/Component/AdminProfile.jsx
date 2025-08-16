@@ -34,7 +34,7 @@ export const AdminProfile = () => {
   if (loading)
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-8 border-t-8 border-gray-200 border-t-primary"></div>
       </div>
     );
 
@@ -48,18 +48,18 @@ export const AdminProfile = () => {
   if (!adminData) return null;
 
   return (
-    <div className="max-w-md mx-auto bg-white shadow-lg rounded-xl p-6 mt-8 sm:p-8">
+    <div className="max-w-md mx-auto bg-neutralBg shadow-lg rounded-xl p-6 mt-8 sm:p-8">
       <div className="flex flex-col items-center text-center px-4">
         <img
           src={adminData.image || user.photoURL || "https://via.placeholder.com/150"}
           alt={adminData.name || user.displayName || "Admin"}
-          className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover mb-6 border-4 border-indigo-500 shadow-md"
+          className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover mb-6 border-4 border-primary shadow-md"
         />
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 truncate max-w-full">
+        <h2 className="text-2xl sm:text-3xl font-bold text-darkText mb-2 truncate max-w-full">
           {adminData.name || user.displayName}
         </h2>
-        <p className="text-gray-600 mb-4 truncate max-w-full">{adminData.email || user.email}</p>
-        <div className="bg-indigo-100 text-indigo-800 px-4 py-2 rounded-full font-semibold text-base sm:text-lg whitespace-nowrap">
+        <p className="text-darkText/70 mb-4 truncate max-w-full">{adminData.email || user.email}</p>
+        <div className="bg-primary/10 text-primary px-4 py-2 rounded-full font-semibold text-base sm:text-lg whitespace-nowrap shadow-sm">
           Meals Added: {adminData.mealsAddedCount ?? 0}
         </div>
       </div>
