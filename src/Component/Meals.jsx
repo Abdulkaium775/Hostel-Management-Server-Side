@@ -7,11 +7,11 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 const categories = ["All", "Breakfast", "Lunch", "Dinner"];
 
 const gradients = [
-  "bg-gradient-to-r from-purple-400 via-pink-500 to-red-500",
-  "bg-gradient-to-r from-green-400 via-blue-500 to-purple-600",
-  "bg-gradient-to-r from-yellow-400 via-red-400 to-pink-500",
-  "bg-gradient-to-r from-indigo-400 via-purple-500 to-pink-500",
-  "bg-gradient-to-r from-teal-400 via-cyan-500 to-blue-500",
+  "bg-gradient-to-r from-[#4F46E5] via-[#06B6D4] to-[#4F46E5]/80",
+  "bg-gradient-to-r from-[#06B6D4] via-[#4F46E5] to-[#06B6D4]/80",
+  "bg-gradient-to-r from-[#4F46E5]/80 via-[#06B6D4]/80 to-[#4F46E5]/80",
+  "bg-gradient-to-r from-[#06B6D4]/70 via-[#4F46E5]/80 to-[#06B6D4]/70",
+  "bg-gradient-to-r from-[#4F46E5]/70 via-[#06B6D4]/70 to-[#4F46E5]/70",
 ];
 
 const Meals = () => {
@@ -28,13 +28,11 @@ const Meals = () => {
 
   const navigate = useNavigate();
 
-  // ✅ Fetch meals function with token
   const fetchMeals = async (pageNum = 1, replace = false, userToken = token) => {
-    if (!userToken) return; // token না থাকলে skip
+    if (!userToken) return;
 
     try {
       setLoading(true);
-
       const { data } = await axiosInstance.get("/meals", {
         params: {
           search: search.trim() || undefined,
@@ -44,9 +42,7 @@ const Meals = () => {
           page: pageNum,
           limit: 6,
         },
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
+        headers: { Authorization: `Bearer ${userToken}` },
       });
 
       setMeals(replace ? data.meals : (prev) => [...prev, ...data.meals]);
@@ -59,7 +55,6 @@ const Meals = () => {
     }
   };
 
-  // ✅ Listen for Firebase user and get token
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -68,9 +63,8 @@ const Meals = () => {
         setToken(userToken);
         fetchMeals(1, true, userToken);
       } else {
-        console.warn("No user logged in!");
         setToken(null);
-        setMeals([]); // user না থাকলে meals clear
+        setMeals([]);
       }
     });
 
@@ -79,27 +73,25 @@ const Meals = () => {
   }, [search, category, minPrice, maxPrice]);
 
   const loadMore = () => {
-    if (!loading && hasMore) {
-      fetchMeals(page + 1);
-    }
+    if (!loading && hasMore) fetchMeals(page + 1);
   };
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 mb-8 bg-white p-4 rounded-lg shadow-md">
+      <div className="flex flex-wrap items-center gap-3 mb-8 bg-[#F8FAFC] p-4 rounded-lg shadow-md">
         <input
           type="text"
           placeholder="Search meals..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="input input-bordered flex-grow min-w-[160px] max-w-full border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-grow min-w-[160px] max-w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
         />
 
         <select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="select select-bordered border-gray-300 rounded-md px-3 py-2 min-w-[120px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="min-w-[120px] border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
         >
           {categories.map((cat) => (
             <option key={cat} value={cat}>
@@ -114,7 +106,7 @@ const Meals = () => {
           placeholder="Min Price"
           value={minPrice}
           onChange={(e) => setMinPrice(e.target.value)}
-          className="input input-bordered w-24 sm:w-28 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-24 sm:w-28 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
         />
         <input
           type="number"
@@ -122,22 +114,18 @@ const Meals = () => {
           placeholder="Max Price"
           value={maxPrice}
           onChange={(e) => setMaxPrice(e.target.value)}
-          className="input input-bordered w-24 sm:w-28 border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-24 sm:w-28 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#4F46E5]"
         />
       </div>
 
-      {/* Meal Cards with Infinite Scroll */}
+      {/* Meals Grid */}
       <InfiniteScroll
         dataLength={meals.length}
         next={loadMore}
         hasMore={hasMore}
-        loader={
-          <h4 className="text-center text-gray-500 mt-6">Loading more meals...</h4>
-        }
+        loader={<h4 className="text-center text-gray-500 mt-6">Loading more meals...</h4>}
         endMessage={
-          <p className="text-center mt-6 text-gray-400 font-medium">
-            No more meals to load.
-          </p>
+          <p className="text-center mt-6 text-gray-400 font-medium">No more meals to load.</p>
         }
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -146,7 +134,7 @@ const Meals = () => {
             return (
               <div
                 key={meal._id}
-                className={`${gradientClass} rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col`}
+                className={`${gradientClass} rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 flex flex-col`}
                 style={{ minHeight: "420px" }}
               >
                 <img
@@ -163,7 +151,7 @@ const Meals = () => {
                   </p>
                   <button
                     onClick={() => navigate(`/meal/${meal._id}`)}
-                    className="mt-auto bg-white bg-opacity-20 hover:bg-opacity-40 text-black py-2 rounded-md transition-colors duration-300"
+                    className="mt-auto bg-[#4F46E5] hover:bg-[#06B6D4] text-white py-2 rounded-md transition-colors duration-300"
                   >
                     View Details
                   </button>

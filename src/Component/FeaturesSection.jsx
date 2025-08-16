@@ -4,27 +4,30 @@ const features = [
   {
     icon: "🍽️",
     title: "Nutritious & Balanced",
-    description: "Meals prepared with nutrition in mind to keep you healthy and energized.",
-    bgColor: "from-green-400 to-blue-500",
+    description:
+      "Meals prepared with nutrition in mind to keep you healthy and energized.",
+    bgColor: "from-[#4F46E5] to-[#06B6D4]",
   },
   {
     icon: "⏰",
     title: "On-Time Service",
-    description: "Enjoy your meals fresh and on time every day with reliable service.",
-    bgColor: "from-yellow-400 to-red-500",
+    description:
+      "Enjoy your meals fresh and on time every day with reliable service.",
+    bgColor: "from-[#06B6D4] to-[#4F46E5]",
   },
   {
     icon: "🌿",
     title: "Fresh Ingredients",
-    description: "We use only fresh, locally sourced ingredients for great taste.",
-    bgColor: "from-purple-400 to-pink-500",
+    description:
+      "We use only fresh, locally sourced ingredients for great taste.",
+    bgColor: "from-[#4F46E5]/80 to-[#06B6D4]/80",
   },
 ];
 
 const FeaturesSection = () => {
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 text-center">
-      <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-10 sm:mb-14 text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500">
+    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 text-center bg-[#F8FAFC]">
+      <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-10 sm:mb-14 text-[#1E293B]">
         Why Choose Our Hostel Meals?
       </h2>
 
@@ -36,8 +39,8 @@ const FeaturesSection = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: idx * 0.3 }}
-            whileHover={{ scale: 1.05, rotateX: 4, rotateY: 4 }}
-            className="relative bg-gray-900 rounded-3xl px-6 py-10 sm:px-8 sm:py-12 shadow-2xl cursor-pointer"
+            whileHover={{ scale: 1.05, rotateX: 3, rotateY: 3 }}
+            className="relative bg-white rounded-3xl px-6 py-10 sm:px-8 sm:py-12 shadow-2xl cursor-pointer"
           >
             {/* Gradient Glow Border */}
             <div
@@ -52,10 +55,10 @@ const FeaturesSection = () => {
               >
                 {icon}
               </div>
-              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 text-white">
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-3 text-[#1E293B]">
                 {title}
               </h3>
-              <p className="text-gray-300 text-sm sm:text-base max-w-xs">
+              <p className="text-[#1E293B] text-sm sm:text-base max-w-xs">
                 {description}
               </p>
             </div>
