@@ -27,14 +27,16 @@ import ViewMeals from "../Component/ViewMeals";
 import { AdminProfile } from "../Component/AdminProfile";
 import UpdateMeal from "../Component/UpdateMeal";
 import UpcomingMealsAdmin from "../Component/UpcomingMealsManagement";
+import Overview from "../Component/Overview"; 
 import ErrorPage from "../Component/Error";
+import FeaturedProducts from "../Component/FeaturedProducts";
+import Newsletter from "../Component/Newsletter";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
-    errorElement: <ErrorPage />, // Global error page
-
+    errorElement: <ErrorPage />,
     children: [
       { index: true, element: <Home /> },
       { path: "login", element: <Login /> },
@@ -43,18 +45,22 @@ export const router = createBrowserRouter([
       // Public Meals routes
       { path: "meals", element: <Meals /> },
       { path: "meal/:id", element: <MealDetails /> },
-      { path: "upcoming-meals", element: <UpcomingMeals /> }, // Public Upcoming Meals
-
+      { path: "upcoming-meals", element: <UpcomingMeals /> },
       { path: "join-us", element: <JoinUs /> },
       { path: "checkout/:packageName", element: <CheckoutPage /> },
-
       { path: "unauthorized", element: <Unauthorized /> },
+
+      // ✅ New public routes
+      { path: "featured", element: <FeaturedProducts /> },
+      { path: "newsletter", element: <Newsletter /> },
 
       // Dashboard routes - Protected
       {
         path: "dashboard",
         element: <Dashboard />,
         children: [
+          { path: "overview", element: <Overview /> },
+
           // User Routes
           {
             path: "my-profile",
@@ -170,16 +176,11 @@ export const router = createBrowserRouter([
               </AdminRoute>
             ),
           },
-
-          // Optional: Add Upcoming Meal modal can be integrated inside UpcomingMealsAdmin component
         ],
       },
 
-      // Catch-all for unknown routes (404)
-      {
-        path: "*",
-        element: <ErrorPage />,
-      },
+      // Catch-all for unknown routes
+      { path: "*", element: <ErrorPage /> },
     ],
   },
 ]);

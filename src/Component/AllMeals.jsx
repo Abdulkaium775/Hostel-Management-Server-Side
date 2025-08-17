@@ -133,24 +133,29 @@ const AllMeals = () => {
                     <td className="px-4 py-3 text-center">{meal.reviewCount}</td>
                     <td className="px-4 py-3 text-center">{meal.rating?.toFixed(1) ?? "N/A"}</td>
                     <td className="px-4 py-3 text-[#1E293B]">{meal.distributorName || "N/A"}</td>
-                    <td className="px-4 py-3 text-center space-x-1 sm:space-x-2">
+                    <td className="px-4 py-3 text-center space-x-2">
+                      {/* Filled Primary */}
                       <button
                         onClick={() => navigate(`/dashboard/meals/update/${meal._id}`)}
-                        className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-xs sm:text-sm"
+                        className="bg-primary hover:bg-primary/90 text-white px-3 py-1 rounded-md text-xs sm:text-sm transition"
                       >
                         Update
                       </button>
-                      <button
-                        onClick={() => handleDelete(meal._id)}
-                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-xs sm:text-sm"
-                      >
-                        Delete
-                      </button>
+
+                      {/* Filled Secondary */}
                       <button
                         onClick={() => navigate(`/meal/${meal._id}`)}
-                        className="bg-[#06B6D4] hover:bg-[#06B6D4]/90 text-white px-3 py-1 rounded-md text-xs sm:text-sm"
+                        className="bg-secondary hover:bg-secondary/90 text-white px-3 py-1 rounded-md text-xs sm:text-sm transition"
                       >
                         View
+                      </button>
+
+                      {/* Outlined Danger */}
+                      <button
+                        onClick={() => handleDelete(meal._id)}
+                        className="border-2 border-red-500 text-red-500 hover:bg-red-50 px-3 py-1 rounded-md text-xs sm:text-sm transition"
+                      >
+                        Delete
                       </button>
                     </td>
                   </tr>
@@ -181,21 +186,21 @@ const AllMeals = () => {
                 <div className="flex justify-between space-x-2">
                   <button
                     onClick={() => navigate(`/dashboard/meals/update/${meal._id}`)}
-                    className="flex-1 bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-semibold"
+                    className="flex-1 bg-primary hover:bg-primary/90 text-white px-3 py-2 rounded-lg text-xs font-semibold transition"
                   >
                     Update
                   </button>
                   <button
-                    onClick={() => handleDelete(meal._id)}
-                    className="flex-1 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-xs font-semibold"
-                  >
-                    Delete
-                  </button>
-                  <button
                     onClick={() => navigate(`/meal/${meal._id}`)}
-                    className="flex-1 bg-[#06B6D4] hover:bg-[#06B6D4]/90 text-white px-3 py-2 rounded-lg text-xs font-semibold"
+                    className="flex-1 bg-secondary hover:bg-secondary/90 text-white px-3 py-2 rounded-lg text-xs font-semibold transition"
                   >
                     View
+                  </button>
+                  <button
+                    onClick={() => handleDelete(meal._id)}
+                    className="flex-1 border-2 border-red-500 text-red-500 hover:bg-red-50 px-3 py-2 rounded-lg text-xs font-semibold transition"
+                  >
+                    Delete
                   </button>
                 </div>
               </div>
@@ -210,17 +215,23 @@ const AllMeals = () => {
           onClick={() => setPage((p) => Math.max(p - 1, 1))}
           disabled={page === 1}
           className={`px-4 py-2 rounded-lg transition-colors duration-200 ${
-            page === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-[#4F46E5] text-white hover:bg-[#4338CA]"
+            page === 1
+              ? "border-2 border-gray-300 text-gray-400 cursor-not-allowed"
+              : "border-2 border-primary text-primary hover:bg-primary/10"
           }`}
         >
           Prev
         </button>
-        <span className="font-semibold text-[#1E293B]">Page {page} of {totalPages}</span>
+        <span className="font-semibold text-[#1E293B]">
+          Page {page} of {totalPages}
+        </span>
         <button
           onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
           disabled={page >= totalPages}
           className={`px-4 py-2 rounded-lg transition-colors duration-200 ${
-            page >= totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-[#4F46E5] text-white hover:bg-[#4338CA]"
+            page >= totalPages
+              ? "border-2 border-gray-300 text-gray-400 cursor-not-allowed"
+              : "border-2 border-primary text-primary hover:bg-primary/10"
           }`}
         >
           Next

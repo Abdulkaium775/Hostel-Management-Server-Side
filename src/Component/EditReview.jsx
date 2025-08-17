@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axiosInstance from '../Api/axios';
-import Swal from 'sweetalert2'; // ✅ import SweetAlert2
+import Swal from 'sweetalert2';
 import toast from 'react-hot-toast';
 
 const EditReview = () => {
@@ -9,6 +9,7 @@ const EditReview = () => {
   const navigate = useNavigate();
   const [comment, setComment] = useState('');
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     axiosInstance.get(`/reviews/${id}`)
@@ -30,15 +31,17 @@ const EditReview = () => {
       return;
     }
 
+    setUpdating(true);
+
     axiosInstance.put(`/reviews/${id}`, { comment })
       .then(() => {
         Swal.fire({
           icon: 'success',
           title: 'Updated!',
           text: 'Your review has been updated successfully.',
-          confirmButtonColor: '#3085d6',
+          confirmButtonColor: '#4F46E5', // Primary color
         }).then(() => {
-          navigate('/dashboard/my-reviews'); // ✅ go back after user confirms
+          navigate('/dashboard/my-reviews');
         });
       })
       .catch(() => {
@@ -46,30 +49,52 @@ const EditReview = () => {
           icon: 'error',
           title: 'Failed!',
           text: 'Could not update the review. Please try again.',
+          confirmButtonColor: '#4F46E5',
         });
-      });
+      })
+      .finally(() => setUpdating(false));
   };
 
-  if (loading) return <div className="p-4">Loading...</div>;
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-neutral-100">
+        <p className="text-darkText text-lg font-medium">Loading...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-xl mx-auto p-4">
-      <h2 className="text-2xl font-semibold mb-4 text-center text-gray-700">Edit Your Review</h2>
-      <form onSubmit={handleUpdate}>
-        <textarea
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          rows="6"
-          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-blue-300"
-          placeholder="Update your review comment..."
-        />
-        <button
-          type="submit"
-          className="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
-        >
-          Update Review
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-neutral-100 p-4">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
+        <h2 className="text-2xl font-bold mb-6 text-darkText text-center">Edit Your Review</h2>
+
+        <form onSubmit={handleUpdate} className="space-y-4">
+          <label className="block text-darkText font-medium mb-1">Comment</label>
+          <textarea
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            rows="6"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition"
+            placeholder="Update your review..."
+          />
+
+          <button
+            type="submit"
+            disabled={updating}
+            className="w-full py-3 bg-primary text-white font-semibold rounded-lg hover:bg-indigo-700 transition"
+          >
+            {updating ? 'Updating...' : 'Update Review'}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard/my-reviews')}
+            className="w-full py-3 border border-darkText text-darkText font-semibold rounded-lg hover:bg-neutral-200 transition"
+          >
+            Cancel
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

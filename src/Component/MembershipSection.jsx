@@ -30,7 +30,7 @@ const MembershipSection = () => {
   ];
 
   return (
-    <section className="py-16 px-4 sm:px-6 lg:px-16 bg-[#F8FAFC]">
+    <section className="py-16 px-4 sm:px-6 lg:px-16 bg-[#F8FAFC] mb-10">
       {/* Section Heading */}
       <div className="text-center mb-12">
         <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#1E293B] mb-3">

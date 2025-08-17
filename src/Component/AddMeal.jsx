@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { AuthContext } from "../Auth/AuthContext";
-import axios from "axios"; // For image upload
-import axiosInstance from "../Api/axios"; // Backend API
+import axios from "axios";
+import axiosInstance from "../Api/axios";
 import Swal from "sweetalert2";
 
 const AddMeal = () => {
@@ -169,7 +169,10 @@ const AddMeal = () => {
           <input
             type="number"
             step="0.01"
-            {...register("price", { required: "Price is required", min: { value: 0, message: "Price must be positive" } })}
+            {...register("price", {
+              required: "Price is required",
+              min: { value: 0, message: "Price must be positive" },
+            })}
             placeholder="Enter price in USD"
             className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary ${
               errors.price ? "border-red-500" : "border-gray-300"
@@ -215,7 +218,7 @@ const AddMeal = () => {
           </div>
         </div>
 
-        {/* Submit Button */}
+        {/* Submit Button (Primary Filled) */}
         <button
           type="submit"
           disabled={isSubmitting || uploading}

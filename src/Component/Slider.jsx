@@ -7,21 +7,29 @@ const slides = [
   {
     title: "Explore the Flavors of Hostel Life",
     description: "Enjoy tasty, nutritious meals every single day—crafted with love.",
-    image: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?auto=format&fit=crop&w=1600&q=80", // hostel breakfast
+    image:
+      "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?crop=entropy&cs=tinysrgb&fit=crop&w=1600&h=900",
     gradient: "from-indigo-700 via-indigo-600 to-indigo-500",
   },
-
   {
     title: "Get Exclusive Premium Access",
     description: "Unlock upcoming meals and features with a premium badge!",
-    image: "https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?auto=format&fit=crop&w=1600&q=80", // healthy meal
+    image:
+      "https://images.unsplash.com/photo-1627308595229-7830a5c91f9f?crop=entropy&cs=tinysrgb&fit=crop&w=1600&h=900",
     gradient: "from-cyan-400 via-cyan-300 to-cyan-200",
+  },
+  {
+    title: "Healthy & Fresh Meals",
+    description: "Eat balanced meals every day to stay energized and focused.",
+    image:
+      "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?crop=entropy&cs=tinysrgb&fit=crop&w=1600&h=900",
+    gradient: "from-green-400 via-green-300 to-cyan-200",
   },
 ];
 
 const Slider = () => {
   return (
-    <div className="relative w-full h-[75vh] sm:h-[80vh] md:h-[85vh] bg-gray-50 py-5">
+    <div className="relative w-full h-[75vh] sm:h-[80vh] md:h-[85vh] mb-10">
       <Swiper
         modules={[Autoplay]}
         autoplay={{ delay: 3500, disableOnInteraction: false }}
@@ -42,7 +50,6 @@ const Slider = () => {
                 <div
                   className={`absolute inset-0 bg-gradient-to-tr ${slide.gradient} opacity-60`}
                 />
-
                 {/* Dark Overlay for readability */}
                 <div className="absolute inset-0 bg-black/25" />
 
@@ -56,15 +63,15 @@ const Slider = () => {
                       {slide.description}
                     </p>
 
-                    {/* Search Box */}
+                    {/* Optional Search Box */}
                     <form
                       onSubmit={(e) => e.preventDefault()}
-                      className="flex w-full max-w-md rounded-lg overflow-hidden bg-white/30 backdrop-blur-md shadow-lg border border-white/30"
+                      className="flex w-full max-w-md rounded-lg overflow-hidden bg-white/30 backdrop-blur-md shadow-lg border border-white/30 mt-2"
                     >
                       <input
                         type="text"
                         placeholder="Search meals..."
-                        className="flex-grow px-4 py-2 sm:px-5 sm:py-3 text-dark-slate placeholder-gray-400 bg-transparent outline-none text-sm sm:text-base"
+                        className="flex-grow px-4 py-2 sm:px-5 sm:py-3 text-[#1E293B] placeholder-gray-400 bg-transparent outline-none text-sm sm:text-base"
                       />
                       <button
                         type="submit"

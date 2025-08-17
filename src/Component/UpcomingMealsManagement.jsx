@@ -20,28 +20,18 @@ const UpcomingMealsAdmin = () => {
     distributorName: '',
   });
 
-  // Fetch meals from backend, sorted by likes descending (client-side)
   const fetchMeals = async () => {
     try {
       setLoading(true);
       const res = await axiosInstance.get('/upcoming-meals');
       if (Array.isArray(res.data)) {
-        const sortedMeals = res.data.sort((a, b) => (b.likes || 0) - (a.likes || 0));
-        setMeals(sortedMeals);
+        setMeals(res.data.sort((a, b) => (b.likes || 0) - (a.likes || 0)));
       } else {
-        await Swal.fire({
-          icon: 'error',
-          title: 'Unexpected Data',
-          text: 'Unexpected data format from server',
-        });
+        Swal.fire('Error', 'Unexpected data from server', 'error');
       }
     } catch (err) {
-      await Swal.fire({
-        icon: 'error',
-        title: 'Fetch Failed',
-        text: 'Failed to fetch upcoming meals',
-      });
       console.error(err);
+      Swal.fire('Error', 'Failed to fetch meals', 'error');
     } finally {
       setLoading(false);
     }
@@ -51,45 +41,23 @@ const UpcomingMealsAdmin = () => {
     fetchMeals();
   }, []);
 
-  // Update form state
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Validate and add new meal
   const handleAddMeal = async (e) => {
     e.preventDefault();
-
     for (const key in formData) {
-      if (formData[key] === '') {
-        await Swal.fire({
-          icon: 'error',
-          title: 'Missing Field',
-          text: `Please fill in ${key}`,
-        });
+      if (!formData[key]) {
+        Swal.fire('Missing Field', `Please fill in ${key}`, 'error');
         return;
       }
     }
-
     if (isNaN(formData.price) || Number(formData.price) <= 0) {
-      await Swal.fire({
-        icon: 'error',
-        title: 'Invalid Price',
-        text: 'Please enter a valid positive price',
-      });
+      Swal.fire('Invalid Price', 'Price must be positive', 'error');
       return;
     }
-
-    if (isNaN(new Date(formData.publishDate).getTime())) {
-      await Swal.fire({
-        icon: 'error',
-        title: 'Invalid Date',
-        text: 'Please enter a valid publish date',
-      });
-      return;
-    }
-
     try {
       setAdding(true);
       const res = await axiosInstance.post('/upcoming-meals', {
@@ -98,13 +66,7 @@ const UpcomingMealsAdmin = () => {
         publishDate: formData.publishDate,
       });
       if (res.data.success) {
-        await Swal.fire({
-          icon: 'success',
-          title: 'Success!',
-          text: 'Upcoming meal added successfully',
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        Swal.fire({ icon: 'success', title: 'Meal added', timer: 1500, showConfirmButton: false });
         setShowModal(false);
         setFormData({
           title: '',
@@ -118,34 +80,24 @@ const UpcomingMealsAdmin = () => {
         });
         fetchMeals();
       } else {
-        await Swal.fire({
-          icon: 'error',
-          title: 'Failed',
-          text: 'Failed to add upcoming meal',
-        });
+        Swal.fire('Failed', 'Could not add meal', 'error');
       }
     } catch (err) {
-      await Swal.fire({
-        icon: 'error',
-        title: 'Server Error',
-        text: 'Server error while adding meal',
-      });
       console.error(err);
+      Swal.fire('Server Error', 'Could not add meal', 'error');
     } finally {
       setAdding(false);
     }
   };
 
-  // Publish meal with SweetAlert confirmation
   const handlePublish = async (mealId) => {
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: 'Do you want to publish this meal?',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#22c55e', // green-600
-      cancelButtonColor: '#6b7280', // gray-500
       confirmButtonText: 'Yes, publish it!',
+      cancelButtonText: 'Cancel',
       reverseButtons: true,
     });
 
@@ -153,58 +105,52 @@ const UpcomingMealsAdmin = () => {
 
     try {
       setPublishingId(mealId);
-      await axiosInstance.post('/upcoming-meals/publish', {
-        mealId,
+      const res = await axiosInstance.post('/upcoming-meals/publish', {
+        mealId: mealId,
         addedByEmail: 'admin@example.com',
       });
-      await Swal.fire({
-        icon: 'success',
-        title: 'Published!',
-        text: 'Meal published successfully',
-        timer: 2000,
-        showConfirmButton: false,
-      });
-      await fetchMeals();
+
+      if (res.data.success) {
+        Swal.fire({ icon: 'success', title: 'Published!', timer: 1500, showConfirmButton: false });
+        fetchMeals();
+      } else {
+        Swal.fire('Failed', res.data.message || 'Could not publish meal', 'error');
+      }
     } catch (err) {
-      await Swal.fire({
-        icon: 'error',
-        title: 'Failed',
-        text: 'Failed to publish meal',
-      });
       console.error(err);
+      const msg = err.response?.data?.message || 'Server error';
+      Swal.fire('Failed', msg, 'error');
     } finally {
       setPublishingId(null);
     }
   };
 
   return (
-    <div className="p-4 sm:p-6 max-w-7xl mx-auto">
-      <h1 className="text-2xl sm:text-3xl font-extrabold mb-6 text-gray-800">Upcoming Meals Admin</h1>
+    <div className="p-6 max-w-7xl mx-auto bg-neutral-100 min-h-screen">
+      <h1 className="text-3xl font-extrabold mb-6 text-darkText">Upcoming Meals Admin</h1>
 
-      {/* Add Upcoming Meal Button */}
+      {/* Filled button: Add Upcoming Meal */}
       <button
         onClick={() => setShowModal(true)}
-        className="mb-6 inline-block bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-2 sm:py-3 px-4 sm:px-6 rounded-lg shadow-lg hover:from-blue-700 hover:to-indigo-700 transition duration-300 text-sm sm:text-base"
-        aria-label="Add upcoming meal"
+        className="mb-6 px-5 py-2 bg-primary text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 transition"
       >
         + Add Upcoming Meal
       </button>
 
       {/* Meals Table */}
       {loading ? (
-        <p className="text-center text-gray-500">Loading upcoming meals...</p>
+        <p className="text-darkText">Loading...</p>
       ) : meals.length === 0 ? (
-        <p className="text-center text-gray-500">No upcoming meals found.</p>
+        <p className="text-darkText">No upcoming meals found</p>
       ) : (
-        <div className="overflow-x-auto border border-gray-200 rounded-lg shadow-md">
+        <div className="overflow-x-auto border border-gray-300 rounded-lg shadow-md">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-indigo-50">
+            <thead className="bg-secondary/20">
               <tr>
                 {['Title', 'Category', 'Likes', 'Publish Date', 'Distributor', 'Actions'].map((head) => (
                   <th
                     key={head}
-                    scope="col"
-                    className="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-medium text-indigo-600 uppercase tracking-wider"
+                    className="px-4 py-3 text-left text-darkText font-medium uppercase tracking-wider"
                   >
                     {head}
                   </th>
@@ -213,36 +159,19 @@ const UpcomingMealsAdmin = () => {
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {meals.map((meal) => (
-                <tr key={meal._id?.toString() || meal._id} className="hover:bg-indigo-50 transition-colors">
-                  <td
-                    className="px-4 sm:px-6 py-3 whitespace-nowrap text-gray-800 font-medium max-w-xs truncate"
-                    title={meal.title}
-                  >
-                    {meal.title}
-                  </td>
-                  <td className="px-4 sm:px-6 py-3 whitespace-nowrap text-gray-600">{meal.category}</td>
-                  <td className="px-4 sm:px-6 py-3 whitespace-nowrap text-center text-gray-700 font-semibold">{meal.likes || 0}</td>
-                  <td className="px-4 sm:px-6 py-3 whitespace-nowrap text-gray-600">
-                    {new Date(meal.publishDate).toLocaleDateString()}
-                  </td>
-                  <td
-                    className="px-4 sm:px-6 py-3 whitespace-nowrap text-gray-600 max-w-xs truncate"
-                    title={meal.distributorName}
-                  >
-                    {meal.distributorName}
-                  </td>
-                  <td className="px-4 sm:px-6 py-3 whitespace-nowrap text-center">
+                <tr key={meal._id} className="hover:bg-secondary/10 transition">
+                  <td className="px-4 py-2 font-medium text-darkText">{meal.title}</td>
+                  <td className="px-4 py-2 text-darkText">{meal.category}</td>
+                  <td className="px-4 py-2 text-center text-darkText font-semibold">{meal.likes || 0}</td>
+                  <td className="px-4 py-2 text-darkText">{new Date(meal.publishDate).toLocaleDateString()}</td>
+                  <td className="px-4 py-2 text-darkText">{meal.distributorName}</td>
+                  <td className="px-4 py-2 text-center">
                     <button
                       disabled={publishingId === meal._id}
                       onClick={() => handlePublish(meal._id)}
-                      className={`inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-semibold rounded-md shadow-sm
-                        ${
-                          publishingId === meal._id
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-green-600 hover:bg-green-700 text-white'
-                        }
-                        transition duration-150`}
-                      aria-label={`Publish meal ${meal.title}`}
+                      className={`px-3 py-1 rounded-md text-white font-semibold ${
+                        publishingId === meal._id ? 'bg-gray-400' : 'bg-primary hover:bg-indigo-700'
+                      } transition`}
                     >
                       {publishingId === meal._id ? 'Publishing...' : 'Publish'}
                     </button>
@@ -256,161 +185,50 @@ const UpcomingMealsAdmin = () => {
 
       {/* Modal */}
       {showModal && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="add-upcoming-meal-title"
-        >
-          <div className="bg-white rounded-xl shadow-xl max-w-lg sm:max-w-xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 relative">
-            <h2 id="add-upcoming-meal-title" className="text-xl sm:text-2xl font-semibold text-gray-900 mb-6">
-              Add Upcoming Meal
-            </h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
+          <div className="bg-neutral-100 rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-lg">
+            <h2 className="text-2xl font-semibold mb-4 text-darkText">Add Upcoming Meal</h2>
             <form onSubmit={handleAddMeal} className="space-y-4">
-              <div>
-                <label htmlFor="title" className="block text-gray-700 font-medium mb-1">
-                  Title
-                </label>
-                <input
-                  id="title"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  type="text"
-                  placeholder="Meal title"
-                  required
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="category" className="block text-gray-700 font-medium mb-1">
-                  Category
-                </label>
-                <input
-                  id="category"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  type="text"
-                  placeholder="Category"
-                  required
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="image" className="block text-gray-700 font-medium mb-1">
-                  Image URL
-                </label>
-                <input
-                  id="image"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  type="url"
-                  placeholder="Image URL"
-                  required
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="ingredients" className="block text-gray-700 font-medium mb-1">
-                  Ingredients
-                </label>
-                <textarea
-                  id="ingredients"
-                  name="ingredients"
-                  value={formData.ingredients}
-                  onChange={handleChange}
-                  placeholder="List of ingredients"
-                  rows={3}
-                  required
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="description" className="block text-gray-700 font-medium mb-1">
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder="Description"
-                  rows={3}
-                  required
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 resize-y focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="price" className="block text-gray-700 font-medium mb-1">
-                    Price
-                  </label>
-                  <input
-                    id="price"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    placeholder="Price"
-                    required
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+              {Object.keys(formData).map((key) => (
+                <div key={key}>
+                  <label className="block mb-1 text-darkText capitalize">{key.replace(/([A-Z])/g, ' $1')}</label>
+                  {key === 'description' || key === 'ingredients' ? (
+                    <textarea
+                      name={key}
+                      value={formData[key]}
+                      onChange={handleChange}
+                      rows={3}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary transition"
+                      required
+                    />
+                  ) : (
+                    <input
+                      name={key}
+                      value={formData[key]}
+                      onChange={handleChange}
+                      type={key === 'price' ? 'number' : key === 'publishDate' ? 'date' : 'text'}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary transition"
+                      required
+                    />
+                  )}
                 </div>
+              ))}
 
-                <div>
-                  <label htmlFor="publishDate" className="block text-gray-700 font-medium mb-1">
-                    Publish Date
-                  </label>
-                  <input
-                    id="publishDate"
-                    name="publishDate"
-                    value={formData.publishDate}
-                    onChange={handleChange}
-                    type="date"
-                    required
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label htmlFor="distributorName" className="block text-gray-700 font-medium mb-1">
-                  Distributor Name
-                </label>
-                <input
-                  id="distributorName"
-                  name="distributorName"
-                  value={formData.distributorName}
-                  onChange={handleChange}
-                  type="text"
-                  placeholder="Distributor Name"
-                  required
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-              </div>
-
-              <div className="flex justify-end space-x-3 mt-6">
+              <div className="flex justify-end gap-3 mt-4">
+                {/* Outline button: Cancel */}
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  disabled={adding}
-                  className="px-4 sm:px-5 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+                  className="px-4 py-2 border border-darkText text-darkText font-semibold rounded-md hover:bg-neutral-200 transition"
                 >
                   Cancel
                 </button>
+
+                {/* Filled button: Add Meal */}
                 <button
                   type="submit"
                   disabled={adding}
-                  className="px-4 sm:px-5 py-2 rounded-md bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition"
+                  className="px-4 py-2 bg-primary text-white font-semibold rounded-md hover:bg-indigo-700 transition"
                 >
                   {adding ? 'Adding...' : 'Add Meal'}
                 </button>

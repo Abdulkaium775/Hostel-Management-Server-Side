@@ -114,9 +114,10 @@ const MyReviews = () => {
                 <td className="py-3 px-4 text-center text-sm text-darkText/70">{likes}</td>
                 <td className="py-3 px-4 text-sm text-darkText/70 max-w-xs break-words">{comment}</td>
                 <td className="py-3 px-4 text-center text-sm flex flex-wrap justify-center gap-2">
+                  {/* Primary Filled Buttons */}
                   <button
                     onClick={() => navigate(`/dashboard/edit-review/${_id}`)}
-                    className="bg-secondary hover:bg-cyan-700 text-white px-3 py-1 rounded text-xs md:text-sm transition"
+                    className="bg-primary hover:bg-indigo-700 text-white px-3 py-1 rounded text-xs md:text-sm transition"
                   >
                     Edit
                   </button>
@@ -128,7 +129,7 @@ const MyReviews = () => {
                   </button>
                   <button
                     onClick={() => navigate(`/meal/${mealId}`)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs md:text-sm transition"
+                    className="bg-primary hover:bg-indigo-700 text-white px-3 py-1 rounded text-xs md:text-sm transition"
                   >
                     View Meal
                   </button>
@@ -139,12 +140,12 @@ const MyReviews = () => {
         </table>
       </div>
 
-      {/* Pagination Footer */}
+      {/* Pagination Footer with Outline Buttons */}
       <div className="flex justify-center mt-6 space-x-2">
         <button
           onClick={() => goToPage(currentPage - 1)}
           disabled={currentPage === 1}
-          className="px-3 py-1 rounded border border-neutralBg bg-white text-darkText hover:bg-neutralBg/30 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="px-3 py-1 rounded border border-primary text-primary hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           Previous
         </button>
@@ -154,7 +155,7 @@ const MyReviews = () => {
         <button
           onClick={() => goToPage(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className="px-3 py-1 rounded border border-neutralBg bg-white text-darkText hover:bg-neutralBg/30 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="px-3 py-1 rounded border border-primary text-primary hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           Next
         </button>

@@ -4,7 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 const axiosInstance = axios.create({
-  baseURL: "https://hotel-server-side-beta.vercel.app", // change if needed
+  baseURL: "https://hotel-server-side-beta.vercel.app", 
 });
 
 const AllReviews = () => {
@@ -12,7 +12,6 @@ const AllReviews = () => {
 
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
@@ -44,8 +43,8 @@ const AllReviews = () => {
       text: "You won't be able to revert this!",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#06B6D4",
+      confirmButtonColor: "#4F46E5", // Primary
+      cancelButtonColor: "#06B6D4",  // Secondary
       confirmButtonText: "Yes, delete it!",
     });
 
@@ -97,15 +96,16 @@ const AllReviews = () => {
                   <td className="p-3 text-sm sm:text-base text-[#1E293B]">{review.comment || "No review text"}</td>
                   <td className="p-3 text-center text-sm sm:text-base">{review.mealReviewCount ?? 0}</td>
                   <td className="p-3 text-center space-y-2 sm:space-y-0 sm:space-x-2 flex flex-col sm:flex-row justify-center items-center">
+                    {/* Primary Filled Buttons */}
                     <button
                       onClick={() => handleDelete(review._id)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs sm:text-sm w-full sm:w-auto"
+                      className="bg-primary hover:bg-indigo-700 text-white px-3 py-1 rounded text-xs sm:text-sm w-full sm:w-auto"
                     >
                       Delete
                     </button>
                     <button
                       onClick={() => navigate(`/meal/${review.mealId}`)}
-                      className="bg-[#06B6D4] hover:bg-[#06B6D4]/90 text-white px-3 py-1 rounded text-xs sm:text-sm w-full sm:w-auto"
+                      className="bg-primary hover:bg-indigo-700 text-white px-3 py-1 rounded text-xs sm:text-sm w-full sm:w-auto"
                     >
                       View Meal
                     </button>
@@ -123,13 +123,13 @@ const AllReviews = () => {
         </table>
       </div>
 
-      {/* Pagination */}
+      {/* Pagination Footer */}
       <div className="flex justify-center items-center space-x-4 mt-6">
         <button
           onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
           disabled={currentPage === 1}
           className={`px-4 py-2 rounded-lg text-white transition-colors duration-200 ${
-            currentPage === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-[#4F46E5] hover:bg-[#4338CA]"
+            currentPage === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-primary hover:bg-indigo-700"
           }`}
         >
           Prev
@@ -139,7 +139,7 @@ const AllReviews = () => {
           onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
           disabled={currentPage === totalPages}
           className={`px-4 py-2 rounded-lg text-white transition-colors duration-200 ${
-            currentPage === totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-[#4F46E5] hover:bg-[#4338CA]"
+            currentPage === totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-primary hover:bg-indigo-700"
           }`}
         >
           Next

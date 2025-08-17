@@ -10,13 +10,13 @@ const ErrorPage = ({
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-tr from-red-100 via-red-50 to-white px-6">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-neutral-100 px-6">
       {/* Big error code with subtle pulse */}
-      <div className="text-red-600 text-9xl font-extrabold mb-8 select-none animate-pulse drop-shadow-lg">
+      <div className="text-primary text-9xl font-extrabold mb-8 select-none animate-pulse drop-shadow-lg">
         {errorCode}
       </div>
 
-      <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4 text-center drop-shadow">
+      <h1 className="text-4xl md:text-5xl font-extrabold text-darkText mb-4 text-center drop-shadow">
         {title}
       </h1>
 
@@ -26,16 +26,18 @@ const ErrorPage = ({
 
       {showHomeButton && (
         <div className="flex space-x-6">
+          {/* Filled primary button */}
           <button
             onClick={() => navigate('/')}
-            className="px-8 py-3 bg-red-600 text-white rounded-lg shadow-lg hover:bg-red-700 transition duration-300 ease-in-out transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+            className="px-8 py-3 bg-primary text-white rounded-lg shadow-lg hover:bg-indigo-700 transition duration-300 ease-in-out transform hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
           >
             Go to Home
           </button>
 
+          {/* Outline secondary button */}
           <button
             onClick={() => navigate(-1)}
-            className="px-8 py-3 border-2 border-red-600 text-red-600 rounded-lg shadow-lg hover:bg-red-50 transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+            className="px-8 py-3 border-2 border-primary text-primary rounded-lg shadow-lg hover:bg-secondary hover:text-white transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50"
           >
             Go Back
           </button>

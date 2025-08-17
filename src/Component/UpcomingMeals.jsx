@@ -14,15 +14,15 @@ const UpcomingMeals = () => {
     try {
       const auth = getAuth();
       const currentUser = auth.currentUser;
-      if (!currentUser) {
-        setMeals([]);
-        setLoading(false);
-        return;
+      let headers = {};
+
+      if (currentUser) {
+        const token = await currentUser.getIdToken();
+        headers.Authorization = `Bearer ${token}`;
       }
-      const token = await currentUser.getIdToken();
-      const res = await axiosInstance.get("/upcoming-meals", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+
+      // 🔥 Public + Authenticated both will work
+      const res = await axiosInstance.get("/upcoming-meals", { headers });
       setMeals(res.data);
     } catch (error) {
       toast.error("Failed to fetch upcoming meals");
@@ -82,7 +82,11 @@ const UpcomingMeals = () => {
         setMeals((prevMeals) =>
           prevMeals.map((m) =>
             m._id === mealId
-              ? { ...m, likes: (m.likes || 0) + 1, likedBy: [...(m.likedBy || []), user.email] }
+              ? {
+                  ...m,
+                  likes: (m.likes || 0) + 1,
+                  likedBy: [...(m.likedBy || []), user.email],
+                }
               : m
           )
         );
