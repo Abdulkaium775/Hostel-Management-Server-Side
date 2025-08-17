@@ -1,51 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const Newsletter = () => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
 
   const handleSubscribe = (e) => {
     e.preventDefault();
     alert(`Subscribed with: ${email}`);
-    setEmail('');
+    setEmail("");
   };
 
   return (
-    <section className="relative bg-indigo-600 py-16 px-6 sm:px-10 lg:px-16 rounded-2xl overflow-hidden max-w-7xl mx-auto mt-16 shadow-xl">
-      {/* Decorative Background Blobs */}
-      <div className="absolute -top-16 -left-16 w-64 h-64 bg-indigo-500/30 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute -bottom-16 -right-16 w-72 h-72 bg-cyan-400/30 rounded-full blur-3xl animate-pulse"></div>
+    <section className="relative bg-gradient-to-r from-[#4F46E5] to-[#06B6D4] py-20 px-6 sm:px-12 lg:px-20 rounded-3xl overflow-hidden max-w-7xl mx-auto mt-20 shadow-2xl">
+      {/* Decorative background shapes */}
+      <div className="absolute -top-20 -left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute -bottom-24 -right-24 w-80 h-80 bg-black/10 rounded-full blur-3xl animate-pulse"></div>
 
-      <div className="relative text-center">
+      <div className="relative text-center z-10">
         <h2 className="text-4xl sm:text-5xl font-extrabold text-white drop-shadow-lg mb-4">
-          Subscribe to Our Newsletter
+          Stay Updated with Our Newsletter
         </h2>
-        <p className="text-lg sm:text-xl text-white/90 mb-8 max-w-2xl mx-auto drop-shadow-sm">
-          Get updates on the latest meals, promotions, and exclusive offers!
+        <p className="text-lg sm:text-xl text-white/90 mb-10 max-w-2xl mx-auto drop-shadow-sm">
+          📩 Get the latest meals, promotions, and exclusive offers delivered
+          straight to your inbox!
         </p>
 
-        <form 
-          onSubmit={handleSubscribe} 
-          className="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-xl mx-auto"
+        <form
+          onSubmit={handleSubscribe}
+          className="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-2xl mx-auto"
         >
-          <input 
+          <input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
-            className="px-4 py-3 rounded-lg text-gray-900 flex-grow focus:outline-none focus:ring-2 focus:ring-cyan-400 transition"
+            className="w-full px-5 py-4 rounded-xl text-[#1E293B] bg-white/90 backdrop-blur-md shadow-md flex-grow focus:outline-none focus:ring-4 focus:ring-[#06B6D4] transition"
           />
-          <button 
-            type="submit" 
-            className="bg-white text-indigo-600 font-bold px-6 py-3 rounded-lg shadow-lg hover:bg-gray-100 transition duration-300"
+          <button
+            type="submit"
+            className="bg-[#F8FAFC] text-[#4F46E5] font-bold px-8 py-4 rounded-xl shadow-lg hover:shadow-2xl hover:bg-[#06B6D4] hover:text-white transition-all duration-300 transform hover:-translate-y-1"
           >
             Subscribe
           </button>
         </form>
 
-        {/* Optional accent icon or graphic */}
+        {/* Privacy Note */}
         <div className="mt-8">
-          <p className="text-white/80 text-sm">We respect your privacy. No spam, ever.</p>
+          <p className="text-white/80 text-sm">
+            🔒 We respect your privacy. No spam, ever.
+          </p>
         </div>
       </div>
     </section>
