@@ -26,7 +26,7 @@ const features = [
 
 const FeaturesSection = () => {
   return (
-    <section className="relative bg-[#F8FAFC] py-16 sm:py-20 lg:py-24">
+    <section className="relative bg-[#F8FAFC] py-16 sm:py-20 lg:py-24 mb-10">
       {/* Section Heading */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <motion.h2

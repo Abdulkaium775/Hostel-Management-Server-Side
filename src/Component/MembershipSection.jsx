@@ -47,13 +47,13 @@ const MembershipSection = () => {
   return (
     <section
       className="
-        relative py-20 px-6 sm:px-10 lg:px-16 mb-16
+        relative py-20 px-6 sm:px-10 lg:px-16 mb-10
         bg-[radial-gradient(1200px_600px_at_10%_-10%,#06B6D40f,transparent_60%),radial-gradient(800px_400px_at_90%_110%,#4F46E510,transparent_60%),linear-gradient(180deg,#F8FAFC,white)]
       "
       aria-labelledby="membership-title"
     >
       {/* Section Heading */}
-      <div className="text-center mb-14 relative z-10">
+      <div className="text-center mb-10 relative z-10">
         <h2
           id="membership-title"
           className="text-4xl sm:text-5xl font-extrabold tracking-tight text-[#1E293B]"

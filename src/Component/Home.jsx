@@ -9,8 +9,7 @@ import Promotion from './Promotion';
 import CustomerReviews from './CustomerReviews';
 const Home = () => {
     return (
-<div className='bg-gradient-to-b from-[#F8FAFC] via-white to-[#F8FAFC]
-'>
+<div>
             <Slider />                    {/* Hero section */}
             <SalesPromotion />            {/* Limited-time offer */}
             <MembershipSection />        {/* Premium subscription */}

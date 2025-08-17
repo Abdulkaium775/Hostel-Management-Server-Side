@@ -56,7 +56,7 @@ const cardVariants = {
 
 const CustomerReviews = () => {
   return (
-    <section className="relative bg-[#F8FAFC] py-20 px-6 sm:px-10 lg:px-16 rounded-2xl overflow-hidden">
+    <section className="relative bg-[#F8FAFC] py-20 px-6 sm:px-10 lg:px-16 rounded-2xl overflow-hidden mb-10">
       {/* Header */}
       <div className="text-center mb-16">
         <h2 className="text-4xl sm:text-5xl font-extrabold text-[#1E293B] mb-3">

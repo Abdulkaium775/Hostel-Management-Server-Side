@@ -2,7 +2,7 @@ import React from 'react';
 
 const SalesPromotion = () => {
   return (
-    <section className="relative bg-[#F8FAFC] py-16 px-6 sm:px-10 lg:px-16 rounded-2xl overflow-hidden max-w-7xl mx-auto mt-16 shadow-2xl mb-10">
+    <section className="relative bg-[#F8FAFC] mb-10 py-16 px-6 sm:px-10 lg:px-16 rounded-2xl overflow-hidden max-w-7xl mx-auto mt-16 shadow-2xl">
       {/* Decorative Background Blobs */}
       <div className="absolute -top-16 -left-16 w-64 h-64 bg-[#4F46E5]/10 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-16 -right-16 w-72 h-72 bg-[#06B6D4]/10 rounded-full blur-3xl"></div>
