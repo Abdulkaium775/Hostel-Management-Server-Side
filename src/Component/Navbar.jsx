@@ -37,23 +37,21 @@ const Navbar = () => {
   const guestLinks = [
     { path: "/", label: "Home" },
     { path: "/meals", label: "Meals" },
-    { path: "/upcoming-meals", label: "Upcoming Meals" },
-    { path: "/featured", label: "Featured-Meals" },      // Updated label
-    { path: "/newsletter", label: "Newsletter" },
+    { path: "/join-us", label: "Join Us" },
   ];
 
   const userLinks = [
     { path: "/", label: "Home" },
     { path: "/meals", label: "Meals" },
     { path: "/upcoming-meals", label: "Upcoming Meals" },
-    { path: "/featured", label: "Featured-Meals" },      // Updated label
+    { path: "/featured", label: "Featured-Meals" },
     { path: "/newsletter", label: "Newsletter" },
   ];
 
   const linksToRender = user ? userLinks : guestLinks;
 
   return (
-    <nav className="bg-[#4F46E5] fixed top-0 z-50 w-full shadow-md text-white">
+    <nav className="bg-[#4F46E5] fixed top-0 w-full z-50 shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
         {/* Logo */}
         <Link
@@ -88,15 +86,8 @@ const Navbar = () => {
         </div>
 
         {/* Desktop User Menu */}
-        <div className="hidden md:flex items-center space-x-4">
-          {!user ? (
-            <Link
-              to="/join-us"
-              className="px-4 py-2 bg-[#06B6D4] text-[#4F46E5] rounded font-semibold hover:bg-[#06B6D4]/90 transition"
-            >
-              Join Us
-            </Link>
-          ) : (
+        {user && (
+          <div className="hidden md:flex items-center space-x-4">
             <div className="relative">
               <button
                 onClick={toggleDropdown}
@@ -142,8 +133,8 @@ const Navbar = () => {
                 )}
               </AnimatePresence>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Mobile Hamburger */}
         <div className="md:hidden flex items-center">
@@ -205,43 +196,33 @@ const Navbar = () => {
             </NavLink>
           ))}
 
-          <div className="border-t border-[#06B6D4] mt-2 pt-2 space-y-1">
-            {!user ? (
+          {user && (
+            <div className="border-t border-[#06B6D4] mt-2 pt-2 space-y-1">
+              <div className="flex items-center space-x-3 px-4 py-3 bg-white rounded-lg shadow-inner">
+                <img
+                  src={user.photoURL || "/default-avatar.png"}
+                  alt="User Avatar"
+                  className="h-10 w-10 rounded-full object-cover border-2 border-[#06B6D4]"
+                />
+                <p className="text-[#1E293B] truncate font-medium">
+                  {user.displayName || user.email}
+                </p>
+              </div>
               <Link
-                to="/join-us"
+                to="/dashboard"
                 onClick={closeMobileMenu}
-                className="block px-4 py-2 bg-[#06B6D4] text-[#4F46E5] rounded-lg font-semibold hover:bg-[#06B6D4]/90 transition"
+                className="block px-4 py-2 bg-white text-[#1E293B] rounded-lg hover:bg-gray-100 transition font-medium"
               >
-                Join Us
+                Dashboard
               </Link>
-            ) : (
-              <>
-                <div className="flex items-center space-x-3 px-4 py-3 bg-white rounded-lg shadow-inner">
-                  <img
-                    src={user.photoURL || "/default-avatar.png"}
-                    alt="User Avatar"
-                    className="h-10 w-10 rounded-full object-cover border-2 border-[#06B6D4]"
-                  />
-                  <p className="text-[#1E293B] truncate font-medium">
-                    {user.displayName || user.email}
-                  </p>
-                </div>
-                <Link
-                  to="/dashboard"
-                  onClick={closeMobileMenu}
-                  className="block px-4 py-2 bg-white text-[#1E293B] rounded-lg hover:bg-gray-100 transition font-medium"
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="block w-full text-left px-4 py-2 bg-white text-[#1E293B] rounded-lg hover:bg-gray-100 transition font-medium"
-                >
-                  Logout
-                </button>
-              </>
-            )}
-          </div>
+              <button
+                onClick={handleLogout}
+                className="block w-full text-left px-4 py-2 bg-white text-[#1E293B] rounded-lg hover:bg-gray-100 transition font-medium"
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       )}
     </nav>
