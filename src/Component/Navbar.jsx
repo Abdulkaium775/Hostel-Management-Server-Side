@@ -110,7 +110,7 @@ const Navbar = () => {
                   <motion.div
                     key="dropdown"
                     initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    animate={{ opacity: 1, scale: 1, y: 12 }} // <-- dropdown slightly lower
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
                     transition={{ duration: 0.2 }}
                     className="absolute right-0 mt-2 w-44 sm:w-48 bg-white dark:bg-gray-800 text-[#1E293B] dark:text-gray-100 rounded-md shadow-lg py-2 z-50"
@@ -181,7 +181,7 @@ const Navbar = () => {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="md:hidden bg-[#4F46E5]/95 dark:bg-gray-900 px-4 py-3 space-y-2"
+            className="md:hidden bg-[#4F46E5]/95 dark:bg-gray-900 px-4 py-3 space-y-3"
           >
             {linksToRender.map(({ path, label }) => (
               <NavLink
