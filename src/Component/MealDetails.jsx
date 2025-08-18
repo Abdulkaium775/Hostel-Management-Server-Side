@@ -32,7 +32,6 @@ const MealDetails = () => {
     });
   };
 
-  // Load meal details
   useEffect(() => {
     const fetchMeal = async () => {
       setLoading(true);
@@ -50,7 +49,6 @@ const MealDetails = () => {
     fetchMeal();
   }, [id, user?.email]);
 
-  // Load reviews
   useEffect(() => {
     const fetchReviews = async () => {
       try {
@@ -64,7 +62,6 @@ const MealDetails = () => {
     fetchReviews();
   }, [id]);
 
-  // Check if the meal is already requested by the user
   useEffect(() => {
     if (!user?.email || !id) return;
 
@@ -72,19 +69,19 @@ const MealDetails = () => {
 
     const checkRequest = async () => {
       try {
-        const { data } = await axiosInstance.get(`/requested-meals/${user.email}?page=1&limit=100`);
+        const { data } = await axiosInstance.get(
+          `/requested-meals/${user.email}?page=1&limit=100`
+        );
         const alreadyRequested = data.requests?.some((req) => {
           if (typeof req.mealId === "string") return req.mealId === id;
           if (req.mealId?._id) return req.mealId._id === id;
           return false;
         });
-
         if (isMounted) setRequested(alreadyRequested);
       } catch (error) {
         console.error("Error checking meal request:", error);
       }
     };
-
     checkRequest();
     return () => {
       isMounted = false;
@@ -92,9 +89,7 @@ const MealDetails = () => {
   }, [user?.email, id]);
 
   const handleLike = async () => {
-    if (!user) {
-      return Swal.fire("Login Required", "Please login to like meals.", "warning");
-    }
+    if (!user) return Swal.fire("Login Required", "Please login to like meals.", "warning");
     if (liked) return;
 
     try {
@@ -108,17 +103,14 @@ const MealDetails = () => {
   };
 
   const handleRequestMeal = async () => {
-    if (!user) {
-      return Swal.fire("Login Required", "Please login to request meals.", "warning");
-    }
+    if (!user) return Swal.fire("Login Required", "Please login to request meals.", "warning");
+
     try {
       const { data } = await axiosInstance.get(`/users/${user.email}`);
       if (!data.badge || data.badge === "Bronze") {
         return Swal.fire("Upgrade Required", "Only Silver, Gold, or Platinum users can request meals.", "info");
       }
-      if (requested) {
-        return Swal.fire("Already Requested", "You have already requested this meal.", "info");
-      }
+      if (requested) return Swal.fire("Already Requested", "You have already requested this meal.", "info");
 
       setRequesting(true);
       await axiosInstance.post("/meal-requests", {
@@ -136,12 +128,8 @@ const MealDetails = () => {
   };
 
   const handlePostReview = async () => {
-    if (!user) {
-      return Swal.fire("Login Required", "Please login to post reviews.", "warning");
-    }
-    if (!newReview.trim()) {
-      return Swal.fire("Empty Comment", "Review cannot be empty.", "error");
-    }
+    if (!user) return Swal.fire("Login Required", "Please login to post reviews.", "warning");
+    if (!newReview.trim()) return Swal.fire("Empty Comment", "Review cannot be empty.", "error");
 
     try {
       setPostingReview(true);
@@ -152,11 +140,11 @@ const MealDetails = () => {
         comment: newReview.trim(),
       });
       setNewReview("");
-      Swal.fire("Success!", "Review posted successfully.", "success");
 
       const { data } = await axiosInstance.get(`/reviews/${id}`);
       setReviews(data);
       setReviewCount(data.length);
+      Swal.fire("Success!", "Review posted successfully.", "success");
     } catch {
       Swal.fire("Error", "Failed to post review.", "error");
     } finally {
@@ -164,11 +152,13 @@ const MealDetails = () => {
     }
   };
 
-  if (loading) return <p className="text-center mt-10 text-lg font-medium">Loading meal details...</p>;
-  if (!meal) return <p className="text-center mt-10 text-lg font-medium">Meal not found.</p>;
+  if (loading)
+    return <p className="text-center mt-10 text-lg font-medium dark:text-gray-200">Loading meal details...</p>;
+  if (!meal)
+    return <p className="text-center mt-10 text-lg font-medium dark:text-gray-200">Meal not found.</p>;
 
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-6 bg-white rounded-lg shadow-md my-10">
+    <div className="max-w-5xl mx-auto p-4 sm:p-6 bg-white dark:bg-gray-900 rounded-lg shadow-md my-10 transition-colors duration-300">
       <div className="flex flex-col md:flex-row md:space-x-8">
         <img
           src={meal.image || "https://via.placeholder.com/600x400?text=No+Image"}
@@ -176,16 +166,17 @@ const MealDetails = () => {
           className="w-full md:w-1/2 h-64 md:h-auto object-cover rounded-md"
         />
         <div className="mt-4 md:mt-0 md:flex-1 flex flex-col">
-          <h1 className="text-3xl font-bold">{meal.title}</h1>
-          <p className="text-gray-600 mt-1 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">{meal.title}</h1>
+          <p className="text-gray-600 dark:text-gray-300 mt-1 mb-2">
             Distributor: <span className="font-semibold">{meal.distributor || "Unknown"}</span>
           </p>
-          <p className="mb-2">{meal.description || "No description available."}</p>
-          <p className="mb-2"><strong>Ingredients:</strong> {meal.ingredients || "N/A"}</p>
-          <p className="text-sm text-gray-400 mb-2">Posted: {formatDate(meal.postedAt || meal.createdAt)}</p>
+          <p className="mb-2 text-gray-800 dark:text-gray-200">{meal.description || "No description available."}</p>
+          <p className="mb-2 text-gray-800 dark:text-gray-200"><strong>Ingredients:</strong> {meal.ingredients || "N/A"}</p>
+          <p className="text-sm text-gray-400 dark:text-gray-400 mb-2">Posted: {formatDate(meal.postedAt || meal.createdAt)}</p>
 
           <div className="text-yellow-500 text-xl mb-4">
-            {"★".repeat(Math.round(meal.rating || 0))}{"☆".repeat(5 - Math.round(meal.rating || 0))}
+            {"★".repeat(Math.round(meal.rating || 0))}
+            {"☆".repeat(5 - Math.round(meal.rating || 0))}
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
@@ -213,35 +204,38 @@ const MealDetails = () => {
       </div>
 
       <section className="mt-10">
-        <h2 className="text-2xl font-semibold mb-4">Reviews ({reviewCount})</h2>
+        <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Reviews ({reviewCount})</h2>
         {user ? (
           <div className="mb-6">
             <textarea
               value={newReview}
               onChange={(e) => setNewReview(e.target.value)}
-              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-3 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
               rows={4}
               placeholder="Write your review..."
             />
             <button
               onClick={handlePostReview}
               disabled={postingReview}
-              className="mt-3 px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              className="mt-3 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition"
             >
               {postingReview ? "Posting..." : "Post Review"}
             </button>
           </div>
         ) : (
-          <p className="text-gray-500 italic">Login to post a review.</p>
+          <p className="text-gray-500 italic dark:text-gray-400">Login to post a review.</p>
         )}
 
         <ul className="space-y-4 max-h-96 overflow-y-auto">
-          {reviews.length === 0 && <p>No reviews yet.</p>}
+          {reviews.length === 0 && <p className="text-gray-700 dark:text-gray-300">No reviews yet.</p>}
           {reviews.map((review) => (
-            <li key={review._id} className="border border-gray-200 p-4 rounded-md shadow-sm bg-gray-50">
-              <p className="font-semibold">{review.userName}</p>
-              <p className="text-xs text-gray-500">{formatDate(review.createdAt)}</p>
-              <p className="mt-2 whitespace-pre-line">{review.comment}</p>
+            <li
+              key={review._id}
+              className="border border-gray-200 dark:border-gray-700 p-4 rounded-md shadow-sm bg-gray-50 dark:bg-gray-800 transition"
+            >
+              <p className="font-semibold text-gray-900 dark:text-gray-100">{review.userName}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(review.createdAt)}</p>
+              <p className="mt-2 whitespace-pre-line text-gray-800 dark:text-gray-200">{review.comment}</p>
             </li>
           ))}
         </ul>

@@ -34,13 +34,23 @@ const CartoonCharacter = () => {
     <motion.div
       animate={{ y: [0, -15, 0] }}
       transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-      className="mx-auto mb-6 w-24 h-24 bg-yellow-400 rounded-full flex flex-col items-center justify-center shadow-xl"
+      className="mx-auto mb-6 w-24 h-24 bg-yellow-400 rounded-full flex flex-col items-center justify-center shadow-xl dark:bg-yellow-500"
     >
       <div className="flex justify-between w-12">
-        <motion.div animate={controls} initial={{ scaleY: 1 }} style={{ originY: 0.5 }} className="w-4 h-4 bg-black rounded-full" />
-        <motion.div animate={controls} initial={{ scaleY: 1 }} style={{ originY: 0.5 }} className="w-4 h-4 bg-black rounded-full" />
+        <motion.div
+          animate={controls}
+          initial={{ scaleY: 1 }}
+          style={{ originY: 0.5 }}
+          className="w-4 h-4 bg-black rounded-full dark:bg-gray-800"
+        />
+        <motion.div
+          animate={controls}
+          initial={{ scaleY: 1 }}
+          style={{ originY: 0.5 }}
+          className="w-4 h-4 bg-black rounded-full dark:bg-gray-800"
+        />
       </div>
-      <div className="w-8 h-2 bg-black rounded-b-full mt-1" />
+      <div className="w-8 h-2 bg-black rounded-b-full mt-1 dark:bg-gray-800" />
     </motion.div>
   );
 };
@@ -53,11 +63,7 @@ const Login = () => {
 
   const togglePassword = () => setShowPassword((prev) => !prev);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
 
   const sendUserToBackend = async (currentUser) => {
     try {
@@ -116,62 +122,83 @@ const Login = () => {
     >
       <CartoonCharacter />
 
-      <div className="bg-gray-50 w-full max-w-md p-8 rounded-2xl shadow-2xl">
-        <h2 className="text-3xl font-bold text-slate-900 text-center mb-6">Login</h2>
+      <div className="bg-gray-50 dark:bg-gray-900 w-full max-w-md p-8 rounded-2xl shadow-2xl transition-colors duration-300">
+        <h2 className="text-3xl font-bold text-slate-900 dark:text-gray-100 text-center mb-6">
+          Login
+        </h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div>
-            <label className="block mb-1 text-slate-900 font-medium text-sm">Email</label>
+            <label className="block mb-1 text-slate-900 dark:text-gray-200 font-medium text-sm">
+              Email
+            </label>
             <input
               type="email"
               placeholder="Type your email"
               {...register("email", { required: "Email is required" })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition"
             />
-            {errors.email && <p className="text-red-600 text-xs mt-1">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-red-600 text-xs mt-1">{errors.email.message}</p>
+            )}
           </div>
 
           <div>
-            <label className="block mb-1 text-slate-900 font-medium text-sm">Password</label>
+            <label className="block mb-1 text-slate-900 dark:text-gray-200 font-medium text-sm">
+              Password
+            </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Type your password"
                 {...register("password", { required: "Password is required" })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg pr-10 focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg pr-10 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-cyan-400 outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 transition"
               />
               <span
                 onClick={togglePassword}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-600"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-gray-600 dark:text-gray-200"
               >
                 {showPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
               </span>
             </div>
-            {errors.password && <p className="text-red-600 text-xs mt-1">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-red-600 text-xs mt-1">{errors.password.message}</p>
+            )}
           </div>
 
           <motion.button
             type="submit"
             whileHover={{ scale: 1.03 }}
-            className="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 focus:ring-4 focus:ring-cyan-300 transition"
+            className="w-full py-3 bg-indigo-600 dark:bg-cyan-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700 dark:hover:bg-cyan-500 focus:ring-4 focus:ring-cyan-300 dark:focus:ring-indigo-400 transition"
           >
             LOGIN
           </motion.button>
         </form>
 
-        <div className="my-5 text-center text-slate-700 font-medium">Or Sign In using</div>
+        <div className="my-5 text-center text-slate-700 dark:text-gray-300 font-medium">
+          Or Sign In using
+        </div>
 
         <motion.button
           onClick={handleGoogleLogin}
           whileHover={{ scale: 1.03 }}
-          className="w-full bg-white border border-gray-300 py-3 rounded-lg flex items-center justify-center gap-3 shadow-sm hover:shadow-md transition"
+          className="
+            w-full bg-white dark:bg-gray-800 
+            text-gray-900 dark:text-white 
+            border border-gray-300 dark:border-gray-700 
+            py-3 rounded-lg flex items-center justify-center gap-3 
+            shadow-sm hover:shadow-md transition
+          "
         >
           <FcGoogle size={28} /> Sign in with Google
         </motion.button>
 
-        <p className="text-sm text-slate-900 text-center mt-5">
+        <p className="text-sm text-slate-900 dark:text-gray-200 text-center mt-5">
           Don’t have an account?{" "}
-          <Link to="/register" className="text-indigo-600 font-bold hover:underline">
+          <Link
+            to="/register"
+            className="text-indigo-600 dark:text-cyan-400 font-bold hover:underline"
+          >
             SIGN UP
           </Link>
         </p>

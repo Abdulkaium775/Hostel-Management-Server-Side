@@ -5,20 +5,20 @@ import Footer from '../Component/Footer';
 
 const Root = () => {
     return (
-        <div className="flex flex-col min-h-screen bg-[#F8FAFC] text-[#1E293B]">
+        <div className="bg-[#F8FAFC] text-[#1E293B]">
             {/* Navbar at the top */}
             <header>
                 <Navbar />
             </header>
 
             {/* Main content area */}
-            <main className="flex-grow px-4 sm:px-6 lg:px-20 py-10 w-full">
+            <main className=" px-4 sm:px-6 lg:px-16 my-10">
                 {/* Each page rendered via Outlet */}
                 <Outlet />
             </main>
 
             {/* Footer at the bottom */}
-            <footer className="mt-auto bg-white shadow-inner">
+            <footer>
                 <Footer />
             </footer>
         </div>

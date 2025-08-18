@@ -20,7 +20,7 @@ const CartoonCharacterRegister = () => {
   return (
     <motion.div
       animate={controls}
-      className="mx-auto mb-6 w-24 h-24 rounded-full bg-yellow-400 shadow-2xl flex flex-col items-center justify-center"
+      className="mx-auto mb-6 w-24 h-24 rounded-full bg-yellow-400 shadow-2xl flex items-center justify-center"
       title="Welcome! Register here"
     >
       <div className="relative w-16 h-16 bg-pink-200 rounded-full flex items-center justify-center">
@@ -117,16 +117,18 @@ const Register = () => {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-tr from-indigo-600 to-cyan-500 p-4 sm:p-6"
+      className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-tr from-indigo-600 to-cyan-500 p-4 sm:p-6 transition-colors"
     >
       <CartoonCharacterRegister />
 
-      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl bg-neutral-50 rounded-2xl shadow-2xl p-6 sm:p-8 text-slate-900">
-        <h2 className="text-3xl font-bold text-center mb-6 text-darkText">Register</h2>
+      <div className="w-full max-w-md sm:max-w-lg md:max-w-xl bg-white dark:bg-[#1E293B] rounded-2xl shadow-2xl p-6 sm:p-8 text-gray-900 dark:text-white transition-colors">
+        <h2 className="text-3xl font-bold text-center mb-6 text-gray-900 dark:text-white">
+          Register
+        </h2>
 
         <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
           <input
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm sm:text-base transition"
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm sm:text-base transition-colors bg-white dark:bg-[#2D2F36] text-gray-900 dark:text-white"
             type="text"
             placeholder="Name"
             {...register("name", { required: "Name is required" })}
@@ -134,7 +136,7 @@ const Register = () => {
           {errors.name && <p className="text-red-600 text-xs sm:text-sm">{errors.name.message}</p>}
 
           <input
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm sm:text-base transition"
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm sm:text-base transition-colors bg-white dark:bg-[#2D2F36] text-gray-900 dark:text-white"
             type="email"
             placeholder="Email"
             {...register("email", {
@@ -148,12 +150,12 @@ const Register = () => {
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm sm:text-base transition"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm sm:text-base transition-colors bg-white dark:bg-[#2D2F36] text-gray-900 dark:text-white"
               {...register("password", { required: "Password is required" })}
             />
             <span
               onClick={togglePassword}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 cursor-pointer"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 dark:text-gray-300 cursor-pointer"
             >
               {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
             </span>
@@ -161,7 +163,7 @@ const Register = () => {
           </div>
 
           <input
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm sm:text-base transition"
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm sm:text-base transition-colors bg-white dark:bg-[#2D2F36] text-gray-900 dark:text-white"
             type="url"
             placeholder="Photo URL (Optional)"
             {...register("photoUrl")}
@@ -171,7 +173,7 @@ const Register = () => {
             type="submit"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:opacity-90 transition text-sm sm:text-base"
+            className="w-full bg-primary dark:bg-indigo-500 text-white py-3 rounded-lg font-semibold hover:opacity-90 transition text-sm sm:text-base"
           >
             Register
           </motion.button>
@@ -181,15 +183,15 @@ const Register = () => {
           onClick={handleGoogleLogin}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="mt-4 w-full bg-white text-darkText border p-3 rounded-lg flex items-center justify-center gap-2 shadow hover:shadow-lg transition font-semibold text-sm sm:text-base"
+          className="mt-4 w-full bg-white dark:bg-gray-700 text-darkText dark:text-white border p-3 rounded-lg flex items-center justify-center gap-2 shadow hover:shadow-lg transition font-semibold text-sm sm:text-base"
         >
           <FcGoogle size={24} />
           Register with Google
         </motion.button>
 
-        <p className="mt-4 text-center text-darkText text-xs sm:text-sm">
+        <p className="mt-4 text-center text-gray-900 dark:text-white text-xs sm:text-sm">
           Already have an account?{" "}
-          <Link to="/login" className="text-primary font-medium underline">
+          <Link to="/login" className="text-primary dark:text-indigo-400 font-medium underline">
             Login here
           </Link>
         </p>

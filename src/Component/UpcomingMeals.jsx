@@ -21,7 +21,6 @@ const UpcomingMeals = () => {
         headers.Authorization = `Bearer ${token}`;
       }
 
-      // 🔥 Public + Authenticated both will work
       const res = await axiosInstance.get("/upcoming-meals", { headers });
       setMeals(res.data);
     } catch (error) {
@@ -105,7 +104,7 @@ const UpcomingMeals = () => {
 
   if (loading) {
     return (
-      <div className="text-center py-20 text-lg font-medium text-slate-700">
+      <div className="text-center py-20 text-lg font-medium text-gray-700 dark:text-gray-300">
         Loading upcoming meals...
       </div>
     );
@@ -113,19 +112,19 @@ const UpcomingMeals = () => {
 
   if (meals.length === 0) {
     return (
-      <div className="text-center py-20 text-lg font-medium text-gray-500">
+      <div className="text-center py-20 text-lg font-medium text-gray-500 dark:text-gray-400">
         No upcoming meals found.
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <h2 className="text-4xl font-extrabold text-center mb-8 text-slate-900 drop-shadow-md">
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen py-12 px-4 sm:px-6 lg:px-8 transition-colors">
+      <h2 className="text-4xl font-extrabold text-center mb-8 text-gray-900 dark:text-white drop-shadow-md">
         🌟 Upcoming Meals
       </h2>
 
-      <p className="text-sm text-gray-600 mb-10 text-center">
+      <p className="text-sm text-gray-600 dark:text-gray-300 mb-10 text-center">
         Showing {meals.length} upcoming meal{meals.length > 1 ? "s" : ""}
       </p>
 
@@ -147,7 +146,7 @@ const UpcomingMeals = () => {
           return (
             <article
               key={meal._id}
-              className="bg-white rounded-3xl shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col overflow-hidden"
+              className="bg-white dark:bg-gray-800 rounded-3xl shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col overflow-hidden"
               aria-label={`Upcoming meal: ${meal.title}`}
             >
               <div className="h-48 w-full relative">
@@ -165,15 +164,15 @@ const UpcomingMeals = () => {
               </div>
 
               <div className="p-5 flex flex-col flex-grow">
-                <h3 className="text-xl font-semibold mb-2 text-slate-900 truncate">
+                <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white truncate">
                   {meal.title}
                 </h3>
-                <p className="text-gray-600 text-sm mb-3 flex-grow line-clamp-3">
+                <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 flex-grow line-clamp-3">
                   {meal.description}
                 </p>
 
-                <p className="text-sm text-gray-500 mb-5">
-                  📅 <span className="font-medium text-slate-700">Publish:</span>{" "}
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">
+                  📅 <span className="font-medium text-gray-700 dark:text-gray-200">Publish:</span>{" "}
                   {formattedDate}
                 </p>
 

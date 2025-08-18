@@ -19,9 +19,7 @@ const EditReview = () => {
       .catch(() => {
         toast.error('Failed to load review.');
       })
-      .finally(() => {
-        setLoading(false);
-      });
+      .finally(() => setLoading(false));
   }, [id]);
 
   const handleUpdate = (e) => {
@@ -39,7 +37,7 @@ const EditReview = () => {
           icon: 'success',
           title: 'Updated!',
           text: 'Your review has been updated successfully.',
-          confirmButtonColor: '#4F46E5', // Primary color
+          confirmButtonColor: '#4F46E5',
         }).then(() => {
           navigate('/dashboard/my-reviews');
         });
@@ -57,31 +55,39 @@ const EditReview = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen bg-neutral-100">
-        <p className="text-darkText text-lg font-medium">Loading...</p>
+      <div className="flex justify-center items-center h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <p className="text-gray-900 dark:text-gray-100 text-lg font-medium transition-colors duration-300">
+          Loading...
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-100 p-4">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-lg p-6">
-        <h2 className="text-2xl font-bold mb-6 text-darkText text-center">Edit Your Review</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-300">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-lg p-6 transition-colors duration-300">
+        <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100 text-center transition-colors duration-300">
+          Edit Your Review
+        </h2>
 
         <form onSubmit={handleUpdate} className="space-y-4">
-          <label className="block text-darkText font-medium mb-1">Comment</label>
+          <label className="block text-gray-900 dark:text-gray-100 font-medium mb-1 transition-colors duration-300">
+            Comment
+          </label>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             rows="6"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary transition"
+            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 dark:focus:ring-cyan-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-300 transition-colors duration-300"
             placeholder="Update your review..."
           />
 
           <button
             type="submit"
             disabled={updating}
-            className="w-full py-3 bg-primary text-white font-semibold rounded-lg hover:bg-indigo-700 transition"
+            className={`w-full py-3 bg-indigo-600 dark:bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors duration-200 ${
+              updating ? 'cursor-not-allowed bg-gray-400 dark:bg-gray-600' : ''
+            }`}
           >
             {updating ? 'Updating...' : 'Update Review'}
           </button>
@@ -89,7 +95,7 @@ const EditReview = () => {
           <button
             type="button"
             onClick={() => navigate('/dashboard/my-reviews')}
-            className="w-full py-3 border border-darkText text-darkText font-semibold rounded-lg hover:bg-neutral-200 transition"
+            className="w-full py-3 border border-gray-900 dark:border-gray-100 text-gray-900 dark:text-gray-100 font-semibold rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors duration-200"
           >
             Cancel
           </button>

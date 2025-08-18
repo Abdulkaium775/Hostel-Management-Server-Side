@@ -25,7 +25,6 @@ const Meals = () => {
 
   const navigate = useNavigate();
 
-  // Fetch meals from backend
   const fetchMeals = async (pageNum = 1, replace = false, userToken = token) => {
     try {
       setLoading(true);
@@ -52,7 +51,6 @@ const Meals = () => {
     }
   };
 
-  // Listen for Firebase auth changes
   useEffect(() => {
     const auth = getAuth();
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -74,15 +72,15 @@ const Meals = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8 my-16">
       {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 mb-6 bg-[#F8FAFC] p-4 rounded-lg shadow-md">
+      <div className="flex flex-wrap items-center gap-3 mb-6 bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-md transition-colors">
         <input
           type="text"
           placeholder="Search meals..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-grow min-w-[160px] max-w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+          className="flex-grow min-w-[160px] max-w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
         />
         <input
           type="number"
@@ -90,7 +88,7 @@ const Meals = () => {
           placeholder="Min Price"
           value={minPrice}
           onChange={(e) => setMinPrice(e.target.value)}
-          className="w-24 sm:w-28 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+          className="w-24 sm:w-28 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
         />
         <input
           type="number"
@@ -98,12 +96,12 @@ const Meals = () => {
           placeholder="Max Price"
           value={maxPrice}
           onChange={(e) => setMaxPrice(e.target.value)}
-          className="w-24 sm:w-28 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+          className="w-24 sm:w-28 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
         />
         <select
           value={sortOrder}
           onChange={(e) => setSortOrder(e.target.value)}
-          className="w-36 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+          className="w-36 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition"
         >
           <option value="">Sort by Price</option>
           {sortOptions.map((opt) => (
@@ -123,7 +121,7 @@ const Meals = () => {
             className={`px-5 py-2 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold rounded-full transition duration-300 ${
               category === cat
                 ? "bg-indigo-600 text-white shadow-lg"
-                : "bg-white text-indigo-600 border border-indigo-600 hover:bg-cyan-400/20 hover:text-gray-900"
+                : "bg-white dark:bg-gray-700 text-indigo-600 dark:text-indigo-400 border border-indigo-600 dark:border-indigo-400 hover:bg-cyan-400/20 hover:text-gray-900 dark:hover:text-white"
             }`}
           >
             {cat}
@@ -136,14 +134,16 @@ const Meals = () => {
         dataLength={meals.length}
         next={loadMore}
         hasMore={hasMore}
-        loader={<h4 className="text-center text-gray-500 mt-6">Loading more meals...</h4>}
+        loader={<h4 className="text-center text-gray-500 dark:text-gray-300 mt-6">Loading more meals...</h4>}
         endMessage={
-          <p className="text-center mt-6 text-gray-400 font-medium">No more meals to load.</p>
+          <p className="text-center mt-6 text-gray-400 dark:text-gray-500 font-medium">
+            No more meals to load.
+          </p>
         }
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {meals.length === 0 && !loading && (
-            <p className="text-center col-span-full text-gray-700 font-medium">
+            <p className="text-center col-span-full text-gray-700 dark:text-gray-300 font-medium">
               No meals available in this category.
             </p>
           )}
@@ -151,7 +151,7 @@ const Meals = () => {
           {meals.map((meal) => (
             <div
               key={meal._id}
-              className="flex flex-col rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition cursor-pointer bg-white h-[460px]"
+              className="flex flex-col rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition cursor-pointer bg-white dark:bg-gray-900 h-[460px]"
               onClick={() => navigate(`/meal/${meal._id}`)}
             >
               <div className="h-48 w-full overflow-hidden">
@@ -162,14 +162,12 @@ const Meals = () => {
                 />
               </div>
 
-              <div className="p-5 flex flex-col flex-grow text-gray-900">
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold truncate">
-                  {meal.title}
-                </h2>
-                <p className="text-sm sm:text-base mt-2 line-clamp-3 text-gray-600">
+              <div className="p-5 flex flex-col flex-grow text-gray-900 dark:text-gray-100">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-bold truncate">{meal.title}</h2>
+                <p className="text-sm sm:text-base mt-2 line-clamp-3 text-gray-600 dark:text-gray-300">
                   {meal.description || "No description available."}
                 </p>
-                <p className="font-bold mt-2 text-indigo-600">
+                <p className="font-bold mt-2 text-indigo-600 dark:text-indigo-400">
                   ${meal.price?.toFixed(2) || "0.00"}
                 </p>
                 <button
@@ -177,7 +175,7 @@ const Meals = () => {
                     e.stopPropagation();
                     navigate(`/meal/${meal._id}`);
                   }}
-                  className="mt-auto bg-indigo-600 text-white hover:bg-cyan-400 hover:text-gray-900 py-2 sm:py-3 rounded-md font-semibold transition text-sm sm:text-base"
+                  className="mt-auto bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-cyan-400 hover:text-gray-900 dark:hover:text-white py-2 sm:py-3 rounded-md font-semibold transition text-sm sm:text-base"
                 >
                   See More
                 </button>

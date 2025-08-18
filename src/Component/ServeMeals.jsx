@@ -76,8 +76,8 @@ const ServeMeals = () => {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="max-w-7xl mx-auto p-6 sm:p-8 bg-[#F8FAFC] rounded-xl shadow-lg mt-10">
-      <h2 className="text-3xl sm:text-4xl font-bold mb-6 text-[#1E293B] text-center sm:text-left">
+    <div className="max-w-7xl mx-auto p-6 sm:p-8 rounded-xl mt-10 shadow-lg bg-gray-50 dark:bg-gray-900 transition-colors">
+      <h2 className="text-3xl sm:text-4xl font-bold mb-6 text-gray-900 dark:text-white text-center sm:text-left transition-colors">
         Serve Meals
       </h2>
 
@@ -89,18 +89,22 @@ const ServeMeals = () => {
           setPage(1);
           setSearch(e.target.value);
         }}
-        className="border border-gray-300 p-2 mb-4 w-full sm:w-1/2 rounded-md focus:outline-none focus:ring-2 focus:ring-[#4F46E5] text-[#1E293B]"
+        className="border border-gray-300 dark:border-gray-600 p-2 mb-4 w-full sm:w-1/2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-600 dark:focus:ring-indigo-400 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 transition-colors"
       />
 
       {loading ? (
-        <p className="text-center text-[#1E293B] py-8 text-lg">Loading requested meals...</p>
+        <p className="text-center text-gray-900 dark:text-gray-100 py-8 text-lg transition-colors">
+          Loading requested meals...
+        </p>
       ) : requests.length === 0 ? (
-        <p className="text-center text-gray-500 py-8 text-lg">No meal requests found.</p>
+        <p className="text-center text-gray-500 dark:text-gray-400 py-8 text-lg transition-colors">
+          No meal requests found.
+        </p>
       ) : (
         <>
-          <div className="overflow-x-auto rounded-lg border border-gray-300 bg-white shadow-sm">
+          <div className="overflow-x-auto rounded-lg border border-gray-300 dark:border-gray-600 shadow-sm bg-white dark:bg-gray-800 transition-colors">
             <table className="min-w-[600px] w-full table-auto border-collapse">
-              <thead className="bg-[#4F46E5] text-white">
+              <thead className="bg-indigo-600 text-white">
                 <tr>
                   <th className="p-3 text-left text-sm sm:text-base whitespace-nowrap">Meal Title</th>
                   <th className="p-3 text-left text-sm sm:text-base whitespace-nowrap">User Name</th>
@@ -113,14 +117,14 @@ const ServeMeals = () => {
                 {requests.map((req, i) => (
                   <tr
                     key={req._id}
-                    className={`hover:bg-[#E0F2FE] transition-colors duration-150 ${
-                      i % 2 === 0 ? "bg-[#F8FAFC]" : "bg-white"
+                    className={`hover:bg-indigo-50 dark:hover:bg-indigo-900 transition-colors duration-150 ${
+                      i % 2 === 0 ? "bg-gray-50 dark:bg-gray-900" : "bg-white dark:bg-gray-800"
                     }`}
                   >
-                    <td className="p-3 text-sm sm:text-base text-[#1E293B]">{req.mealTitle}</td>
-                    <td className="p-3 text-sm sm:text-base text-[#1E293B]">{req.userName}</td>
-                    <td className="p-3 text-sm sm:text-base text-[#1E293B]">{req.userEmail}</td>
-                    <td className="p-3 text-center text-sm sm:text-base capitalize text-[#1E293B]">
+                    <td className="p-3 text-sm sm:text-base text-gray-900 dark:text-gray-100">{req.mealTitle}</td>
+                    <td className="p-3 text-sm sm:text-base text-gray-900 dark:text-gray-100">{req.userName}</td>
+                    <td className="p-3 text-sm sm:text-base text-gray-900 dark:text-gray-100">{req.userEmail}</td>
+                    <td className="p-3 text-center text-sm sm:text-base capitalize text-gray-900 dark:text-gray-100">
                       {req.status}
                     </td>
                     <td className="p-3 text-center flex flex-col sm:flex-row justify-center items-center gap-2">
@@ -131,13 +135,13 @@ const ServeMeals = () => {
                           className={`px-4 py-1 rounded text-white text-sm sm:text-base w-full sm:w-auto ${
                             servingId === req._id
                               ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-[#4F46E5] hover:bg-[#4338CA]"
+                              : "bg-indigo-600 hover:bg-indigo-700"
                           }`}
                         >
                           {servingId === req._id ? "Serving..." : "Serve"}
                         </button>
                       ) : (
-                        <span className="text-gray-500 text-sm sm:text-base">Delivered</span>
+                        <span className="text-gray-500 dark:text-gray-400 text-sm sm:text-base">Delivered</span>
                       )}
                     </td>
                   </tr>
@@ -151,19 +155,19 @@ const ServeMeals = () => {
             <button
               disabled={page <= 1}
               onClick={() => setPage((p) => Math.max(p - 1, 1))}
-              className="px-4 py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded disabled:opacity-50 w-full sm:w-auto"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded disabled:opacity-50 w-full sm:w-auto"
             >
               Prev
             </button>
 
-            <span className="font-semibold text-[#1E293B] text-center w-full sm:w-auto">
+            <span className="font-semibold text-gray-900 dark:text-gray-100 text-center w-full sm:w-auto transition-colors">
               Page {page} of {totalPages}
             </span>
 
             <button
               disabled={page >= totalPages}
               onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
-              className="px-4 py-2 bg-[#4F46E5] hover:bg-[#4338CA] text-white rounded disabled:opacity-50 w-full sm:w-auto"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded disabled:opacity-50 w-full sm:w-auto"
             >
               Next
             </button>

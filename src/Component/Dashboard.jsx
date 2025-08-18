@@ -42,7 +42,7 @@ const Dashboard = () => {
   const links = isAdmin ? adminLinks : userLinks;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-neutralBg">
+    <div className="min-h-screen flex flex-col md:flex-row bg-neutralBg my-16">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-white shadow-lg p-6">
         <h2 className="text-2xl font-bold mb-8 flex items-center gap-3 text-darkText">
@@ -99,7 +99,7 @@ const Dashboard = () => {
       )}
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:p-8 overflow-auto">
+      <main className="flex-1 p-6 md:p-8 my-6">
         <Outlet />
       </main>
     </div>

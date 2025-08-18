@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import React from "react";
 
 const features = [
   {
@@ -26,34 +26,23 @@ const features = [
 
 const FeaturesSection = () => {
   return (
-    <section className="relative bg-[#F8FAFC] py-16 sm:py-20 lg:py-24 mb-10">
+    <section className="relative bg-gray-50 dark:bg-gray-900 py-12 sm:py-16 lg:py-20 xl:py-24 mb-8 sm:mb-12 lg:mb-16 transition-colors duration-300 overflow-hidden">
       {/* Section Heading */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <motion.h2
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#1E293B] mb-12"
-        >
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-gray-100 mb-8 sm:mb-10 lg:mb-14 transition-colors duration-300">
           Why Choose Our Hostel Meals?
-        </motion.h2>
+        </h2>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8 lg:gap-10">
           {features.map(({ icon, title, description, bgColor }, idx) => (
-            <motion.div
+            <div
               key={idx}
-              initial={{ opacity: 0, y: 60 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: idx * 0.25 }}
-              whileHover={{ scale: 1.05, rotateX: 3, rotateY: 3 }}
-              className="relative bg-white rounded-3xl px-8 py-12 shadow-2xl cursor-pointer overflow-hidden"
+              className="relative bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl px-5 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
             >
               {/* Gradient Glow Border */}
               <div
-                className={`absolute -inset-1 rounded-3xl bg-gradient-to-tr ${bgColor} opacity-60 blur-2xl`}
+                className={`absolute -inset-0.5 sm:-inset-1 rounded-2xl sm:rounded-3xl bg-gradient-to-tr ${bgColor} opacity-60 blur-xl sm:blur-2xl`}
                 aria-hidden="true"
               />
 
@@ -61,22 +50,22 @@ const FeaturesSection = () => {
               <div className="relative z-10 flex flex-col items-center">
                 {/* Icon Circle */}
                 <div
-                  className={`flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br ${bgColor} text-4xl drop-shadow-xl mb-6`}
+                  className={`flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br ${bgColor} text-2xl sm:text-3xl lg:text-4xl drop-shadow-lg mb-4 sm:mb-5 lg:mb-6`}
                 >
                   {icon}
                 </div>
 
                 {/* Title */}
-                <h3 className="text-2xl font-bold text-[#1E293B] mb-3">
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 text-center">
                   {title}
                 </h3>
 
                 {/* Description */}
-                <p className="text-[#1E293B]/80 text-base leading-relaxed max-w-xs">
+                <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed max-w-[280px] sm:max-w-xs lg:max-w-sm text-center">
                   {description}
                 </p>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

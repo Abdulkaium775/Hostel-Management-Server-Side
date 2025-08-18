@@ -1,6 +1,5 @@
 import React from "react";
 import { FaStar, FaStarHalfAlt, FaRegStar, FaQuoteLeft } from "react-icons/fa";
-import { motion } from "framer-motion";
 
 const TESTIMONIALS = [
   {
@@ -36,95 +35,89 @@ const StarRating = ({ value }) => {
   const full = Math.floor(value);
   const hasHalf = value % 1 >= 0.5;
   const empty = 5 - full - (hasHalf ? 1 : 0);
+
   return (
     <div className="flex items-center gap-1">
       {Array.from({ length: full }).map((_, i) => (
-        <FaStar key={`f-${i}`} className="text-yellow-400 text-lg" />
+        <FaStar key={`f-${i}`} className="text-yellow-400 text-base sm:text-lg" />
       ))}
-      {hasHalf && <FaStarHalfAlt className="text-yellow-400 text-lg" />}
+      {hasHalf && <FaStarHalfAlt className="text-yellow-400 text-base sm:text-lg" />}
       {Array.from({ length: empty }).map((_, i) => (
-        <FaRegStar key={`e-${i}`} className="text-yellow-400 text-lg" />
+        <FaRegStar key={`e-${i}`} className="text-yellow-400 text-base sm:text-lg" />
       ))}
     </div>
   );
 };
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 70, damping: 12 } },
-};
-
 const CustomerReviews = () => {
   return (
-    <section className="relative bg-[#F8FAFC] py-20 px-6 sm:px-10 lg:px-16 rounded-2xl overflow-hidden mb-10">
+    <section className="relative bg-gray-50 dark:bg-gray-900 py-12 sm:py-16 lg:py-20 px-4 sm:px-8 lg:px-12 rounded-2xl overflow-hidden mb-10 transition-colors duration-300">
       {/* Header */}
-      <div className="text-center mb-16">
-        <h2 className="text-4xl sm:text-5xl font-extrabold text-[#1E293B] mb-3">
+      <div className="text-center mb-10 sm:mb-14 lg:mb-16 px-2">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-gray-900 dark:text-gray-100 mb-3">
           Loved by Our Students
         </h2>
-        <p className="text-slate-600 max-w-2xl mx-auto mb-6">
+        <p className="text-gray-600 dark:text-gray-300 max-w-xl sm:max-w-2xl mx-auto mb-5 sm:mb-6 text-sm sm:text-base">
           Real testimonials from happy customers. See why everyone loves our meals.
         </p>
-        <span className="inline-block h-1 w-28 rounded-full bg-gradient-to-r from-[#4F46E5] via-[#06B6D4] to-[#4F46E5]" />
+        <span className="inline-block h-1 w-20 sm:w-28 rounded-full bg-gradient-to-r from-indigo-600 via-cyan-400 to-indigo-600" />
       </div>
 
       {/* Testimonials Grid */}
-      <motion.div
-        className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto"
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.2 }}
-        transition={{ staggerChildren: 0.1 }}
-      >
+      <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
         {TESTIMONIALS.map((t) => (
-          <motion.article
+          <article
             key={t.id}
-            variants={cardVariants}
-            className="group relative flex flex-col p-8 bg-white rounded-3xl shadow-xl ring-1 ring-slate-200 transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl"
+            className="group relative flex flex-col p-6 sm:p-8 bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5"
           >
             {/* Quote Icon */}
-            <FaQuoteLeft className="absolute -top-5 -left-5 text-[#06B6D4] text-4xl opacity-20" />
+            <FaQuoteLeft className="absolute -top-4 -left-4 text-cyan-400 dark:text-cyan-300 text-3xl sm:text-4xl opacity-20" />
 
             {/* Avatar + Name */}
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-3 sm:gap-4 mb-5 sm:mb-6">
               <img
                 src={t.image}
                 alt={t.name}
-                className="w-16 h-16 rounded-full border-2 border-[#4F46E5] shadow-sm object-cover"
+                className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full border-2 border-indigo-600 dark:border-indigo-400 shadow-sm object-cover"
               />
               <div>
-                <h3 className="text-xl font-semibold text-[#1E293B]">{t.name}</h3>
-                <p className="text-sm text-slate-500">{t.role}</p>
+                <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 dark:text-gray-100">
+                  {t.name}
+                </h3>
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-300">
+                  {t.role}
+                </p>
               </div>
             </div>
 
             {/* Review */}
-            <blockquote className="text-slate-700 mb-6 leading-relaxed">
+            <blockquote className="text-gray-700 dark:text-gray-200 mb-5 sm:mb-6 text-sm sm:text-base leading-relaxed">
               “{t.review}”
             </blockquote>
 
             {/* Rating */}
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mt-auto">
               <StarRating value={t.rating} />
-              <span className="ml-3 inline-flex items-center rounded-full border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-600 bg-white/90">
+              <span className="ml-3 inline-flex items-center rounded-full border border-gray-200 dark:border-gray-700 px-2 py-0.5 sm:px-2.5 sm:py-1 text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300 bg-white/90 dark:bg-gray-900/70">
                 {t.rating.toFixed(1)} / 5
               </span>
             </div>
 
             {/* Soft hover glow */}
             <div
-              className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"
+              className="pointer-events-none absolute inset-0 rounded-2xl sm:rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity"
               style={{
-                background: "radial-gradient(600px 200px at 20% 0%, rgba(79,70,229,0.06), transparent 60%)",
+                background:
+                  "radial-gradient(500px 150px at 20% 0%, rgba(79,70,229,0.06), transparent 60%)",
               }}
             />
-          </motion.article>
+          </article>
         ))}
-      </motion.div>
+      </div>
 
-      {/* Soft decorative blobs */}
-      <div className="absolute -bottom-32 -right-20 w-80 h-80 bg-gradient-to-tr from-[#4F46E5]/10 to-[#06B6D4]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -top-32 -left-20 w-72 h-72 bg-gradient-to-tr from-[#06B6D4]/10 to-[#4F46E5]/10 rounded-full blur-3xl pointer-events-none" />
+      {/* Decorative blobs */}
+      <div className="absolute -bottom-28 sm:-bottom-32 -right-16 sm:-right-20 w-60 sm:w-72 lg:w-80 h-60 sm:h-72 lg:h-80 bg-gradient-to-tr from-indigo-600/10 to-cyan-400/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-28 sm:-top-32 -left-16 sm:-left-20 w-56 sm:w-72 lg:w-80 h-56 sm:h-72 lg:h-80 bg-gradient-to-tr from-cyan-400/10 to-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
     </section>
   );
 };

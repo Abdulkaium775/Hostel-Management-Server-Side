@@ -2,19 +2,19 @@ import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/f
 
 const Footer = () => {
   return (
-    <footer className="relative bg-[#F8FAFC] text-[#1E293B] py-16 px-6 sm:px-12 lg:px-20 overflow-hidden">
+    <footer className="relative bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 py-16 px-6 sm:px-12 lg:px-20 overflow-hidden transition-colors duration-300">
       {/* Floating Background Circles */}
-      <div className="absolute -top-16 -left-16 w-72 h-72 bg-[#4F46E5]/20 rounded-full blur-3xl animate-slow-spin"></div>
-      <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-[#06B6D4]/20 rounded-full blur-3xl animate-slow-spin-reverse"></div>
+      <div className="absolute -top-16 -left-16 w-72 h-72 bg-indigo-600/20 dark:bg-indigo-400/20 rounded-full blur-3xl animate-slow-spin"></div>
+      <div className="absolute -bottom-16 -right-16 w-64 h-64 bg-cyan-400/20 dark:bg-cyan-600/20 rounded-full blur-3xl animate-slow-spin-reverse"></div>
 
       <div className="relative max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
         {/* Logo & Description */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left">
           <div className="flex items-center space-x-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-[#4F46E5] flex items-center justify-center text-white font-bold text-lg">
+            <div className="w-10 h-10 rounded-lg bg-indigo-600 dark:bg-indigo-400 flex items-center justify-center text-white font-bold text-lg">
               H
             </div>
-            <span className="text-2xl font-bold tracking-wide text-[#4F46E5]">
+            <span className="text-2xl font-bold tracking-wide text-indigo-600 dark:text-indigo-400">
               Hostel Meals
             </span>
           </div>
@@ -26,7 +26,7 @@ const Footer = () => {
 
         {/* Quick Links */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left">
-          <h3 className="text-xl font-semibold mb-4 border-b-2 border-[#06B6D4] pb-2 inline-block">
+          <h3 className="text-xl font-semibold mb-4 border-b-2 border-cyan-400 dark:border-cyan-600 pb-2 inline-block">
             Quick Links
           </h3>
           <ul className="space-y-2 text-sm sm:text-base">
@@ -39,7 +39,7 @@ const Footer = () => {
               <li key={link.name}>
                 <a
                   href={link.href}
-                  className="hover:text-[#06B6D4] transition-colors duration-300"
+                  className="hover:text-cyan-400 dark:hover:text-cyan-600 transition-colors duration-300"
                 >
                   {link.name}
                 </a>
@@ -50,7 +50,7 @@ const Footer = () => {
 
         {/* Contact & Social */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left">
-          <h3 className="text-xl font-semibold mb-4 border-b-2 border-[#06B6D4] pb-2 inline-block">
+          <h3 className="text-xl font-semibold mb-4 border-b-2 border-cyan-400 dark:border-cyan-600 pb-2 inline-block">
             Contact Us
           </h3>
           <p className="opacity-80 mb-2 text-sm sm:text-base">University Hostel Office</p>
@@ -62,7 +62,7 @@ const Footer = () => {
               <a
                 key={i}
                 href="#"
-                className="p-3 rounded-full bg-[#4F46E5] text-white hover:bg-[#06B6D4] hover:text-[#1E293B] shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                className="p-3 rounded-full bg-indigo-600 dark:bg-indigo-400 text-white dark:text-gray-900 hover:bg-cyan-400 dark:hover:bg-cyan-600 hover:text-gray-900 dark:hover:text-gray-100 shadow-lg transition-all duration-300 transform hover:-translate-y-1"
               >
                 <Icon />
               </a>
@@ -72,7 +72,7 @@ const Footer = () => {
       </div>
 
       {/* Divider */}
-      <hr className="border-[#06B6D4]/30 my-8" />
+      <hr className="border-cyan-400/30 dark:border-cyan-600/30 my-8 transition-colors duration-300" />
 
       {/* Copyright */}
       <p className="text-center opacity-60 text-xs sm:text-sm select-none">

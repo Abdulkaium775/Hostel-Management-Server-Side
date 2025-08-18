@@ -63,7 +63,6 @@ const UpcomingMealsAdmin = () => {
       const res = await axiosInstance.post('/upcoming-meals', {
         ...formData,
         price: parseFloat(formData.price),
-        publishDate: formData.publishDate,
       });
       if (res.data.success) {
         Swal.fire({ icon: 'success', title: 'Meal added', timer: 1500, showConfirmButton: false });
@@ -106,7 +105,7 @@ const UpcomingMealsAdmin = () => {
     try {
       setPublishingId(mealId);
       const res = await axiosInstance.post('/upcoming-meals/publish', {
-        mealId: mealId,
+        mealId,
         addedByEmail: 'admin@example.com',
       });
 
@@ -118,60 +117,59 @@ const UpcomingMealsAdmin = () => {
       }
     } catch (err) {
       console.error(err);
-      const msg = err.response?.data?.message || 'Server error';
-      Swal.fire('Failed', msg, 'error');
+      Swal.fire('Failed', err.response?.data?.message || 'Server error', 'error');
     } finally {
       setPublishingId(null);
     }
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto bg-neutral-100 min-h-screen">
-      <h1 className="text-3xl font-extrabold mb-6 text-darkText">Upcoming Meals Admin</h1>
+    <div className="p-6 max-w-7xl mx-auto min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+      <h1 className="text-3xl font-extrabold mb-6 text-gray-900 dark:text-white">Upcoming Meals Admin</h1>
 
-      {/* Filled button: Add Upcoming Meal */}
+      {/* Add Upcoming Meal Button */}
       <button
         onClick={() => setShowModal(true)}
-        className="mb-6 px-5 py-2 bg-primary text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 transition"
+        className="mb-6 px-5 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 transition"
       >
         + Add Upcoming Meal
       </button>
 
       {/* Meals Table */}
       {loading ? (
-        <p className="text-darkText">Loading...</p>
+        <p className="text-gray-900 dark:text-gray-100">Loading...</p>
       ) : meals.length === 0 ? (
-        <p className="text-darkText">No upcoming meals found</p>
+        <p className="text-gray-900 dark:text-gray-100">No upcoming meals found</p>
       ) : (
-        <div className="overflow-x-auto border border-gray-300 rounded-lg shadow-md">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-secondary/20">
+        <div className="overflow-x-auto border border-gray-300 dark:border-gray-700 rounded-lg shadow-md">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-200 dark:bg-gray-800">
               <tr>
                 {['Title', 'Category', 'Likes', 'Publish Date', 'Distributor', 'Actions'].map((head) => (
                   <th
                     key={head}
-                    className="px-4 py-3 text-left text-darkText font-medium uppercase tracking-wider"
+                    className="px-4 py-3 text-left text-gray-900 dark:text-gray-200 font-medium uppercase tracking-wider"
                   >
                     {head}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {meals.map((meal) => (
-                <tr key={meal._id} className="hover:bg-secondary/10 transition">
-                  <td className="px-4 py-2 font-medium text-darkText">{meal.title}</td>
-                  <td className="px-4 py-2 text-darkText">{meal.category}</td>
-                  <td className="px-4 py-2 text-center text-darkText font-semibold">{meal.likes || 0}</td>
-                  <td className="px-4 py-2 text-darkText">{new Date(meal.publishDate).toLocaleDateString()}</td>
-                  <td className="px-4 py-2 text-darkText">{meal.distributorName}</td>
+                <tr key={meal._id} className="hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                  <td className="px-4 py-2 font-medium text-gray-900 dark:text-gray-100">{meal.title}</td>
+                  <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{meal.category}</td>
+                  <td className="px-4 py-2 text-center text-gray-900 dark:text-gray-100 font-semibold">{meal.likes || 0}</td>
+                  <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{new Date(meal.publishDate).toLocaleDateString()}</td>
+                  <td className="px-4 py-2 text-gray-900 dark:text-gray-100">{meal.distributorName}</td>
                   <td className="px-4 py-2 text-center">
                     <button
                       disabled={publishingId === meal._id}
                       onClick={() => handlePublish(meal._id)}
-                      className={`px-3 py-1 rounded-md text-white font-semibold ${
-                        publishingId === meal._id ? 'bg-gray-400' : 'bg-primary hover:bg-indigo-700'
-                      } transition`}
+                      className={`px-3 py-1 rounded-md text-white font-semibold transition ${
+                        publishingId === meal._id ? 'bg-gray-400' : 'bg-indigo-600 hover:bg-indigo-700'
+                      }`}
                     >
                       {publishingId === meal._id ? 'Publishing...' : 'Publish'}
                     </button>
@@ -186,19 +184,19 @@ const UpcomingMealsAdmin = () => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 z-50">
-          <div className="bg-neutral-100 rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-lg">
-            <h2 className="text-2xl font-semibold mb-4 text-darkText">Add Upcoming Meal</h2>
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-lg transition-colors">
+            <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">Add Upcoming Meal</h2>
             <form onSubmit={handleAddMeal} className="space-y-4">
               {Object.keys(formData).map((key) => (
                 <div key={key}>
-                  <label className="block mb-1 text-darkText capitalize">{key.replace(/([A-Z])/g, ' $1')}</label>
+                  <label className="block mb-1 text-gray-900 dark:text-gray-100 capitalize">{key.replace(/([A-Z])/g, ' $1')}</label>
                   {key === 'description' || key === 'ingredients' ? (
                     <textarea
                       name={key}
                       value={formData[key]}
                       onChange={handleChange}
                       rows={3}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary transition"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:focus:ring-indigo-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       required
                     />
                   ) : (
@@ -207,7 +205,7 @@ const UpcomingMealsAdmin = () => {
                       value={formData[key]}
                       onChange={handleChange}
                       type={key === 'price' ? 'number' : key === 'publishDate' ? 'date' : 'text'}
-                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-secondary transition"
+                      className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:focus:ring-indigo-500 transition bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                       required
                     />
                   )}
@@ -215,20 +213,17 @@ const UpcomingMealsAdmin = () => {
               ))}
 
               <div className="flex justify-end gap-3 mt-4">
-                {/* Outline button: Cancel */}
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 border border-darkText text-darkText font-semibold rounded-md hover:bg-neutral-200 transition"
+                  className="px-4 py-2 border border-gray-900 dark:border-gray-100 text-gray-900 dark:text-gray-100 font-semibold rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition"
                 >
                   Cancel
                 </button>
-
-                {/* Filled button: Add Meal */}
                 <button
                   type="submit"
                   disabled={adding}
-                  className="px-4 py-2 bg-primary text-white font-semibold rounded-md hover:bg-indigo-700 transition"
+                  className="px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 transition"
                 >
                   {adding ? 'Adding...' : 'Add Meal'}
                 </button>

@@ -17,12 +17,11 @@ const MealsTabs = () => {
     const fetchMeals = async (token = null) => {
       setLoading(true);
       try {
-        const params = { limit: 6 }; // fetch more meals for better layout
+        const params = { limit: 6 };
         if (activeTab !== 'All') params.category = activeTab;
 
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         const { data } = await axiosInstance.get('/meals', { params, headers });
-
         setMeals(data.meals || []);
       } catch (error) {
         console.error('Error fetching meals:', error);
@@ -43,31 +42,33 @@ const MealsTabs = () => {
   }, [activeTab]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 bg-gray-50 min-h-screen mb-10">
-      {/* Tabs */}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 min-h-screen mb-10 
+                    bg-gray-50 dark:bg-gray-900 transition-colors duration-500">
+
+      {/* Category Tabs */}
       <div className="flex flex-wrap justify-center gap-3 mb-8">
         {categories.map((cat) => (
           <button
             key={cat}
             onClick={() => setActiveTab(cat)}
-            className={`px-5 py-2 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold rounded-full transition duration-300 ${
-              activeTab === cat
-                ? 'bg-indigo-600 text-white shadow-lg'
-                : 'bg-white text-indigo-600 border border-indigo-600 hover:bg-cyan-400/20 hover:text-gray-900'
-            }`}
+            className={`px-5 py-2 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold rounded-full transition duration-300
+                        ${activeTab === cat
+                          ? 'bg-indigo-600 text-white shadow-lg dark:bg-indigo-500 dark:text-gray-100'
+                          : 'bg-white text-indigo-600 border border-indigo-600 hover:bg-cyan-400/20 hover:text-gray-900 dark:bg-gray-800 dark:text-indigo-400 dark:border-indigo-500 dark:hover:bg-cyan-600/30 dark:hover:text-white'
+                        }`}
           >
             {cat}
           </button>
         ))}
       </div>
 
-      {/* Meal Cards */}
+      {/* Meals Grid */}
       {loading ? (
-        <p className="text-center text-gray-700 text-lg">Loading meals...</p>
+        <p className="text-center text-gray-700 dark:text-gray-300 text-lg">Loading meals...</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {meals.length === 0 && (
-            <p className="text-center col-span-full text-gray-700 font-medium">
+            <p className="text-center col-span-full text-gray-700 dark:text-gray-300 font-medium">
               No meals available in this category.
             </p>
           )}
@@ -75,7 +76,8 @@ const MealsTabs = () => {
           {meals.map((meal) => (
             <div
               key={meal._id}
-              className="flex flex-col rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition cursor-pointer bg-white"
+              className="flex flex-col h-full rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition cursor-pointer 
+                         bg-white dark:bg-gray-800 dark:text-gray-100"
               onClick={() => navigate(`/meal/${meal._id}`)}
             >
               {/* Image */}
@@ -88,19 +90,22 @@ const MealsTabs = () => {
               </div>
 
               {/* Content */}
-              <div className="p-5 flex flex-col flex-grow text-gray-900">
+              <div className="flex flex-col flex-grow p-5">
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold truncate">
                   {meal.title}
                 </h2>
 
-                <p className="text-sm sm:text-base mt-2 line-clamp-3 text-gray-600">
+                <p className="text-sm sm:text-base mt-2 line-clamp-3 flex-grow text-gray-600 dark:text-gray-300">
                   {meal.description || 'No description available.'}
                 </p>
 
-                <p className="font-bold mt-2 text-indigo-600">${meal.price?.toFixed(2) || '0.00'}</p>
+                <p className="font-bold mt-2 text-indigo-600 dark:text-indigo-400">
+                  ${meal.price?.toFixed(2) || '0.00'}
+                </p>
 
                 <button
-                  className="mt-4 bg-indigo-600 text-white hover:bg-cyan-400 hover:text-gray-900 py-2 sm:py-3 rounded-md font-semibold transition text-sm sm:text-base"
+                  className="mt-auto bg-indigo-600 text-white hover:bg-cyan-400 hover:text-gray-900 py-2 sm:py-3 rounded-md font-semibold transition text-sm sm:text-base
+                             dark:bg-indigo-500 dark:text-gray-100 dark:hover:bg-cyan-600 dark:hover:text-white"
                 >
                   See More
                 </button>

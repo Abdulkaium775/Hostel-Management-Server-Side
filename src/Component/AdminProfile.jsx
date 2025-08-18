@@ -14,7 +14,9 @@ export const AdminProfile = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await fetch(`https://hotel-server-side-beta.vercel.app/admin/profile/${user.email}`);
+        const res = await fetch(
+          `https://hotel-server-side-beta.vercel.app/admin/profile/${user.email}`
+        );
         if (!res.ok) {
           const errorData = await res.json();
           throw new Error(errorData.message || "Failed to fetch admin profile");
@@ -33,34 +35,61 @@ export const AdminProfile = () => {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-16 w-16 border-8 border-t-8 border-gray-200 border-t-primary"></div>
-      </div>
+      <p className="text-center mt-10 text-gray-500 dark:text-gray-300 font-medium">
+        Loading profile...
+      </p>
     );
 
   if (error)
     return (
-      <div className="max-w-md mx-auto p-6 bg-red-100 text-red-700 rounded-md mt-6 shadow">
-        <p>Error: {error}</p>
-      </div>
+      <p className="text-center mt-10 text-red-500 font-medium">{error}</p>
     );
 
   if (!adminData) return null;
 
+  const badgeLabel = adminData.role || "Admin";
+  const badgeClass = {
+    Admin: "bg-indigo-600 dark:bg-indigo-500",
+    SuperAdmin: "bg-purple-700 dark:bg-purple-600",
+  }[badgeLabel] || "bg-indigo-600 dark:bg-indigo-500";
+
   return (
-    <div className="max-w-md mx-auto bg-neutralBg shadow-lg rounded-xl p-6 mt-8 sm:p-8">
-      <div className="flex flex-col items-center text-center px-4">
+    <div className="p-5 sm:p-8 max-w-3xl mx-auto min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300 space-y-6">
+      <h2 className="text-3xl font-bold text-gray-800 dark:text-gray-100 text-center md:text-left">
+        My Profile
+      </h2>
+
+      <div className="relative flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8 bg-white dark:bg-gray-800 p-6 sm:p-8 rounded-xl shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden">
+        {/* Subtle background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-tr from-indigo-100 via-white to-cyan-100 dark:from-indigo-900 dark:via-gray-800 dark:to-cyan-900 opacity-20 rounded-xl pointer-events-none" />
+
+        {/* Profile Image */}
         <img
-          src={adminData.image || user.photoURL || "https://via.placeholder.com/150"}
+          src={adminData.image || user.photoURL || "https://via.placeholder.com/96"}
           alt={adminData.name || user.displayName || "Admin"}
-          className="w-24 h-24 sm:w-32 sm:h-32 rounded-full object-cover mb-6 border-4 border-primary shadow-md"
+          className="w-28 h-28 rounded-full object-cover border-4 border-indigo-500 dark:border-indigo-400 mb-4 md:mb-0 z-10"
         />
-        <h2 className="text-2xl sm:text-3xl font-bold text-darkText mb-2 truncate max-w-full">
-          {adminData.name || user.displayName}
-        </h2>
-        <p className="text-darkText/70 mb-4 truncate max-w-full">{adminData.email || user.email}</p>
-        <div className="bg-primary/10 text-primary px-4 py-2 rounded-full font-semibold text-base sm:text-lg whitespace-nowrap shadow-sm">
-          Meals Added: {adminData.mealsAddedCount ?? 0}
+
+        {/* Profile Info */}
+        <div className="text-center md:text-left space-y-2 z-10">
+          <h3 className="text-2xl font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+            {adminData.name || user.displayName}
+          </h3>
+
+          <p className="text-gray-600 dark:text-gray-300 flex items-center gap-2">📧 {adminData.email || user.email}</p>
+          <p className="text-gray-600 dark:text-gray-300 flex items-center gap-2">📞 {adminData.phoneNumber || "No Phone"}</p>
+          <p className="text-gray-600 dark:text-gray-300 flex items-center gap-2">🏠 {adminData.address || "No Address"}</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            🗓 Member since: {adminData.createdAt ? new Date(adminData.createdAt).toLocaleDateString() : "N/A"}
+          </p>
+
+          <span className={`inline-block px-5 py-1 rounded-full text-white font-semibold ${badgeClass} text-sm`}>
+            {badgeLabel}
+          </span>
+
+          <div className="mt-4 bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary/80 px-4 py-2 rounded-full font-semibold text-base sm:text-lg shadow-sm">
+            Meals Added: {adminData.mealsAddedCount ?? 0}
+          </div>
         </div>
       </div>
     </div>

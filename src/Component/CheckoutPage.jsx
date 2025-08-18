@@ -113,36 +113,36 @@ const CheckoutForm = ({ packageKey, packageName, packagePrice }) => {
     <>
       <form
         onSubmit={handleSubmit}
-        className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 mx-auto"
+        className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mx-auto transition-colors duration-300"
       >
-        <h3 className="text-2xl font-extrabold mb-8 text-indigo-700 text-center">
+        <h3 className="text-2xl font-extrabold mb-8 text-indigo-700 dark:text-indigo-400 text-center">
           {packageName} Package - ${packagePrice.toFixed(2)}
         </h3>
 
         <div className="mb-6">
-          <label className="block mb-2 text-gray-700 font-semibold text-sm">
+          <label className="block mb-2 text-gray-700 dark:text-gray-200 font-semibold text-sm">
             Card Number
           </label>
-          <div className="p-3 border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-indigo-500">
+          <div className="p-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-indigo-500">
             <CardNumberElement options={{ style: inputStyle }} />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-6 mb-8">
           <div>
-            <label className="block mb-2 text-gray-700 font-semibold text-sm">
+            <label className="block mb-2 text-gray-700 dark:text-gray-200 font-semibold text-sm">
               Expiry Date
             </label>
-            <div className="p-3 border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-indigo-500">
+            <div className="p-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-indigo-500">
               <CardExpiryElement options={{ style: inputStyle }} />
             </div>
           </div>
 
           <div>
-            <label className="block mb-2 text-gray-700 font-semibold text-sm">
+            <label className="block mb-2 text-gray-700 dark:text-gray-200 font-semibold text-sm">
               CVC
             </label>
-            <div className="p-3 border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-indigo-500">
+            <div className="p-3 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-indigo-500">
               <CardCvcElement options={{ style: inputStyle }} />
             </div>
           </div>
@@ -152,9 +152,7 @@ const CheckoutForm = ({ packageKey, packageName, packagePrice }) => {
           type="submit"
           disabled={!stripe || processing}
           className={`w-full py-3 rounded-md text-white font-bold transition-colors duration-200 ${
-            processing
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-indigo-600 hover:bg-indigo-700"
+            processing ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
           }`}
         >
           {processing ? "Processing..." : `Pay $${packagePrice.toFixed(2)}`}
@@ -164,16 +162,16 @@ const CheckoutForm = ({ packageKey, packageName, packagePrice }) => {
       {/* Confirmation Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-full text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 max-w-sm w-full text-center transition-colors duration-300">
             <h2 className="text-2xl font-extrabold mb-4 text-green-600">
               Payment Successful!
             </h2>
-            <p className="mb-8 text-gray-700">
+            <p className="mb-8 text-gray-700 dark:text-gray-200">
               Your package has been upgraded to <strong>{packageName}</strong>.
             </p>
             <button
               onClick={() => navigate("/dashboard")}
-              className="px-6 py-3 bg-indigo-600 text-white rounded-md font-semibold hover:bg-indigo-700 transition"
+              className="px-6 py-3 bg-indigo-600 dark:bg-indigo-500 text-white rounded-md font-semibold hover:bg-indigo-700 transition"
             >
               Continue
             </button>
@@ -204,8 +202,8 @@ const CheckoutPage = () => {
 
   if (!packageInfo || !stripePromise) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <p className="text-red-600 text-lg font-semibold text-center">
+      <div className="min-h-screen flex items-center justify-center p-6 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+        <p className="text-red-600 dark:text-red-400 text-lg font-semibold text-center">
           Cannot proceed to checkout. Stripe is not configured or package is invalid.
         </p>
       </div>
@@ -213,8 +211,8 @@ const CheckoutPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
-      <h1 className="text-5xl font-extrabold mb-10 text-indigo-700 text-center">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-6 transition-colors duration-300">
+      <h1 className="text-5xl font-extrabold mb-10 text-indigo-700 dark:text-indigo-400 text-center">
         Checkout
       </h1>
       <Elements stripe={stripePromise}>

@@ -97,13 +97,13 @@ const UpdateMeal = () => {
   };
 
   if (loading)
-    return <p className="text-center mt-10 text-gray-600 text-lg">Loading...</p>;
+    return <p className="text-center mt-10 text-gray-600 dark:text-gray-300 text-lg">Loading...</p>;
   if (error)
-    return <p className="text-center mt-10 text-red-600 text-lg">{error}</p>;
+    return <p className="text-center mt-10 text-red-600 dark:text-red-400 text-lg">{error}</p>;
 
   return (
-    <div className="max-w-3xl mx-auto p-8 bg-[#F8FAFC] rounded-xl shadow-lg mt-12">
-      <h2 className="text-3xl font-semibold mb-8 text-center text-[#1E293B]">
+    <div className="max-w-3xl mx-auto p-6 sm:p-8 bg-gray-50 dark:bg-gray-900 rounded-xl shadow-lg mt-8 transition-colors">
+      <h2 className="text-3xl font-semibold mb-8 text-center text-gray-900 dark:text-white">
         Update Meal
       </h2>
 
@@ -121,7 +121,7 @@ const UpdateMeal = () => {
           <div key={name} className="flex flex-col">
             <label
               htmlFor={name}
-              className="mb-2 font-medium text-[#1E293B]"
+              className="mb-2 font-medium text-gray-900 dark:text-gray-100"
             >
               {label}
             </label>
@@ -133,7 +133,7 @@ const UpdateMeal = () => {
                 onChange={handleChange}
                 required
                 rows={4}
-                className="rounded-md border border-gray-300 px-4 py-3 resize-none shadow-sm focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition"
+                className="rounded-md border border-gray-300 dark:border-gray-600 px-4 py-3 resize-none shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 dark:focus:ring-cyan-500 transition"
               />
             ) : (
               <input
@@ -143,7 +143,7 @@ const UpdateMeal = () => {
                 value={mealData[name]}
                 onChange={handleChange}
                 required
-                className="rounded-md border border-gray-300 px-4 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#06B6D4] transition"
+                className="rounded-md border border-gray-300 dark:border-gray-600 px-4 py-3 shadow-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 dark:focus:ring-cyan-500 transition"
               />
             )}
           </div>
@@ -154,7 +154,7 @@ const UpdateMeal = () => {
           {/* Filled Primary */}
           <button
             type="submit"
-            className="flex-1 bg-[#4F46E5] hover:bg-[#4338CA] text-white font-semibold py-3 rounded-lg shadow-md transition"
+            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg shadow-md transition"
           >
             Update Meal
           </button>
@@ -163,7 +163,7 @@ const UpdateMeal = () => {
           <button
             type="button"
             onClick={() => navigate('/dashboard/all-meals')}
-            className="flex-1 border-2 border-[#06B6D4] text-[#06B6D4] hover:bg-[#06B6D4]/10 font-semibold py-3 rounded-lg transition"
+            className="flex-1 border-2 border-cyan-500 text-cyan-500 hover:bg-cyan-500/10 font-semibold py-3 rounded-lg transition"
           >
             Cancel
           </button>

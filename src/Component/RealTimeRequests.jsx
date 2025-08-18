@@ -8,7 +8,7 @@ const RealTimeRequests = () => {
   // Animate counter
   useEffect(() => {
     let start = 0;
-    const duration = 2000;
+    const duration = 2000; // total animation duration
     const increment = Math.ceil(targetCount / (duration / 50));
     const interval = setInterval(() => {
       start += increment;
@@ -41,53 +41,34 @@ const RealTimeRequests = () => {
   };
 
   return (
-    <section className="relative overflow-hidden py-16 px-6 sm:px-12 lg:px-20 text-center bg-[#F8FAFC] rounded-2xl shadow-2xl mb-10">
-      {/* Background Accents */}
-      <div className="absolute -top-16 -left-16 w-64 h-64 bg-[#4F46E5] opacity-10 rounded-full animate-float-slow"></div>
-      <div className="absolute -bottom-16 -right-1/4 w-72 h-72 bg-[#06B6D4] opacity-10 rounded-full animate-float-slow animation-delay-3000"></div>
+    <section className="relative overflow-hidden py-12 px-4 sm:px-8 lg:px-12 text-center rounded-2xl shadow-2xl mb-10 bg-white dark:bg-[#1E293B] transition-colors">
+      <div className="max-w-4xl mx-auto relative z-10">
+        {/* Background Accents */}
+        <div className="absolute -top-12 -left-12 w-40 sm:w-56 lg:w-72 h-40 sm:h-56 lg:h-72 bg-[#4F46E5] dark:bg-[#6366F1] opacity-10 rounded-full"></div>
+        <div className="absolute -bottom-12 -right-12 w-44 sm:w-60 lg:w-80 h-44 sm:h-60 lg:h-80 bg-[#06B6D4] dark:bg-[#0EA5E9] opacity-10 rounded-full"></div>
 
-      {/* Heading */}
-      <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-[#1E293B] drop-shadow-sm">
-        Meals Served So Far
-      </h2>
+        {/* Heading */}
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4 text-[#1E293B] dark:text-white drop-shadow-sm transition-colors">
+          Meals Served So Far
+        </h2>
 
-      {/* Animated Counter */}
-      <p className="text-5xl sm:text-6xl md:text-7xl font-extrabold mb-2 text-[#4F46E5] animate-bounce-slow drop-shadow-lg">
-        {count.toLocaleString()}
-      </p>
+        {/* Counter */}
+        <p className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-2 text-[#4F46E5] dark:text-[#60A5FA] drop-shadow-lg transition-colors">
+          {count.toLocaleString()}
+        </p>
 
-      <p className="text-[#1E293B] text-lg sm:text-xl mb-8">
-        And counting! Join us to enjoy your delicious meal.
-      </p>
+        <p className="text-[#1E293B] dark:text-white/80 text-base sm:text-lg md:text-xl mb-8 transition-colors">
+          And counting! Join us to enjoy your delicious meal.
+        </p>
 
-      {/* Cancel Button */}
-      <button
-        onClick={handleCancel}
-        className="px-6 py-3 bg-[#06B6D4] hover:bg-[#4F46E5] text-white font-semibold rounded-lg shadow-lg transition text-sm sm:text-base"
-      >
-        Cancel Action
-      </button>
-
-      {/* Animations */}
-      <style>{`
-        @keyframes floatSlow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-        @keyframes bounce-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-6px); }
-        }
-        .animate-float-slow {
-          animation: floatSlow 12s ease-in-out infinite;
-        }
-        .animate-bounce-slow {
-          animation: bounce-slow 1.5s ease-in-out infinite;
-        }
-        .animation-delay-3000 {
-          animation-delay: 3s;
-        }
-      `}</style>
+        {/* Cancel Button */}
+        <button
+          onClick={handleCancel}
+          className="px-5 py-2.5 sm:px-6 sm:py-3 bg-[#06B6D4] dark:bg-[#0EA5E9] hover:bg-[#4F46E5] dark:hover:bg-[#6366F1] text-white font-semibold rounded-lg shadow-lg transition-all text-sm sm:text-base"
+        >
+          Cancel Action
+        </button>
+      </div>
     </section>
   );
 };
