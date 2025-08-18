@@ -64,7 +64,7 @@ const CustomerReviews = () => {
       </div>
 
       {/* Testimonials Grid */}
-      <div className="grid gap-6 sm:gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto">
         {TESTIMONIALS.map((t) => (
           <article
             key={t.id}
@@ -91,7 +91,7 @@ const CustomerReviews = () => {
             </div>
 
             {/* Review */}
-            <blockquote className="text-gray-700 dark:text-gray-200 mb-5 sm:mb-6 text-sm sm:text-base leading-relaxed">
+            <blockquote className="text-gray-700 dark:text-gray-200 mb-5 sm:mb-6 text-sm sm:text-base leading-relaxed flex-grow">
               “{t.review}”
             </blockquote>
 
@@ -116,8 +116,8 @@ const CustomerReviews = () => {
       </div>
 
       {/* Decorative blobs */}
-      <div className="absolute -bottom-28 sm:-bottom-32 -right-16 sm:-right-20 w-60 sm:w-72 lg:w-80 h-60 sm:h-72 lg:h-80 bg-gradient-to-tr from-indigo-600/10 to-cyan-400/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -top-28 sm:-top-32 -left-16 sm:-left-20 w-56 sm:w-72 lg:w-80 h-56 sm:h-72 lg:h-80 bg-gradient-to-tr from-cyan-400/10 to-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="pointer-events-none absolute -bottom-28 sm:-bottom-32 -right-16 sm:-right-20 w-60 sm:w-72 lg:w-80 h-60 sm:h-72 lg:h-80 bg-gradient-to-tr from-indigo-600/10 to-cyan-400/10 rounded-full blur-3xl" />
+      <div className="pointer-events-none absolute -top-28 sm:-top-32 -left-16 sm:-left-20 w-56 sm:w-72 lg:w-80 h-56 sm:h-72 lg:h-80 bg-gradient-to-tr from-cyan-400/10 to-indigo-600/10 rounded-full blur-3xl" />
     </section>
   );
 };

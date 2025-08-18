@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../Api/axios';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
-// Category Tabs
 const categories = ['All', 'Breakfast', 'Lunch', 'Dinner'];
 
 const MealsTabs = () => {
@@ -12,7 +11,6 @@ const MealsTabs = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Fetch meals based on category
   useEffect(() => {
     const fetchMeals = async (token = null) => {
       setLoading(true);
@@ -31,7 +29,7 @@ const MealsTabs = () => {
     };
 
     const auth = getAuth();
-    onAuthStateChanged(auth, async (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const token = await user.getIdToken();
         fetchMeals(token);
@@ -39,11 +37,12 @@ const MealsTabs = () => {
         fetchMeals();
       }
     });
+
+    return () => unsubscribe();
   }, [activeTab]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 min-h-screen mb-10 
-                    bg-gray-50 dark:bg-gray-900 transition-colors duration-500">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-500">
 
       {/* Category Tabs */}
       <div className="flex flex-wrap justify-center gap-3 mb-8">
@@ -52,10 +51,10 @@ const MealsTabs = () => {
             key={cat}
             onClick={() => setActiveTab(cat)}
             className={`px-5 py-2 sm:px-6 sm:py-3 text-sm sm:text-base font-semibold rounded-full transition duration-300
-                        ${activeTab === cat
-                          ? 'bg-indigo-600 text-white shadow-lg dark:bg-indigo-500 dark:text-gray-100'
-                          : 'bg-white text-indigo-600 border border-indigo-600 hover:bg-cyan-400/20 hover:text-gray-900 dark:bg-gray-800 dark:text-indigo-400 dark:border-indigo-500 dark:hover:bg-cyan-600/30 dark:hover:text-white'
-                        }`}
+              ${activeTab === cat
+                ? 'bg-indigo-600 text-white shadow-lg dark:bg-indigo-500 dark:text-gray-100'
+                : 'bg-white text-indigo-600 border border-indigo-600 hover:bg-cyan-400/20 hover:text-gray-900 dark:bg-gray-800 dark:text-indigo-400 dark:border-indigo-500 dark:hover:bg-cyan-600/30 dark:hover:text-white'
+              }`}
           >
             {cat}
           </button>
@@ -76,8 +75,7 @@ const MealsTabs = () => {
           {meals.map((meal) => (
             <div
               key={meal._id}
-              className="flex flex-col h-full rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition cursor-pointer 
-                         bg-white dark:bg-gray-800 dark:text-gray-100"
+              className="flex flex-col h-full rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition cursor-pointer bg-white dark:bg-gray-800 dark:text-gray-100"
               onClick={() => navigate(`/meal/${meal._id}`)}
             >
               {/* Image */}
@@ -104,8 +102,7 @@ const MealsTabs = () => {
                 </p>
 
                 <button
-                  className="mt-auto bg-indigo-600 text-white hover:bg-cyan-400 hover:text-gray-900 py-2 sm:py-3 rounded-md font-semibold transition text-sm sm:text-base
-                             dark:bg-indigo-500 dark:text-gray-100 dark:hover:bg-cyan-600 dark:hover:text-white"
+                  className="mt-auto bg-indigo-600 text-white hover:bg-cyan-400 hover:text-gray-900 py-2 sm:py-3 rounded-md font-semibold transition text-sm sm:text-base dark:bg-indigo-500 dark:text-gray-100 dark:hover:bg-cyan-600 dark:hover:text-white"
                 >
                   See More
                 </button>

@@ -30,9 +30,9 @@ const MembershipSection = () => {
     <section
       className="
         relative py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-12 xl:px-20
-        mb-8 sm:mb-12 lg:mb-16
         bg-[radial-gradient(1200px_600px_at_10%_-10%,#06B6D40f,transparent_60%),radial-gradient(800px_400px_at_90%_110%,#4F46E510,transparent_60%),linear-gradient(180deg,#F8FAFC,white)]
         dark:bg-gray-900 transition-colors duration-500
+        overflow-hidden
       "
       aria-labelledby="membership-title"
     >

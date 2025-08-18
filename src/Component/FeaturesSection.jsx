@@ -38,7 +38,7 @@ const FeaturesSection = () => {
           {features.map(({ icon, title, description, bgColor }, idx) => (
             <div
               key={idx}
-              className="relative bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl px-5 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
+              className="relative flex flex-col items-center text-center bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl px-5 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
             >
               {/* Gradient Glow Border */}
               <div
@@ -56,12 +56,12 @@ const FeaturesSection = () => {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3 text-center">
+                <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3">
                   {title}
                 </h3>
 
                 {/* Description */}
-                <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed max-w-[280px] sm:max-w-xs lg:max-w-sm text-center">
+                <p className="text-gray-700 dark:text-gray-300 text-sm sm:text-base lg:text-lg leading-relaxed max-w-[280px] sm:max-w-xs lg:max-w-sm">
                   {description}
                 </p>
               </div>
